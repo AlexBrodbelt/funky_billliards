@@ -6,8 +6,38 @@ use bevy::{
 
 use crate::config::*;
 
-#[derive(Component)]
-pub struct Ball;
+#[derive(Component, Eq, Hash, PartialEq)]
+pub enum Ball {
+    Black,
+    White,
+    Yellow,
+    Red(usize),
+    Blue,
+    Green,
+    Pink,
+    Brown,
+}
+
+impl Ball {
+    pub fn color(&self) -> Color {
+        match *self {
+            Ball::Black => Color::rgb(0.0, 0.0, 0.0),
+            Ball::White => Color::rgb(1.0, 1.0, 1.0),
+            Ball::Yellow => Color::rgb(1.0, 0.68, 0.26),
+            Ball::Red(_) => Color::rgb(1.0, 0.0, 0.0),
+            Ball::Blue => Color::rgb(0.0, 0.0, 1.0),
+            Ball::Green => Color::rgb(0.0, 1.0, 0.0),
+            Ball::Pink => Color::rgb(1.0, 0.08, 0.58),
+            Ball::Brown => Color::rgb(0.55, 0.27, 0.07),
+        }
+    }
+}
+
+impl From<Ball> for ColorMaterial {
+    fn from(ball_color : Ball) -> ColorMaterial {
+        ColorMaterial::from(ball_color.color())       
+    }
+}
 
 #[derive(Component)]
 pub struct Brick;
@@ -17,6 +47,21 @@ pub struct Paddle;
 
 #[derive(Component, Deref, DerefMut)]
 pub struct Velocity(pub Vec2);
+
+impl Velocity {
+    pub fn new(x : f32, y : f32) -> Velocity {
+        Velocity(Vec2::new(x, y))
+    }
+}
+
+#[derive(Component, Deref, DerefMut)]
+pub struct Position(pub Vec3);
+
+impl Position {
+    pub fn new(x : f32, y : f32) -> Position {
+        Position(Vec3::new(x, y, 1.0))
+    }
+}
 
 #[derive(Component)]
 pub struct Collider;
@@ -97,15 +142,6 @@ pub enum WallLocation {
 }
 
 
-#[derive(Component)]
-enum Color {
-    Black,
-    White,
-    Yellow,
-    Red,
-    Blue,
-    Green,
-    Pink,
-    Brown,
-    BackgroundGreen,  
-}
+
+
+
