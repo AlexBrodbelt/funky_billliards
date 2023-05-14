@@ -29,10 +29,11 @@ fn main() {
         .add_systems(
             (
                 check_for_collisions,
-                apply_velocity.before(check_for_collisions),
-                move_paddle
-                    .before(check_for_collisions)
-                    .after(apply_velocity),
+                move_system.before(check_for_collisions),
+                // move_paddle
+                //     .before(check_for_collisions)
+                //     .after(apply_velocity),
+                velocity_system.before(move_system),
                 play_collision_sound.after(check_for_collisions),
             )
                 .in_schedule(CoreSchedule::FixedUpdate),

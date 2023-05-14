@@ -64,6 +64,9 @@ impl Position {
 }
 
 #[derive(Component)]
+pub struct Pocket;
+
+#[derive(Component)]
 pub struct Collider;
 
 #[derive(Default)]
