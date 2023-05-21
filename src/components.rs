@@ -1,6 +1,5 @@
 use bevy::{
     prelude::*, 
-    sprite::Material2d,
     sprite::MaterialMesh2dBundle,
 };
 use bevy_rapier2d::prelude::*;
@@ -84,7 +83,7 @@ impl From<&Ball> for Velocity {
 }
 
 
-
+#[derive(Bundle)]
 pub struct BallBundle {
     ball: Ball,
     material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
@@ -96,12 +95,8 @@ pub struct BallBundle {
     restitution_coefficient: Restitution,
 }
 
-// impl Default for BallBundle {
-//     pub fn default() -> Self {}
-// }
-
 impl BallBundle {
-    pub fn new(ball: Ball, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<ColorMaterial>>) -> BallBundle {
+    pub fn new(ball: Ball, meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<ColorMaterial>>) -> BallBundle {
         BallBundle {
         material_mesh_bundle: MaterialMesh2dBundle {
             mesh: meshes.add(shape::Circle::new(BALL_RADIUS).into()).into(),

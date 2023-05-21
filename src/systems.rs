@@ -47,6 +47,8 @@ pub fn setup(
     // ));
 
     
+    commands.spawn(BallBundle::new(Ball::White, &mut meshes, &mut materials));
+    commands.spawn(BallBundle::new(Ball::Green, &mut meshes, &mut materials));
     // initialise positions of the balls
     // for ball in Ball::iter() {
     //     match ball {
