@@ -1,9 +1,12 @@
 use bevy::{
-    prelude::*,
-    // sprite::collide_aabb::{collide, Collision},
-    // sprite::MaterialMesh2dBundle,
+    prelude::*, 
+    sprite::Material2d,
+    sprite::MaterialMesh2dBundle,
 };
 use bevy_rapier2d::prelude::*;
+
+// use strum::IntoEnumIterator;
+// use strum_macros::EnumIter;
 
 use crate::config::*;
 
@@ -32,28 +35,99 @@ impl Ball {
             Ball::Brown => Color::rgb(0.55, 0.27, 0.07),
         }
     }
+
+    pub fn position(&self) -> Vec2 {
+        match *self {
+            Ball::Black          => Vec2::new(0.75 * TABLE_WIDTH, 0.5 * TABLE_HEIGHT),
+            Ball::White          => Vec2::new(X_BAULK_D, 0.0),
+            Ball::Yellow         => Vec2::new(X_BAULK_LINE, 2.0 * Y_BAULK_D),
+            Ball::Red(id) => {
+                let x_offset = 0.75 * TABLE_WIDTH; let y_offset = 0.5 * TABLE_HEIGHT;
+                let index = id / 3; let level = id / 5;
+                Vec2::new(
+                    x_offset + f32::sqrt(3.0)*(0.5 + GAP_BETWEEN_BALLS)*((level as f32) + 1.0),
+                    y_offset + (2.0 *(index as f32) - (level as f32)) * (0.5 + GAP_BETWEEN_BALLS)
+                )
+            },
+            Ball::Blue           => Vec2::new(0.0, 0.0),
+            Ball::Green          => Vec2::new(X_BAULK_LINE, Y_BAULK_D),
+            Ball::Pink           => Vec2::new(0.75 * TABLE_WIDTH, 0.5 * TABLE_HEIGHT),
+            Ball::Brown          => Vec2::new(X_BAULK_LINE, 0.5 * TABLE_HEIGHT),
+        }
+    }
+
+    pub fn velocity(&self) -> Vec2 {
+        match *self {
+            Ball::White => Vec2::new(400.0, 0.0),
+            _ => Vec2::ZERO,
+        }
+    }
 }
 
-impl From<Ball> for ColorMaterial {
-    fn from(ball_color : Ball) -> ColorMaterial {
-        ColorMaterial::from(ball_color.color())       
+impl From<&Ball> for ColorMaterial {
+    fn from(ball : &Ball) -> ColorMaterial {
+        ColorMaterial::from(ball.color())       
+    }
+}
+
+impl From<&Ball> for Transform {
+    fn from(ball: &Ball) -> Transform {
+        Transform::from_translation(ball.position()
+                                        .extend(1.0))
+    }
+}
+
+impl From<&Ball> for Velocity {
+    fn from(ball: &Ball) -> Velocity {
+        Velocity::linear(ball.velocity())
+    }
+}
+
+
+
+pub struct BallBundle {
+    ball: Ball,
+    material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
+    velocity: Velocity,
+    collider: Collider,
+    rigid_body: RigidBody,
+    external_force: ExternalForce,
+    damping: Damping,
+    restitution_coefficient: Restitution,
+}
+
+// impl Default for BallBundle {
+//     pub fn default() -> Self {}
+// }
+
+impl BallBundle {
+    pub fn new(ball: Ball, mut meshes: ResMut<Assets<Mesh>>, mut materials: ResMut<Assets<ColorMaterial>>) -> BallBundle {
+        BallBundle {
+        material_mesh_bundle: MaterialMesh2dBundle {
+            mesh: meshes.add(shape::Circle::new(BALL_RADIUS).into()).into(),
+            material: materials.add(ColorMaterial::from(&ball)),
+            transform: Transform::from(&ball),
+            ..default()
+        },
+        velocity: Velocity::from(&ball),
+        ball: ball,
+        collider: Collider::ball(BALL_RADIUS),
+        rigid_body: RigidBody::Dynamic,
+        external_force: ExternalForce {
+            force: Vec2::ZERO,
+            torque: 0.0,
+            },
+        damping: Damping {
+            linear_damping: FRICTION_COEFFICIENT,
+            angular_damping: 0.0,
+            },
+        restitution_coefficient: Restitution::coefficient(0.90), 
+        }
     }
 }
 
 #[derive(Component)]
-pub struct Brick;
-
-#[derive(Component)]
 pub struct Paddle;
-
-// #[derive(Component, Deref, DerefMut)]
-// pub struct Velocity(pub Vec2);
-
-// impl Velocity {
-//     pub fn new(x : f32, y : f32) -> Velocity {
-//         Velocity(Vec2::new(x, y))
-//     }
-// }
 
 #[derive(Component, Deref, DerefMut)]
 pub struct Position(pub Vec3);
@@ -81,6 +155,7 @@ pub struct WallBundle {
     sprite_bundle: SpriteBundle,
     collider: Collider,
     rigid_body : RigidBody,
+    restitution_coefficient: Restitution,
 }
 
 impl WallLocation {
@@ -109,6 +184,23 @@ impl WallLocation {
             }
         }
     }
+
+    pub fn dimensions(&self) -> (f32, f32) {
+        let arena_height = TOP_WALL - BOTTOM_WALL;
+        let arena_width = RIGHT_WALL - LEFT_WALL;
+        // Make sure we haven't messed up our constants
+        assert!(arena_height > 0.0);
+        assert!(arena_width > 0.0);
+
+        match self {
+            WallLocation::Left | WallLocation::Right => {
+                (WALL_THICKNESS / 2.0, arena_height / 2.0)
+            }
+            WallLocation::Bottom | WallLocation::Top => {
+                (arena_width / 2.0, WALL_THICKNESS / 2.0)
+            }
+        }
+    }
 }
 
 impl WallBundle {
@@ -133,8 +225,9 @@ impl WallBundle {
                 },
                 ..default()
             },
-            collider: Collider::cuboid(location.size()[0] / 2.0, location.size()[1] / 2.0),
+            collider: Collider::cuboid(location.dimensions().0, location.dimensions().1),
             rigid_body: RigidBody::Fixed,
+            restitution_coefficient:  Restitution::coefficient(0.95),
         }
     }
 }

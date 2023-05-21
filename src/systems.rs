@@ -1,10 +1,8 @@
 use bevy::{
     prelude::*,
-    sprite::collide_aabb::{collide, Collision},
-    sprite::MaterialMesh2dBundle, 
-    utils::HashMap,
 };
 use bevy_rapier2d::prelude::*;
+
 
 use crate::config::*;
 use crate::components::*; 
@@ -48,115 +46,21 @@ pub fn setup(
     //     Collider,
     // ));
 
-    let mut initial_data = HashMap::<Ball, (Position, Velocity)>::new();
-    initial_data.insert(
-        Ball::White,
-        (
-            Position::new(X_BAULK_D, 0.0),
-            Velocity {
-                linvel: Vec2 { x: 400.0, y: 200.0},
-                ..Default::default()
-            },
-        )
-    );
-    // initial_data.insert(
-    //     Ball::Green,
-    //     (
-    //         Position::new(X_BAULK_LINE, Y_BAULK_D),
-    //         Velocity::new(0.0, 0.0)
-    //     )
-    // );
-    // initial_data.insert(
-    //     Ball::Brown,
-    //     (
-    //         Position::new(X_BAULK_LINE, 0.5 * TABLE_HEIGHT),
-    //         Velocity::new(0.0, 0.0)
-    //     )
-    // );
-    // initial_data.insert(
-    //     Ball::Yellow,
-    //     (
-    //         Position::new(X_BAULK_LINE, 2.0 * Y_BAULK_D),
-    //         Velocity::new(0.0, 0.0)
-    //     )
-    // );
-    initial_data.insert(
-        Ball::Blue,
-        (
-            Position::new( 0.0, 0.0),
-            Velocity::zero(),
-        )
-    );
-    // initial_data.insert(
-    //     Ball::Pink,
-    //     (
-    //         Position::new( 0.75 * TABLE_WIDTH, 0.5 * TABLE_HEIGHT),
-    //         Velocity::new(0.0, 0.0)
-    //     )
-    // );
-    // initial_data.insert(
-    //     Ball::Black,
-    //     (
-    //         Position::new(0.875 * TABLE_WIDTH, 0.5 * TABLE_HEIGHT),
-    //         Velocity::new(0.0, 0.0)
-    //     )
-    // );
-    // // Red Balls
-    // let x_offset = 0.75 * TABLE_WIDTH;
-    // let y_offset = 0.5 * TABLE_HEIGHT;
-
-    // for level in 0..5 {
-    //     for index in 0..=level {
-    //         initial_data.insert(
-    //             Ball::Red(5 * level + index),
-    //             (
-    //                 Position::new(
-    //                     x_offset + f32::sqrt(3.0)*(0.5 + GAP_BETWEEN_BALLS)*((level as f32) + 1.0),
-    //                     y_offset + (2.0 *(index as f32) - (level as f32)) * (0.5 + GAP_BETWEEN_BALLS),
-    //                 ),
-    //                 Velocity::new(0.0, 0.0)
-    //             )
-    //         );
-
+    
+    // initialise positions of the balls
+    // for ball in Ball::iter() {
+    //     match ball {
+    //         Ball::Red(_) => {
+    //             for id in 0..15 {
+    //             commands.spawn(BallBundle::new(Ball::Red(id), meshes, materials));
+    //             }
+    //         },
+    //         _  => {
+    //             commands.spawn(BallBundle::new(ball, meshes, materials));
+    //         }
     //     }
     // }
 
-    // initialise positions of the balls
-    for (ball,  (Position(position), velocity)) in initial_data.into_iter() {
-        commands.spawn((
-            MaterialMesh2dBundle {
-                mesh: meshes.add(shape::Circle::new(BALL_RADIUS).into()).into(),
-                material: materials.add(ColorMaterial::from(ball.color())),
-                transform: Transform::from_translation(position),//.with_scale(BALL_SIZE),
-                ..default()
-            },
-            RigidBody::Dynamic,
-            Collider::ball(BALL_RADIUS),
-            ExternalForce {
-                force: Vec2::ZERO,
-                torque: 0.0,
-            },
-            Damping {
-                linear_damping: FRICTION_COEFFICIENT,
-                angular_damping: 0.0,
-            },
-            Restitution::coefficient(0.9),
-            velocity,
-            ball,
-            // velocity,
-        ));
-    }
-
-    // commands.spawn((
-    //     MaterialMesh2dBundle {
-    //         mesh: meshes.add(shape::Circle::default().into()).into(),
-    //         material: materials.add(ColorMaterial::from(Ball::White)),
-    //         transform: Transform::from_translation(BALL_STARTING_POSITION).with_scale(BALL_SIZE),
-    //         ..default()
-    //     },
-    //     Ball::White,
-    //     Velocity(INITIAL_BALL_DIRECTION.normalize() * BALL_SPEED),
-    // ));
     
 
 
