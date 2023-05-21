@@ -21,6 +21,7 @@ pub const PADDLE_PADDING: f32 = 10.0;
 // We set the z-value of the ball to 1 so it renders on top in the case of overlapping sprites.
 pub const BALL_SIZE: Vec3 = Vec3::new(30.0, 30.0, 0.0);
 pub const INITIAL_BALL_DIRECTION: Vec2 = Vec2::new(0.5, -0.5);
+pub const BALL_RADIUS: f32 = 16.0;
 
 pub const WALL_THICKNESS: f32 = 10.0;
 // x coordinates
@@ -43,7 +44,7 @@ pub const GAP_BETWEEN_BRICKS: f32 = 5.0;
 // These values are lower bounds, as the number of bricks is computed
 pub const GAP_BETWEEN_BRICKS_AND_CEILING: f32 = 20.0;
 pub const GAP_BETWEEN_BRICKS_AND_SIDES: f32 = 20.0;
-pub const GAP_BETWEEN_BALLS: f32 = 0.5;
+pub const GAP_BETWEEN_BALLS: f32 = 16.0;
 
 pub const SCOREBOARD_FONT_SIZE: f32 = 40.0;
 pub const SCOREBOARD_TEXT_PADDING: Val = Val::Px(5.0);

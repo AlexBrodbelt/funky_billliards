@@ -5,6 +5,7 @@ use bevy::{
     // sprite::collide_aabb::{collide, Collision},
     // sprite::MaterialMesh2dBundle,
 };
+use bevy_rapier2d::prelude::*;
 
 pub mod components;
 pub mod config;
@@ -21,23 +22,18 @@ use systems::*;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(1500.0)) // needs to be tweaked
+        // .add_plugin(RapierDebugRenderPlugin::default())
         .insert_resource(Scoreboard { score: 0 })
         .insert_resource(ClearColor(BACKGROUND_COLOR))
+        .insert_resource( RapierConfiguration {
+            gravity : Vec2::ZERO,
+            ..Default::default()
+        })
         .add_startup_system(setup)
         .add_event::<CollisionEvent>()
+        .add_system(play_collision_sound)
         // Add our gameplay simulation systems to the fixed timestep schedule
-        .add_systems(
-            (
-                check_for_collisions,
-                move_system.before(check_for_collisions),
-                // move_paddle
-                //     .before(check_for_collisions)
-                //     .after(apply_velocity),
-                velocity_system.before(move_system),
-                play_collision_sound.after(check_for_collisions),
-            )
-                .in_schedule(CoreSchedule::FixedUpdate),
-        )
         // Configure how frequently our gameplay systems are run
         .insert_resource(FixedTime::new_from_secs(TIME_STEP))
         .add_system(update_scoreboard)

@@ -4,6 +4,7 @@ use bevy::{
     sprite::MaterialMesh2dBundle, 
     utils::HashMap,
 };
+use bevy_rapier2d::prelude::*;
 
 use crate::config::*;
 use crate::components::*; 
@@ -52,7 +53,11 @@ pub fn setup(
         Ball::White,
         (
             Position::new(X_BAULK_D, 0.0),
-            Velocity::new(400.0, 0.0))
+            Velocity {
+                linvel: Vec2 { x: 400.0, y: 200.0},
+                ..Default::default()
+            },
+        )
     );
     // initial_data.insert(
     //     Ball::Green,
@@ -79,7 +84,7 @@ pub fn setup(
         Ball::Blue,
         (
             Position::new( 0.0, 0.0),
-            Velocity::new(0.0, 0.0)
+            Velocity::zero(),
         )
     );
     // initial_data.insert(
@@ -120,13 +125,25 @@ pub fn setup(
     for (ball,  (Position(position), velocity)) in initial_data.into_iter() {
         commands.spawn((
             MaterialMesh2dBundle {
-                mesh: meshes.add(shape::Circle::default().into()).into(),
+                mesh: meshes.add(shape::Circle::new(BALL_RADIUS).into()).into(),
                 material: materials.add(ColorMaterial::from(ball.color())),
-                transform: Transform::from_translation(position).with_scale(BALL_SIZE),
+                transform: Transform::from_translation(position),//.with_scale(BALL_SIZE),
                 ..default()
             },
-            ball,
+            RigidBody::Dynamic,
+            Collider::ball(BALL_RADIUS),
+            ExternalForce {
+                force: Vec2::ZERO,
+                torque: 0.0,
+            },
+            Damping {
+                linear_damping: FRICTION_COEFFICIENT,
+                angular_damping: 0.0,
+            },
+            Restitution::coefficient(0.9),
             velocity,
+            ball,
+            // velocity,
         ));
     }
 
@@ -177,6 +194,9 @@ pub fn setup(
     commands.spawn(WallBundle::new(WallLocation::Right));
     commands.spawn(WallBundle::new(WallLocation::Bottom));
     commands.spawn(WallBundle::new(WallLocation::Top));
+
+    // Cuestick-Player
+    
 
     // // Bricks
     // // Negative scales result in flipped sprites / meshes,
@@ -238,81 +258,81 @@ pub fn setup(
     // }
 }
 
-pub fn check_for_collisions(
-    mut commands: Commands,
-    mut scoreboard: ResMut<Scoreboard>,
-    mut ball_query: Query<(&mut Velocity, &Transform), With<Ball>>,
-    collider_query: Query<(Entity, &Transform, Option<&Brick>), With<Collider>>,
-    mut collision_events: EventWriter<CollisionEvent>,
-) {
-    for (mut ball_velocity, ball_transform) in &mut ball_query {
+// pub fn check_for_collisions(
+//     mut commands: Commands,
+//     mut scoreboard: ResMut<Scoreboard>,
+//     mut ball_query: Query<(&mut Velocity, &Transform), With<Ball>>,
+//     collider_query: Query<(Entity, &Transform, Option<&Brick>), With<Collider>>,
+//     mut collision_events: EventWriter<CollisionEvent>,
+// ) { 
+//     for (mut ball_velocity, ball_transform) in &mut ball_query {
         
-        // let (mut ball_velocity, ball_transform) = ball_query.single_mut();
-        let ball_size = ball_transform.scale.truncate();
+//         // let (mut ball_velocity, ball_transform) = ball_query.single_mut();
+//         let ball_size = ball_transform.scale.truncate();
 
-        // check collision with walls
-        for (collider_entity, transform, maybe_brick) in &collider_query {
-            let collision = collide(
-                ball_transform.translation,
-                ball_size,
-                transform.translation,
-                transform.scale.truncate(),
-            );
-            if let Some(collision) = collision {
-                // Sends a collision event so that other systems can react to the collision
-                collision_events.send_default();
+//         // check collision with walls
+//         for (collider_entity, transform, maybe_brick) in &collider_query {
+//             let collision = collide(
+//                 ball_transform.translation,
+//                 ball_size,
+//                 transform.translation,
+//                 transform.scale.truncate(),
+//             );
+//             if let Some(collision) = collision {
+//                 // Sends a collision event so that other systems can react to the collision
+//                 collision_events.send_default();
 
-                // Bricks should be despawned and increment the scoreboard on collision
-                if maybe_brick.is_some() {
-                    scoreboard.score += 1;
-                    commands.entity(collider_entity).despawn();
-                }
+//                 // Bricks should be despawned and increment the scoreboard on collision
+//                 if maybe_brick.is_some() {
+//                     scoreboard.score += 1;
+//                     commands.entity(collider_entity).despawn();
+//                 }
 
-                // reflect the ball when it collides
-                let mut reflect_x = false;
-                let mut reflect_y = false;
+//                 // reflect the ball when it collides
+//                 let mut reflect_x = false;
+//                 let mut reflect_y = false;
 
-                // only reflect if the ball's velocity is going in the opposite direction of the
-                // collision
-                match collision {
-                    Collision::Left => reflect_x = ball_velocity.x > 0.0,
-                    Collision::Right => reflect_x = ball_velocity.x < 0.0,
-                    Collision::Top => reflect_y = ball_velocity.y < 0.0,
-                    Collision::Bottom => reflect_y = ball_velocity.y > 0.0,
-                    Collision::Inside => { /* do nothing */ }
-                }
+//                 // only reflect if the ball's velocity is going in the opposite direction of the
+//                 // collision
+//                 match collision {
+//                     Collision::Left => reflect_x = ball_velocity.x > 0.0,
+//                     Collision::Right => reflect_x = ball_velocity.x < 0.0,
+//                     Collision::Top => reflect_y = ball_velocity.y < 0.0,
+//                     Collision::Bottom => reflect_y = ball_velocity.y > 0.0,
+//                     Collision::Inside => { /* do nothing */ }
+//                 }
 
-                // reflect velocity on the x-axis if we hit something on the x-axis
-                if reflect_x {
-                    ball_velocity.x = -ball_velocity.x;
-                }
+//                 // reflect velocity on the x-axis if we hit something on the x-axis
+//                 if reflect_x {
+//                     ball_velocity.x = -ball_velocity.x;
+//                 }
 
-                // reflect velocity on the y-axis if we hit something on the y-axis
-                if reflect_y {
-                    ball_velocity.y = -ball_velocity.y;
-                }
-            }
-        }
-    }
-}
+//                 // reflect velocity on the y-axis if we hit something on the y-axis
+//                 if reflect_y {
+//                     ball_velocity.y = -ball_velocity.y;
+//                 }
+//             }
+//         }
+//     }
+// }
 
-pub fn velocity_system(mut query: Query<&mut Velocity>) {
-    for mut velocity in &mut query{
-        velocity.x -= velocity.x * FRICTION_COEFFICIENT * TIME_STEP;
-        velocity.y -= velocity.y * FRICTION_COEFFICIENT * TIME_STEP;
+// pub fn velocity_system(mut query: Query<&mut Velocity>) {
+//     for mut velocity in &mut query{
+//         velocity.x -= velocity.x * FRICTION_COEFFICIENT * TIME_STEP;
+//         velocity.y -= velocity.y * FRICTION_COEFFICIENT * TIME_STEP;
 
-        if velocity.length_squared() < STOPPING_THRESHOLD {
-            *velocity = Velocity(Vec2::ZERO);
-        }
-    } 
-}
+//         if velocity.length_squared() < STOPPING_THRESHOLD {
+//             *velocity = Velocity(Vec2::ZERO);
+//         }
+//     } 
+// }
 
-pub fn move_system(mut query: Query<(&mut Transform, &Velocity)>) {
-    for (mut transform, velocity) in &mut query {
-        transform.translation.x += velocity.x * TIME_STEP;
-        transform.translation.y += velocity.y * TIME_STEP;
-    }
-}
+// pub fn move_system(mut query: Query<(&mut Transform, &Velocity)>) {
+//     for (mut transform, velocity) in &mut query {
+//         transform.translation.x += velocity.x * TIME_STEP;
+//         transform.translation.y += velocity.y * TIME_STEP;
+//     }
+// }
 
 pub fn play_collision_sound(
     mut collision_events: EventReader<CollisionEvent>,
@@ -357,3 +377,9 @@ pub fn update_scoreboard(scoreboard: Res<Scoreboard>, mut query: Query<&mut Text
     let mut text = query.single_mut();
     text.sections[1].value = scoreboard.score.to_string();
 }
+
+// pub fn collision_detection_between_balls(a_pos : Vec3, b_pos : Vec3, ball_size : f32) {
+//     if (a_pos - b_pos).length() <= 2 * ball_size {
+
+//     }
+// }

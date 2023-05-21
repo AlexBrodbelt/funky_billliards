@@ -3,6 +3,7 @@ use bevy::{
     // sprite::collide_aabb::{collide, Collision},
     // sprite::MaterialMesh2dBundle,
 };
+use bevy_rapier2d::prelude::*;
 
 use crate::config::*;
 
@@ -45,14 +46,14 @@ pub struct Brick;
 #[derive(Component)]
 pub struct Paddle;
 
-#[derive(Component, Deref, DerefMut)]
-pub struct Velocity(pub Vec2);
+// #[derive(Component, Deref, DerefMut)]
+// pub struct Velocity(pub Vec2);
 
-impl Velocity {
-    pub fn new(x : f32, y : f32) -> Velocity {
-        Velocity(Vec2::new(x, y))
-    }
-}
+// impl Velocity {
+//     pub fn new(x : f32, y : f32) -> Velocity {
+//         Velocity(Vec2::new(x, y))
+//     }
+// }
 
 #[derive(Component, Deref, DerefMut)]
 pub struct Position(pub Vec3);
@@ -66,11 +67,11 @@ impl Position {
 #[derive(Component)]
 pub struct Pocket;
 
-#[derive(Component)]
-pub struct Collider;
+// #[derive(Component)]
+// pub struct Collider;
 
-#[derive(Default)]
-pub struct CollisionEvent;
+// #[derive(Default)]
+// pub struct CollisionEvent;
 
 // This bundle is a collection of the components that define a "wall" in our game
 #[derive(Bundle)]
@@ -79,6 +80,7 @@ pub struct WallBundle {
     // Allowing you to compose their functionality
     sprite_bundle: SpriteBundle,
     collider: Collider,
+    rigid_body : RigidBody,
 }
 
 impl WallLocation {
@@ -131,7 +133,8 @@ impl WallBundle {
                 },
                 ..default()
             },
-            collider: Collider,
+            collider: Collider::cuboid(location.size()[0] / 2.0, location.size()[1] / 2.0),
+            rigid_body: RigidBody::Fixed,
         }
     }
 }
@@ -143,8 +146,3 @@ pub enum WallLocation {
     Bottom,
     Top,
 }
-
-
-
-
-
