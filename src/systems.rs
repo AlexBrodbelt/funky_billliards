@@ -3,7 +3,6 @@ use bevy::{
 };
 use bevy_rapier2d::prelude::*;
 
-
 use crate::config::*;
 use crate::components::*; 
 use crate::resources::*;
@@ -46,7 +45,7 @@ pub fn setup(
     //     Collider,
     // ));
 
-    
+    // Balls
     commands.spawn(BallBundle::new(Ball::White,  &mut meshes, &mut materials));
     // commands.spawn(BallBundle::new(Ball::Yellow, &mut meshes, &mut materials));
     // commands.spawn(BallBundle::new(Ball::Green,  &mut meshes, &mut materials));
@@ -65,11 +64,11 @@ pub fn setup(
     //     match ball {
     //         Ball::Red(_) => {
     //             for id in 0..15 {
-    //             commands.spawn(BallBundle::new(Ball::Red(id), meshes, materials));
+    //             commands.spawn(BallBundle::new(Ball::Red(id), &mut meshes, &mut materials));
     //             }
     //         },
     //         _  => {
-    //             commands.spawn(BallBundle::new(ball, meshes, materials));
+    //             commands.spawn(BallBundle::new(ball, &mut meshes, &mut materials));
     //         }
     //     }
     // }
