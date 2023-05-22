@@ -21,7 +21,7 @@ pub const PADDLE_PADDING: f32 = 10.0;
 // We set the z-value of the ball to 1 so it renders on top in the case of overlapping sprites.
 pub const BALL_SIZE: Vec3 = Vec3::new(30.0, 30.0, 0.0);
 pub const INITIAL_BALL_DIRECTION: Vec2 = Vec2::new(0.5, -0.5);
-pub const BALL_RADIUS: f32 = 16.0;
+pub const BALL_RADIUS: f32 = TABLE_WIDTH / 136.0;
 // Pocket
 pub const POCKET_RADIUS: f32 = 20.0;
 
@@ -35,19 +35,12 @@ pub const BOTTOM_WALL: f32 = - TABLE_HEIGHT / 2.0;
 pub const TOP_WALL: f32 = TABLE_HEIGHT / 2.0;
 
 // snooker table features
-pub const X_BAULK_LINE : f32 = TABLE_WIDTH / 5.0; // x coordinate for Baulk Line
+pub const X_BAULK_LINE : f32 = LEFT_WALL + (TABLE_WIDTH / 5.0); // x coordinate for Baulk Line
 pub const R_BAULK_D : f32 = TABLE_HEIGHT / 6.0; // radius of Baulk D
 pub const X_BAULK_D : f32 = X_BAULK_LINE - R_BAULK_D;
-pub const Y_BAULK_D : f32 = TABLE_HEIGHT / 3.0;
+// pub const Y_BAULK_D : f32 = TABLE_HEIGHT / 3.0;
 
-pub const BRICK_SIZE: Vec2 = Vec2::new(100., 30.);
-// These values are exact
-pub const GAP_BETWEEN_PADDLE_AND_BRICKS: f32 = 270.0;
-pub const GAP_BETWEEN_BRICKS: f32 = 5.0;
-// These values are lower bounds, as the number of bricks is computed
-pub const GAP_BETWEEN_BRICKS_AND_CEILING: f32 = 20.0;
-pub const GAP_BETWEEN_BRICKS_AND_SIDES: f32 = 20.0;
-pub const GAP_BETWEEN_BALLS: f32 = 16.0;
+pub const GAP_BETWEEN_BALLS: f32 = 8.0;
 
 pub const SCOREBOARD_FONT_SIZE: f32 = 40.0;
 pub const SCOREBOARD_TEXT_PADDING: Val = Val::Px(5.0);

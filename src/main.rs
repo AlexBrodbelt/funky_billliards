@@ -13,9 +13,9 @@ mod events;
 pub mod resources;
 mod systems;
 
-use components::*;
+// use components::*;
 use config::*;
-use events::*;
+// use events::*;
 use resources::*;
 use systems::*;
 

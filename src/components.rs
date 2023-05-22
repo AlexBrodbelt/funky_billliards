@@ -9,12 +9,24 @@ use bevy_rapier2d::prelude::*;
 
 use crate::config::*;
 
-#[derive(Component, Eq, Hash, PartialEq)]
+#[derive(Eq, PartialEq, Hash)]
+pub struct RedBallIdentifier {
+    level: usize,
+    index: usize,
+}
+
+impl RedBallIdentifier {
+    pub fn new(level: usize, index: usize) -> RedBallIdentifier {
+        RedBallIdentifier { level, index }
+    }
+}
+
+#[derive(Component, Eq, PartialEq, Hash)]
 pub enum Ball {
     Black,
     White,
     Yellow,
-    Red(usize),
+    Red(RedBallIdentifier),
     Blue,
     Green,
     Pink,
@@ -37,27 +49,27 @@ impl Ball {
 
     pub fn position(&self) -> Vec2 {
         match *self {
-            Ball::Black          => Vec2::new(0.75 * TABLE_WIDTH, 0.5 * TABLE_HEIGHT),
+            Ball::Black          => Vec2::new( (9.0 / 11.0) * RIGHT_WALL, 0.0),
             Ball::White          => Vec2::new(X_BAULK_D, 0.0),
-            Ball::Yellow         => Vec2::new(X_BAULK_LINE, 2.0 * Y_BAULK_D),
-            Ball::Red(id) => {
-                let x_offset = 0.75 * TABLE_WIDTH; let y_offset = 0.5 * TABLE_HEIGHT;
-                let index = (id / 3) as f32; let level = (id / 5) as f32;
+            Ball::Yellow         => Vec2::new(X_BAULK_LINE, -R_BAULK_D),
+            Ball::Red(RedBallIdentifier { level , index }) => {
+                let x_offset = (1.0 / 2.0) * RIGHT_WALL ; 
+                let y_offset = 0.0;
                 Vec2::new(
-                    x_offset + f32::sqrt(3.0)*(0.5 + GAP_BETWEEN_BALLS)*((level) + 1.0),
-                    y_offset + (2.0 *(index) - level ) * (0.5 + GAP_BETWEEN_BALLS)
+                    x_offset + f32::sqrt( 3.0 )*(BALL_RADIUS + GAP_BETWEEN_BALLS / 2.0)*((level as f32) + 1.0),
+                    y_offset + (2.0 * (index as f32) - (level as f32) ) * (0.5 + GAP_BETWEEN_BALLS)
                 )
             },
             Ball::Blue           => Vec2::new(0.0, 0.0),
-            Ball::Green          => Vec2::new(X_BAULK_LINE, Y_BAULK_D),
-            Ball::Pink           => Vec2::new(0.75 * TABLE_WIDTH, 0.5 * TABLE_HEIGHT),
-            Ball::Brown          => Vec2::new(X_BAULK_LINE, 0.5 * TABLE_HEIGHT),
+            Ball::Green          => Vec2::new(X_BAULK_LINE, R_BAULK_D),
+            Ball::Pink           => Vec2::new(0.75 * TABLE_WIDTH, 0.0),
+            Ball::Brown          => Vec2::new(X_BAULK_LINE, 0.0),
         }
     }
 
     pub fn velocity(&self) -> Vec2 {
         match *self {
-            Ball::White => Vec2::new(400.0, 0.0),
+            Ball::White => Vec2::new(600.0, 10.0),
             _ => Vec2::ZERO,
         }
     }
@@ -113,7 +125,7 @@ impl BallBundle {
             },
         damping: Damping {
             linear_damping: FRICTION_COEFFICIENT,
-            angular_damping: 0.0,
+            angular_damping: FRICTION_COEFFICIENT,
             },
         restitution_coefficient: Restitution::coefficient(0.90), 
         }

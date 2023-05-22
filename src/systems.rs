@@ -47,8 +47,19 @@ pub fn setup(
     // ));
 
     
-    commands.spawn(BallBundle::new(Ball::White, &mut meshes, &mut materials));
-    commands.spawn(BallBundle::new(Ball::Green, &mut meshes, &mut materials));
+    commands.spawn(BallBundle::new(Ball::White,  &mut meshes, &mut materials));
+    // commands.spawn(BallBundle::new(Ball::Yellow, &mut meshes, &mut materials));
+    // commands.spawn(BallBundle::new(Ball::Green,  &mut meshes, &mut materials));
+    // commands.spawn(BallBundle::new(Ball::Blue,   &mut meshes, &mut materials));
+    // commands.spawn(BallBundle::new(Ball::Pink,   &mut meshes, &mut materials));
+    // commands.spawn(BallBundle::new(Ball::Brown,  &mut meshes, &mut materials));
+    // commands.spawn(BallBundle::new(Ball::Black,  &mut meshes, &mut materials));
+    for level in 0..5  {
+        for index in 0..=level {
+            commands.spawn(BallBundle::new(Ball::Red(RedBallIdentifier::new(level, index)), &mut meshes, &mut materials));
+        }
+    }
+
     // initialise positions of the balls
     // for ball in Ball::iter() {
     //     match ball {
