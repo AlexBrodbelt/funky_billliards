@@ -22,6 +22,9 @@ pub const PADDLE_PADDING: f32 = 10.0;
 pub const BALL_SIZE: Vec3 = Vec3::new(30.0, 30.0, 0.0);
 pub const INITIAL_BALL_DIRECTION: Vec2 = Vec2::new(0.5, -0.5);
 pub const BALL_RADIUS: f32 = 16.0;
+// Pocket
+pub const POCKET_RADIUS: f32 = 20.0;
+
 
 pub const WALL_THICKNESS: f32 = 10.0;
 // x coordinates
@@ -56,14 +59,4 @@ pub const BRICK_COLOR: Color = Color::rgb(0.5, 0.5, 1.0);
 pub const WALL_COLOR: Color = Color::rgb(0.8, 0.8, 0.8);
 pub const TEXT_COLOR: Color = Color::rgb(0.5, 0.5, 1.0);
 pub const SCORE_COLOR: Color = Color::rgb(1.0, 0.5, 0.5);
-
-
-
-// pub const BLACK: Color =  Color::rgb(0.0, 0.0, 0.0);
-// pub const CUE_BALL: Color =  Color::rgb(255.0, 255.0, 255.0);
-// pub const YELLOW: Color =  Color::rgb(255.0, 0.68, 0.26);
-// pub const RED: Color =  Color::rgb(255.0, 0.0, 0.0);
-// pub const BLUE: Color =  Color::rgb(0.0, 0.0, 255.0);
-// pub const GREEN: Color =  Color::rgb(0.0, 255.0, 0.0);
-// pub const PINK: Color =  Color::rgb(255.0, 0.08, 0.58);
-// pub const BROWN: Color =  Color::rgb(0.55, 0.27, 0.07);
+pub const POCKET_COLOR: Color = Color::BLACK;

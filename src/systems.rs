@@ -96,10 +96,10 @@ pub fn setup(
     );
 
     // Walls
-    commands.spawn(WallBundle::new(WallLocation::Left));
-    commands.spawn(WallBundle::new(WallLocation::Right));
-    commands.spawn(WallBundle::new(WallLocation::Bottom));
-    commands.spawn(WallBundle::new(WallLocation::Top));
+    commands.spawn(WallBundle::new(WallLocation::Left, &mut meshes, &mut materials));
+    commands.spawn(WallBundle::new(WallLocation::Right, &mut meshes, &mut materials));
+    commands.spawn(WallBundle::new(WallLocation::Bottom, &mut meshes, &mut materials));
+    commands.spawn(WallBundle::new(WallLocation::Top, &mut meshes, &mut materials));
 
     // Cuestick-Player
 }

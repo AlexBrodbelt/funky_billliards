@@ -42,10 +42,10 @@ impl Ball {
             Ball::Yellow         => Vec2::new(X_BAULK_LINE, 2.0 * Y_BAULK_D),
             Ball::Red(id) => {
                 let x_offset = 0.75 * TABLE_WIDTH; let y_offset = 0.5 * TABLE_HEIGHT;
-                let index = id / 3; let level = id / 5;
+                let index = (id / 3) as f32; let level = (id / 5) as f32;
                 Vec2::new(
-                    x_offset + f32::sqrt(3.0)*(0.5 + GAP_BETWEEN_BALLS)*((level as f32) + 1.0),
-                    y_offset + (2.0 *(index as f32) - (level as f32)) * (0.5 + GAP_BETWEEN_BALLS)
+                    x_offset + f32::sqrt(3.0)*(0.5 + GAP_BETWEEN_BALLS)*((level) + 1.0),
+                    y_offset + (2.0 *(index) - level ) * (0.5 + GAP_BETWEEN_BALLS)
                 )
             },
             Ball::Blue           => Vec2::new(0.0, 0.0),
@@ -81,7 +81,6 @@ impl From<&Ball> for Velocity {
         Velocity::linear(ball.velocity())
     }
 }
-
 
 #[derive(Bundle)]
 pub struct BallBundle {
@@ -134,23 +133,64 @@ impl Position {
 }
 
 #[derive(Component)]
-pub struct Pocket;
+pub enum Pocket {
+    TopRight,
+    TopCenter,
+    TopLeft,
+    BottomRight,
+    BotttomCenter,
+    BottomLeft,
+}
 
-// #[derive(Component)]
-// pub struct Collider;
+impl Pocket {
+    pub fn position(&self) -> Vec2 {
+        match *self {
+            Pocket::TopRight => Vec2::new(0.0, 0.0),
+            Pocket::TopCenter => Vec2::new(0.0, 0.0),
+            Pocket::TopLeft => Vec2::new(0.0, 0.0),
+            Pocket::BottomRight => Vec2::new(0.0, 0.0),
+            Pocket::BotttomCenter => Vec2::new(0.0, 0.0),
+            Pocket::BottomLeft => Vec2::new(0.0, 0.0),
+        }
+    }
+}
+
+#[derive(Bundle)]
+pub struct PocketBundle {
+    material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
+    collider: Collider,
+    rigid_body : RigidBody,
+    sensor: Sensor,
+}
+
+impl PocketBundle {
+    pub fn new(pocket: Pocket, meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<ColorMaterial>>) -> PocketBundle {
+        PocketBundle {
+            material_mesh_bundle: MaterialMesh2dBundle {
+                    mesh: meshes.add(shape::Circle::new(POCKET_RADIUS).into()).into(),
+                    material: materials.add(ColorMaterial::from(POCKET_COLOR)),
+                    transform: Transform::from_translation(pocket.position().extend(1.0)),
+                    ..default()
+            },
+            collider: Collider::ball(POCKET_RADIUS),
+            rigid_body: RigidBody::Fixed,
+            sensor: Sensor,
+        }
+    }
+}
+
 
 // #[derive(Default)]
 // pub struct CollisionEvent;
 
 // This bundle is a collection of the components that define a "wall" in our game
-#[derive(Bundle)]
-pub struct WallBundle {
-    // You can nest bundles inside of other bundles like this
-    // Allowing you to compose their functionality
-    sprite_bundle: SpriteBundle,
-    collider: Collider,
-    rigid_body : RigidBody,
-    restitution_coefficient: Restitution,
+
+/// Which side of the arena is this wall located on?
+pub enum WallLocation {
+    Left,
+    Right,
+    Bottom,
+    Top,
 }
 
 impl WallLocation {
@@ -162,14 +202,14 @@ impl WallLocation {
             WallLocation::Top => Vec2::new(0., TOP_WALL),
         }
     }
-
+    
     pub fn size(&self) -> Vec2 {
         let arena_height = TOP_WALL - BOTTOM_WALL;
         let arena_width = RIGHT_WALL - LEFT_WALL;
         // Make sure we haven't messed up our constants
         assert!(arena_height > 0.0);
         assert!(arena_width > 0.0);
-
+        
         match self {
             WallLocation::Left | WallLocation::Right => {
                 Vec2::new(WALL_THICKNESS, arena_height + WALL_THICKNESS)
@@ -179,58 +219,61 @@ impl WallLocation {
             }
         }
     }
-
-    pub fn dimensions(&self) -> (f32, f32) {
+    pub fn dimensions(&self) -> Vec2 {
         let arena_height = TOP_WALL - BOTTOM_WALL;
         let arena_width = RIGHT_WALL - LEFT_WALL;
         // Make sure we haven't messed up our constants
         assert!(arena_height > 0.0);
         assert!(arena_width > 0.0);
-
+        
         match self {
             WallLocation::Left | WallLocation::Right => {
-                (WALL_THICKNESS / 2.0, arena_height / 2.0)
+                Vec2::new(WALL_THICKNESS / 2.0, arena_height / 2.0)
             }
             WallLocation::Bottom | WallLocation::Top => {
-                (arena_width / 2.0, WALL_THICKNESS / 2.0)
+                Vec2::new(arena_width / 2.0, WALL_THICKNESS / 2.0)
             }
         }
-    }
+    }   
+}
+
+
+#[derive(Bundle)]
+pub struct WallBundle {
+    // You can nest bundles inside of other bundles like this
+    // Allowing you to compose their functionality
+    material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
+    // sprite_bundle: SpriteBundle,
+    collider: Collider,
+    rigid_body : RigidBody,
+    restitution_coefficient: Restitution,
 }
 
 impl WallBundle {
     // This "builder method" allows us to reuse logic across our wall entities,
     // making our code easier to read and less prone to bugs when we change the logic
-    pub fn new(location: WallLocation) -> WallBundle {
-        WallBundle {
-            sprite_bundle: SpriteBundle {
-                transform: Transform {
-                    // We need to convert our Vec2 into a Vec3, by giving it a z-coordinate
+
+     // We need to convert our Vec2 into a Vec3, by giving it a z-coordinate
                     // This is used to determine the order of our sprites
-                    translation: location.position().extend(0.0),
+                    // translation: location.position().extend(0.0),
                     // The z-scale of 2D objects must always be 1.0,
                     // or their ordering will be affected in surprising ways.
                     // See https://github.com/bevyengine/bevy/issues/4149
-                    scale: location.size().extend(1.0),
-                    ..default()
-                },
-                sprite: Sprite {
-                    color: WALL_COLOR,
-                    ..default()
-                },
+            //         scale: location.size().extend(1.0),
+    pub fn new(location: WallLocation,  meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<ColorMaterial>>) -> WallBundle {
+        WallBundle {
+            material_mesh_bundle: MaterialMesh2dBundle {
+                mesh: meshes
+                    .add(shape::Quad::new(2.0 * location.dimensions()).into())
+                    .into(),
+                material: materials.add(ColorMaterial::from(WALL_COLOR)),
+                transform: Transform::from_translation(location.position().extend(1.0)),
                 ..default()
             },
-            collider: Collider::cuboid(location.dimensions().0, location.dimensions().1),
+            collider: Collider::cuboid(location.dimensions()[0], location.dimensions()[1]),
             rigid_body: RigidBody::Fixed,
             restitution_coefficient:  Restitution::coefficient(0.95),
         }
     }
 }
 
-/// Which side of the arena is this wall located on?
-pub enum WallLocation {
-    Left,
-    Right,
-    Bottom,
-    Top,
-}
