@@ -7,9 +7,6 @@ use crate::config::*;
 use crate::components::*; 
 use crate::resources::*;
 
-// use bevy::window::PrimaryWindow;
-
-
 
 // Add the game's entities to our world
 pub fn setup(
@@ -111,6 +108,13 @@ pub fn setup(
     commands.spawn(WallBundle::new(WallLocation::Bottom, &mut meshes, &mut materials));
     commands.spawn(WallBundle::new(WallLocation::Top, &mut meshes, &mut materials));
 
+    // Pockets
+    commands.spawn(PocketBundle::new(Pocket::BottomLeft, &mut meshes, &mut materials ));
+    commands.spawn(PocketBundle::new(Pocket::BotttomCenter, &mut meshes, &mut materials ));
+    commands.spawn(PocketBundle::new(Pocket::BottomRight, &mut meshes, &mut materials ));
+    commands.spawn(PocketBundle::new(Pocket::TopLeft, &mut meshes, &mut materials ));
+    commands.spawn(PocketBundle::new(Pocket::TopCenter, &mut meshes, &mut materials ));
+    commands.spawn(PocketBundle::new(Pocket::TopRight, &mut meshes, &mut materials ));
     // Cuestick-Player
 }
 
@@ -131,9 +135,25 @@ pub fn play_collision_sound(
 ) {
     // Play a sound once per frame if a collision occurred.
     if !collision_events.is_empty() {
-        // This prevents events staying active on the next frame.
+        // This prevents events staying active on the next frame.r
         collision_events.clear();
         audio.play(sound.0.clone());
+    }
+}
+
+pub fn pocket_condition(
+    mut commands: Commands,
+    mut scoreboard: ResMut<Scoreboard>,
+    rapier_context: Res<RapierContext>,
+    pocket_query: Query<Entity, With<Pocket>>
+) {
+    for pocket in pocket_query.iter() {
+        for (ball, _pocket, intersecting) in rapier_context.intersections_with(pocket){
+            if intersecting {
+                commands.entity(ball).despawn();
+                scoreboard.score += 1;
+            }
+        }
     }
 }
 

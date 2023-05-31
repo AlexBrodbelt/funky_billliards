@@ -33,6 +33,8 @@ fn main() {
         .add_startup_system(setup)
         .add_event::<CollisionEvent>()
         .add_system(play_collision_sound)
+        .add_system(pocket_condition)
+        // .add_system(display_events)
         // Add our gameplay simulation systems to the fixed timestep schedule
         // Configure how frequently our gameplay systems are run
         .insert_resource(FixedTime::new_from_secs(TIME_STEP))

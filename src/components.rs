@@ -157,12 +157,12 @@ pub enum Pocket {
 impl Pocket {
     pub fn position(&self) -> Vec2 {
         match *self {
-            Pocket::TopRight => Vec2::new(0.0, 0.0),
-            Pocket::TopCenter => Vec2::new(0.0, 0.0),
-            Pocket::TopLeft => Vec2::new(0.0, 0.0),
-            Pocket::BottomRight => Vec2::new(0.0, 0.0),
-            Pocket::BotttomCenter => Vec2::new(0.0, 0.0),
-            Pocket::BottomLeft => Vec2::new(0.0, 0.0),
+            Pocket::TopRight      => Vec2::new(RIGHT_WALL - GAP_BETWEEN_POCKET_AND_WALL, TOP_WALL - GAP_BETWEEN_POCKET_AND_WALL),
+            Pocket::TopCenter     => Vec2::new(0.0, TOP_WALL - GAP_BETWEEN_POCKET_AND_WALL),
+            Pocket::TopLeft       => Vec2::new(LEFT_WALL + GAP_BETWEEN_POCKET_AND_WALL, TOP_WALL - GAP_BETWEEN_POCKET_AND_WALL),
+            Pocket::BottomRight   => Vec2::new(RIGHT_WALL - GAP_BETWEEN_POCKET_AND_WALL, BOTTOM_WALL + GAP_BETWEEN_POCKET_AND_WALL),
+            Pocket::BotttomCenter => Vec2::new(0.0, BOTTOM_WALL + GAP_BETWEEN_POCKET_AND_WALL),
+            Pocket::BottomLeft    => Vec2::new(LEFT_WALL + GAP_BETWEEN_POCKET_AND_WALL, BOTTOM_WALL + GAP_BETWEEN_POCKET_AND_WALL),
         }
     }
 }
@@ -170,6 +170,7 @@ impl Pocket {
 #[derive(Bundle)]
 pub struct PocketBundle {
     material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
+    pocket: Pocket,
     collider: Collider,
     rigid_body : RigidBody,
     sensor: Sensor,
@@ -181,10 +182,11 @@ impl PocketBundle {
             material_mesh_bundle: MaterialMesh2dBundle {
                     mesh: meshes.add(shape::Circle::new(POCKET_RADIUS).into()).into(),
                     material: materials.add(ColorMaterial::from(POCKET_COLOR)),
-                    transform: Transform::from_translation(pocket.position().extend(1.0)),
+                    transform: Transform::from_translation(pocket.position().extend(0.9)),
                     ..default()
             },
-            collider: Collider::ball(POCKET_RADIUS),
+            pocket: pocket,
+            collider: Collider::ball(POCKET_RADIUS - BALL_RADIUS),
             rigid_body: RigidBody::Fixed,
             sensor: Sensor,
         }
@@ -240,10 +242,10 @@ impl WallLocation {
         
         match self {
             WallLocation::Left | WallLocation::Right => {
-                Vec2::new(WALL_THICKNESS / 2.0, arena_height / 2.0)
+                Vec2::new(WALL_THICKNESS / 2.0, arena_height / 2.0 - GAP_BETWEEN_POCKET_AND_WALL)
             }
             WallLocation::Bottom | WallLocation::Top => {
-                Vec2::new(arena_width / 2.0, WALL_THICKNESS / 2.0)
+                Vec2::new(arena_width / 2.0  - GAP_BETWEEN_POCKET_AND_WALL, WALL_THICKNESS / 2.0)
             }
         }
     }   
@@ -276,7 +278,7 @@ impl WallBundle {
         WallBundle {
             material_mesh_bundle: MaterialMesh2dBundle {
                 mesh: meshes
-                    .add(shape::Quad::new(2.0 * location.dimensions()).into())
+                    .add(shape::Quad::new(2.0 * (location.dimensions())).into())
                     .into(),
                 material: materials.add(ColorMaterial::from(WALL_COLOR)),
                 transform: Transform::from_translation(location.position().extend(1.0)),

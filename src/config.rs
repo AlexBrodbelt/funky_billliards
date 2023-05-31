@@ -24,6 +24,7 @@ pub const INITIAL_BALL_DIRECTION: Vec2 = Vec2::new(0.5, -0.5);
 pub const BALL_RADIUS: f32 = TABLE_WIDTH / 136.0;
 // Pocket
 pub const POCKET_RADIUS: f32 = 20.0;
+pub const GAP_BETWEEN_POCKET_AND_WALL: f32 = 25.0;
 
 
 pub const WALL_THICKNESS: f32 = 10.0;
