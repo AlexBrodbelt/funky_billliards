@@ -162,34 +162,48 @@ pub fn pocket_condition(
     }
 }
 
+fn get_cursor_position(
+    mut cursor: EventReader<CursorMoved>,
+    primary_window_query: Query<&Window, With<PrimaryWindow>>
+) -> Option<Vec2> {
+    let Ok(primary) = primary_window_query.get_single() else {
+        return None;
+    };
+    let mut cursor_position = match cursor.iter().last() {
+        Some(cursor_moved) => cursor_moved.position,
+        None => return None
+    };
+    cursor_position.x -= 0.5 * primary.width();
+    cursor_position.y -= 0.5 * primary.height();
+    Some(cursor_position)
+}
+
 pub fn strike_cue_ball(
     mut cue_ball_query: Query<(&Transform, &mut Velocity), With<CueBall>>,
     mut cursor: EventReader<CursorMoved>,
     primary_window_query: Query<&Window, With<PrimaryWindow>>
 ) {
-    let Ok(primary) = primary_window_query.get_single() else {
+    let Some(cursor_position) = get_cursor_position(cursor, primary_window_query) else {
         return;
     };
-    let mut cursor_position = match cursor.iter().last() {
-        Some(cursor_moved) => cursor_moved.position,
-        None => return,
-    };
-    cursor_position.x -= 0.5 * primary.width();
-    cursor_position.y -= 0.5 * primary.height();
 
-    let Ok((tranform, mut velocity)) = cue_ball_query.get_single_mut() else {
+    let Ok((transform, mut velocity)) = cue_ball_query.get_single_mut() else {
         return;
     };
     
-    let new_velocity = cursor_position - tranform.translation.truncate();
+    let new_velocity = cursor_position - transform.translation.truncate();
 
     *velocity = Velocity::linear(new_velocity);
 }
 
 pub fn set_cue_ball(
-    
+    mut cue_ball_query: Query<(&Transform, &mut Velocity), With<CueBall>>,
+    mut cursor: EventReader<CursorMoved>,
+    primary_window_query: Query<&Window, With<PrimaryWindow>>
 ) {
-    todo!()
+    let Some(cursor_position) = get_cursor_position(cursor, primary_window_query) else {
+        return;
+    };
 }
 
 // pub fn move_paddle(
