@@ -2,8 +2,6 @@
 
 use bevy::{
     prelude::*,
-    // sprite::collide_aabb::{collide, Collision},
-    // sprite::MaterialMesh2dBundle,
 };
 use bevy_rapier2d::prelude::*;
 
@@ -42,21 +40,3 @@ fn main() {
         .add_system(bevy::window::close_on_esc)
         .run();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

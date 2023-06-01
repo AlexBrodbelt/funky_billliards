@@ -162,35 +162,35 @@ pub fn pocket_condition(
     }
 }
 
-// fn cursor_position(
-//     windows: Res<Windows>,
-// ) {
-//     // Games typically only have one window (the primary window).
-//     // For multi-window applications, you need to use a specific window ID here.
-//     let window = windows.get_primary().unwrap();
+pub fn strike_cue_ball(
+    mut cue_ball_query: Query<(&Transform, &mut Velocity), With<CueBall>>,
+    mut cursor: EventReader<CursorMoved>,
+    primary_window_query: Query<&Window, With<PrimaryWindow>>
+) {
+    let Ok(primary) = primary_window_query.get_single() else {
+        return;
+    };
+    let mut cursor_position = match cursor.iter().last() {
+        Some(cursor_moved) => cursor_moved.position,
+        None => return,
+    };
+    cursor_position.x -= 0.5 * primary.width();
+    cursor_position.y -= 0.5 * primary.height();
 
-//     if let Some(_position) = window.cursor_position() {
-//         // cursor is inside the window, position given
-//     } else {
-//         // cursor is not inside the window
-//     }
-// }
+    let Ok((tranform, mut velocity)) = cue_ball_query.get_single_mut() else {
+        return;
+    };
+    
+    let new_velocity = cursor_position - tranform.translation.truncate();
 
-// pub fn strike_cue_ball(
-//     cue_ball: Query<(&Transform, &mut Velocity), With<CueBall>>,
-//     mut cursor: EventReader<CursorMoved>,
-//     primary_window_query: Query<&Window, With<PrimaryWindow>>
-// ) {
-//     let Ok(primary) = primary_window_query.get_single() else {
-//         return;
-//     };
-//     let mut cursor_position = match cursor.iter().last() {
-//         Some(cursor_moved) => cursor_moved.position,
-//         None => return,
-//     };
+    *velocity = Velocity::linear(new_velocity);
+}
 
-//     cursor
-// }
+pub fn set_cue_ball(
+    
+) {
+    todo!()
+}
 
 // pub fn move_paddle(
 //     keyboard_input: Res<Input<KeyCode>>,
