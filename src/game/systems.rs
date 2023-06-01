@@ -5,8 +5,8 @@ use bevy::{
 use bevy_rapier2d::prelude::*;
 
 use crate::config::*;
-use crate::components::*; 
-use crate::resources::*;
+use crate::game::components::*; 
+use crate::game::resources::*;
 
 
 // Add the game's entities to our world
