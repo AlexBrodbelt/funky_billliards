@@ -5,17 +5,20 @@ use bevy::{
 };
 use bevy_rapier2d::prelude::*;
 
-pub mod components;
-pub mod config;
-mod events;
-pub mod resources;
-mod systems;
+mod config;
+mod states;
+
+mod game;
+use crate::game::systems::*;
+use crate::game::resources::*;
+
+mod game_menu;
 
 // use components::*;
+
 use config::*;
 // use events::*;
-use resources::*;
-use systems::*;
+
 
 fn main() {
     App::new()
