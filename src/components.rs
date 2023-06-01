@@ -2,7 +2,7 @@ use bevy::{
     prelude::*, 
     sprite::MaterialMesh2dBundle,
 };
-use bevy_rapier2d::prelude::*;
+use bevy_rapier2d::{prelude::*};
 
 // use strum::IntoEnumIterator;
 // use strum_macros::EnumIter;
@@ -133,16 +133,9 @@ impl BallBundle {
 }
 
 #[derive(Component)]
-pub struct Paddle;
+pub struct CueBall;
 
-#[derive(Component, Deref, DerefMut)]
-pub struct Position(pub Vec3);
 
-impl Position {
-    pub fn new(x : f32, y : f32) -> Position {
-        Position(Vec3::new(x, y, 1.0))
-    }
-}
 
 #[derive(Component)]
 pub enum Pocket {
@@ -174,6 +167,7 @@ pub struct PocketBundle {
     collider: Collider,
     rigid_body : RigidBody,
     sensor: Sensor,
+    active_events: ActiveEvents
 }
 
 impl PocketBundle {
@@ -186,9 +180,28 @@ impl PocketBundle {
                     ..default()
             },
             pocket: pocket,
+            // collider: ColliderBuilder {
+            //     shape: SharedShape::ball(POCKET_RADIUS- BALL_RADIUS),
+            //     mass_properties: ColliderMassProps::default(),
+            //     friction: Self::default_friction(),
+            //     restitution: 0.0,
+            //     position: Isometry::identity(),
+            //     is_sensor: true,
+            //     user_data: 0,
+            //     collision_groups: InteractionGroups::all(),
+            //     solver_groups: InteractionGroups::all(),
+            //     friction_combine_rule: CoefficientCombineRule::Average,
+            //     restitution_combine_rule: CoefficientCombineRule::Average,
+            //     active_collision_types: ActiveCollisionTypes::default(),
+            //     active_hooks: ActiveHooks::empty(),
+            //     active_events: ActiveEvents::empty(),
+            //     enabled: true,
+            //     contact_force_event_threshold: 0.0,
+            // }.into(),
             collider: Collider::ball(POCKET_RADIUS - BALL_RADIUS),
             rigid_body: RigidBody::Fixed,
             sensor: Sensor,
+            active_events: ActiveEvents::COLLISION_EVENTS,
         }
     }
 }

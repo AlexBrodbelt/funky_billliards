@@ -1,5 +1,6 @@
 use bevy::{
     prelude::*,
+    window::PrimaryWindow,
 };
 use bevy_rapier2d::prelude::*;
 
@@ -43,7 +44,12 @@ pub fn setup(
     // ));
 
     // Balls
-    commands.spawn(BallBundle::new(Ball::White,  &mut meshes, &mut materials));
+    commands.spawn(
+        (
+            BallBundle::new(Ball::White,  &mut meshes, &mut materials),
+        CueBall
+        )
+    );
     // commands.spawn(BallBundle::new(Ball::Yellow, &mut meshes, &mut materials));
     // commands.spawn(BallBundle::new(Ball::Green,  &mut meshes, &mut materials));
     // commands.spawn(BallBundle::new(Ball::Blue,   &mut meshes, &mut materials));
@@ -127,7 +133,6 @@ pub fn setup(
 //         transform.translation.y += velocity.y * TIME_STEP;
 //     }
 // }
-
 pub fn play_collision_sound(
     mut collision_events: EventReader<CollisionEvent>,
     audio: Res<Audio>,
@@ -156,6 +161,36 @@ pub fn pocket_condition(
         }
     }
 }
+
+// fn cursor_position(
+//     windows: Res<Windows>,
+// ) {
+//     // Games typically only have one window (the primary window).
+//     // For multi-window applications, you need to use a specific window ID here.
+//     let window = windows.get_primary().unwrap();
+
+//     if let Some(_position) = window.cursor_position() {
+//         // cursor is inside the window, position given
+//     } else {
+//         // cursor is not inside the window
+//     }
+// }
+
+// pub fn strike_cue_ball(
+//     cue_ball: Query<(&Transform, &mut Velocity), With<CueBall>>,
+//     mut cursor: EventReader<CursorMoved>,
+//     primary_window_query: Query<&Window, With<PrimaryWindow>>
+// ) {
+//     let Ok(primary) = primary_window_query.get_single() else {
+//         return;
+//     };
+//     let mut cursor_position = match cursor.iter().last() {
+//         Some(cursor_moved) => cursor_moved.position,
+//         None => return,
+//     };
+
+//     cursor
+// }
 
 // pub fn move_paddle(
 //     keyboard_input: Res<Input<KeyCode>>,
