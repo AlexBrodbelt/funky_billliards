@@ -1,6 +1,7 @@
 use bevy::{
     prelude::*,
     window::PrimaryWindow,
+    input::mouse::MouseButton::*,
 };
 use bevy_rapier2d::prelude::*;
 
@@ -197,13 +198,22 @@ pub fn strike_cue_ball(
 }
 
 pub fn set_cue_ball(
-    mut cue_ball_query: Query<(&Transform, &mut Velocity), With<CueBall>>,
+    mut cue_ball_query: Query<&mut Transform, With<CueBall>>,
     mut cursor: EventReader<CursorMoved>,
-    primary_window_query: Query<&Window, With<PrimaryWindow>>
+    primary_window_query: Query<&Window, With<PrimaryWindow>>,
+    mouse_input: Res<Input<MouseButton>>
 ) {
     let Some(cursor_position) = get_cursor_position(cursor, primary_window_query) else {
         return;
     };
+
+    if (mouse_input.pressed(Left) || mouse_input.pressed(Middle) || mouse_input.pressed(Right))  {
+        let Ok(mut cue_ball_position) = cue_ball_query.get_single_mut() else {
+            return;
+        };
+    
+        cue_ball_position.translation = cursor_position.extend(1.0);
+    }
 }
 
 // pub fn move_paddle(
