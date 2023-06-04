@@ -1,12 +1,4 @@
-use bevy::{
-    prelude::*,
-};
-
-// This resource tracks the game's score
-#[derive(Resource)]
-pub struct Scoreboard {
-    pub score: usize,
-}
+use bevy::prelude::*;
 
 #[derive(Resource)]
 pub struct CollisionSound(pub Handle<AudioSource>);
