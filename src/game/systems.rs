@@ -4,8 +4,7 @@ use bevy::{
 };
 use bevy_rapier2d::prelude::*;
 
-use super::resources::*;
-use crate::game::scoreboard::resources::*;
+use super::{resources::*, SimulationState};
 
 
 pub fn spawn_camera(
@@ -52,6 +51,26 @@ pub fn get_cursor_position(
     cursor_position.x -= 0.5 * primary.width();
     cursor_position.y -= 0.5 * primary.height();
     Some(cursor_position)
+
+}
+
+pub fn toggle_simulation(
+    mut commands: Commands,
+    keyboard_input: Res<Input<KeyCode>>,
+    simulation_state: Res<State<SimulationState>>
+) {
+    if keyboard_input.just_pressed(KeyCode::Space) {
+        match simulation_state.0 {
+            SimulationState::Runnning => {
+                commands.insert_resource(NextState(Some(SimulationState::Paused)));
+                println!("Simulation paused.");
+            }
+            SimulationState::Paused => {
+                commands.insert_resource(NextState(Some(SimulationState::Runnning)));
+                println!("Simulation running.");
+            } 
+        }
+    }
 }
 
 pub fn exit_game(

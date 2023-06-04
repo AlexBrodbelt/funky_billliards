@@ -11,7 +11,10 @@ pub mod pocket;
 pub mod walls;
 pub mod scoreboard;
 
-use crate::config::*;
+use crate::{
+    config::*,
+    AppState
+};
 
 use self::systems::*;
 
@@ -21,28 +24,27 @@ use scoreboard::ScoreBoardPlugin;
 use walls::WallPlugin;
 
 
-
-#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
-pub enum SimulationState {
-    Runnning,
-    #[default]
-    Paused,
-}
-
-
 pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         // Add our gameplay simulation systems to the fixed timestep schedule
         // Configure how frequently our gameplay systems are run
-        app.insert_resource(FixedTime::new_from_secs(TIME_STEP))
+
+        
+        app.add_state::<SimulationState>()
+            // Resources
+            .insert_resource(FixedTime::new_from_secs(TIME_STEP))
+            .insert_resource(ClearColor(BACKGROUND_COLOR))
+            // Events
             .add_event::<CollisionEvent>()
+            // Systems
+
             .add_system(play_collision_sound)
+            .add_system(toggle_simulation.run_if(in_state(AppState::Game)))
             .add_system(bevy::window::close_on_esc);
     }
 }
-
 
 
 pub struct GamePlugins;
@@ -57,4 +59,11 @@ impl PluginGroup for GamePlugins {
             .add(WallPlugin)
             .add(GamePlugin)         
     }
+}
+
+#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
+pub enum SimulationState {
+    Runnning,
+    #[default]
+    Paused,
 }
