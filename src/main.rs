@@ -11,7 +11,7 @@ mod menu;
 
 use game::{
     GamePlugins, 
-    systems::*
+    systems::*,
 };
 
 use systems::*;
@@ -21,6 +21,7 @@ use systems::*;
 pub enum AppState {
     #[default]
     Menu,
+    Edit,
     Game,
     GameOver,
 }
@@ -44,7 +45,14 @@ fn main() {
         .add_startup_system(spawn_camera)
         .add_startup_system(spawn_sound)
         // Systems
-        .add_system(transition_to_game_state)
-        .add_system(transition_to_menu_state)
+        .add_systems(
+            (   
+                display_state,
+                state_transitions,
+                toggle_physics_pipeline,
+                exit_game
+            )
+        )
+        // .add_system(bevy::window::close_on_esc)
         .run();
     }

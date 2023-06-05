@@ -20,7 +20,7 @@ use self::systems::*;
 
 use ball::BallPlugin;
 use pocket::PocketPlugin;
-use scoreboard::ScoreBoardPlugin;
+use scoreboard::ScoreboardPlugin;
 use walls::WallPlugin;
 
 
@@ -31,18 +31,27 @@ impl Plugin for GamePlugin {
         // Add our gameplay simulation systems to the fixed timestep schedule
         // Configure how frequently our gameplay systems are run
 
-        
         app.add_state::<SimulationState>()
             // Resources
             .insert_resource(FixedTime::new_from_secs(TIME_STEP))
             .insert_resource(ClearColor(BACKGROUND_COLOR))
             // Events
             .add_event::<CollisionEvent>()
-            // Systems
-
-            .add_system(play_collision_sound)
-            .add_system(toggle_simulation.run_if(in_state(AppState::Game)))
-            .add_system(bevy::window::close_on_esc);
+            // On Update Systems
+            .add_systems(
+                (
+                    toggle_simulation,
+                )
+                .in_set(OnUpdate(AppState::Game))
+            )
+            // On Update Systems when SimulationState::Running
+            .add_systems(
+                (
+                    play_collision_sound,
+                )
+                .in_set(OnUpdate(AppState::Game))
+                .in_set(OnUpdate(SimulationState::Running)),  
+            );
     }
 }
 
@@ -55,15 +64,15 @@ impl PluginGroup for GamePlugins {
             .add(BallPlugin)
             // .add(CueStickPlugin)
             .add(PocketPlugin)
-            .add(ScoreBoardPlugin)  
+            .add(ScoreboardPlugin)  
             .add(WallPlugin)
-            .add(GamePlugin)         
+            .add(GamePlugin)
     }
 }
 
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
 pub enum SimulationState {
-    Runnning,
+    Running,
     #[default]
     Paused,
 }

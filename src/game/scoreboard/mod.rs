@@ -6,12 +6,22 @@ mod systems;
 use systems::*;
 use resources::*;
 
-pub struct ScoreBoardPlugin;
+use crate::AppState;
 
-impl Plugin for ScoreBoardPlugin {
+pub struct ScoreboardPlugin;
+
+impl Plugin for ScoreboardPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(Scoreboard { score: 0 })
-            .add_startup_system(spawn_scoreboard)
-            .add_system(update_scoreboard);
+        app.add_system(
+                spawn_scoreboard
+                    .run_if(not(resource_exists::<Scoreboard>()))
+                    .in_schedule(OnEnter(AppState::Game))
+            )
+            .add_system(update_scoreboard.in_set(OnUpdate(AppState::Game)))
+            .add_system(
+                despawn_scoreboard
+                    .run_if(resource_exists::<Scoreboard>())
+                    .in_schedule(OnExit(AppState::Game))
+            );
     }
 }

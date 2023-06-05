@@ -1,6 +1,6 @@
 use bevy::{
     prelude::*,
-    window::PrimaryWindow, app::AppExit,
+    window::PrimaryWindow,
 };
 use bevy_rapier2d::prelude::*;
 
@@ -57,27 +57,18 @@ pub fn get_cursor_position(
 pub fn toggle_simulation(
     mut commands: Commands,
     keyboard_input: Res<Input<KeyCode>>,
-    simulation_state: Res<State<SimulationState>>
+    simulation_state: Res<State<SimulationState>>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Space) {
         match simulation_state.0 {
-            SimulationState::Runnning => {
+            SimulationState::Running => {
                 commands.insert_resource(NextState(Some(SimulationState::Paused)));
-                println!("Simulation paused.");
             }
             SimulationState::Paused => {
-                commands.insert_resource(NextState(Some(SimulationState::Runnning)));
-                println!("Simulation running.");
+                commands.insert_resource(NextState(Some(SimulationState::Running)));
             } 
         }
     }
 }
 
-pub fn exit_game(
-    keyboard_input: Res<Input<KeyCode>>,
-    mut app_exit_event_writer: EventWriter<AppExit>,
-) {
-    if keyboard_input.just_pressed(KeyCode::Escape) {
-        app_exit_event_writer.send(AppExit);
-    }
-}
+

@@ -3,7 +3,7 @@ use bevy_rapier2d::prelude::*;
 
 use super::components::*;
 
-use crate::game::scoreboard::resources::*;
+use crate::game::{scoreboard::resources::*, ball::components::Ball};
 
 pub fn spawn_pockets(
     mut commands: Commands,
@@ -27,11 +27,24 @@ pub fn pocket_condition(
     pocket_query: Query<Entity, With<Pocket>>
 ) {
     for pocket in pocket_query.iter() {
-        for (ball, _pocket, intersecting) in rapier_context.intersections_with(pocket){
+        for (entity1, entity2, intersecting) in rapier_context.intersections_with(pocket){
             if intersecting {
-                commands.entity(ball).despawn();
+                if entity1 == pocket {
+                    commands.entity(entity2).despawn();
+                } else {
+                    commands.entity(entity1).despawn();
+                }
                 scoreboard.score += 1;
             }
         }
+    }
+}
+
+pub fn despawn_pockets( // idea make despawning generic function that takes in the component to despawn
+    mut commands: Commands,
+    pocket_query: Query<Entity, With<Pocket>>,
+) {
+    for pocket in &pocket_query {
+        commands.entity(pocket).despawn();
     }
 }

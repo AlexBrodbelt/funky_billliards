@@ -34,10 +34,23 @@ pub fn spawn_scoreboard(
             ..default()
         }),
     );
+    commands.insert_resource(Scoreboard { score: 0 })
 }
-
 
 pub fn update_scoreboard(scoreboard: Res<Scoreboard>, mut query: Query<&mut Text>) {
     let mut text = query.single_mut();
     text.sections[1].value = scoreboard.score.to_string();
 }
+
+pub fn despawn_scoreboard(
+    mut commands: Commands,
+    scoreboard_text_query: Query<Entity, With<Text>>,
+) {
+    commands.remove_resource::<Scoreboard>();
+    
+    let scoreboard_text_entity = scoreboard_text_query.single();
+
+    commands.entity(scoreboard_text_entity).despawn();
+
+}
+

@@ -6,7 +6,10 @@ use bevy_rapier2d::prelude::*;
 
 use crate::config::*;
 
-pub enum WallLocation {
+
+
+#[derive(Component)]
+pub enum Wall {
     Left,
     Right,
     Bottom,
@@ -14,13 +17,13 @@ pub enum WallLocation {
 }
 
 /// Which side of the arena is this wall located on?
-impl WallLocation {
+impl Wall {
     pub fn position(&self) -> Vec2 {
         match self {
-            WallLocation::Left => Vec2::new(LEFT_WALL, 0.),
-            WallLocation::Right => Vec2::new(RIGHT_WALL, 0.),
-            WallLocation::Bottom => Vec2::new(0., BOTTOM_WALL),
-            WallLocation::Top => Vec2::new(0., TOP_WALL),
+            Wall::Left => Vec2::new(LEFT_WALL, 0.),
+            Wall::Right => Vec2::new(RIGHT_WALL, 0.),
+            Wall::Bottom => Vec2::new(0., BOTTOM_WALL),
+            Wall::Top => Vec2::new(0., TOP_WALL),
         }
     }
     
@@ -32,10 +35,10 @@ impl WallLocation {
         assert!(arena_width > 0.0);
         
         match self {
-            WallLocation::Left | WallLocation::Right => {
+            Wall::Left | Wall::Right => {
                 Vec2::new(WALL_THICKNESS, arena_height + WALL_THICKNESS)
             }
-            WallLocation::Bottom | WallLocation::Top => {
+            Wall::Bottom | Wall::Top => {
                 Vec2::new(arena_width + WALL_THICKNESS, WALL_THICKNESS)
             }
         }
@@ -48,10 +51,10 @@ impl WallLocation {
         assert!(arena_width > 0.0);
         
         match self {
-            WallLocation::Left | WallLocation::Right => {
+            Wall::Left | Wall::Right => {
                 Vec2::new(WALL_THICKNESS / 2.0, arena_height / 2.0 - GAP_BETWEEN_POCKET_AND_WALL)
             }
-            WallLocation::Bottom | WallLocation::Top => {
+            Wall::Bottom | Wall::Top => {
                 Vec2::new(arena_width / 2.0  - GAP_BETWEEN_POCKET_AND_WALL, WALL_THICKNESS / 2.0)
             }
         }
@@ -68,6 +71,7 @@ pub struct WallBundle {
     collider: Collider,
     rigid_body : RigidBody,
     restitution_coefficient: Restitution,
+    wall: Wall
 }
 
 impl WallBundle {
@@ -81,19 +85,20 @@ impl WallBundle {
                     // or their ordering will be affected in surprising ways.
                     // See https://github.com/bevyengine/bevy/issues/4149
             //         scale: location.size().extend(1.0),
-    pub fn new(location: WallLocation,  meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<ColorMaterial>>) -> WallBundle {
+    pub fn new(wall: Wall,  meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<ColorMaterial>>) -> WallBundle {
         WallBundle {
             material_mesh_bundle: MaterialMesh2dBundle {
                 mesh: meshes
-                    .add(shape::Quad::new(2.0 * (location.dimensions())).into())
+                    .add(shape::Quad::new(2.0 * (wall.dimensions())).into())
                     .into(),
                 material: materials.add(ColorMaterial::from(WALL_COLOR)),
-                transform: Transform::from_translation(location.position().extend(1.0)),
+                transform: Transform::from_translation(wall.position().extend(1.0)),
                 ..default()
             },
-            collider: Collider::cuboid(location.dimensions()[0], location.dimensions()[1]),
+            collider: Collider::cuboid(wall.dimensions().x, wall.dimensions().y),
             rigid_body: RigidBody::Fixed,
             restitution_coefficient:  Restitution::coefficient(0.95),
+            wall
         }
     }
 }
