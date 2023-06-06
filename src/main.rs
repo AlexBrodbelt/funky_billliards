@@ -3,17 +3,19 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-
-mod config;
-mod systems;
 mod game;
 mod menu;
+mod config;
+pub mod resources;
+mod systems;
+
 
 use game::{
     GamePlugins, 
     systems::*,
 };
 
+use resources::CursorPosition;
 use systems::*;
 
 
@@ -41,12 +43,14 @@ fn main() {
             gravity : Vec2::ZERO,
             ..Default::default()
         })
+        .insert_resource(CursorPosition(Vec2::default()))
         // Startup Systems
         .add_startup_system(spawn_camera)
         .add_startup_system(spawn_sound)
         // Systems
         .add_systems(
             (   
+                get_cursor_position,
                 display_state,
                 state_transitions,
                 toggle_physics_pipeline,

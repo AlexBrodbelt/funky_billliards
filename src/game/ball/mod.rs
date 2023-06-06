@@ -22,7 +22,7 @@ impl Plugin for BallPlugin {
             // OnUpdate AppState::GameSetup Systems
             .add_system(set_cue_ball.in_set(OnUpdate(AppState::GameSetup)))
             // OnUpdate CueBallState::InPlay Systems
-            .add_system(spawn_cue_ball.in_schedule(OnEnter(CueBallState::InPlay)));
+            .add_system(spawn_cue_ball.in_schedule(OnEnter(AppState::GameSetup)));
     }
 }
 

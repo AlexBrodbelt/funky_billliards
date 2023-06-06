@@ -1,7 +1,30 @@
+use bevy::input::mouse::MouseButtonInput;
+use bevy::window::PrimaryWindow;
 use bevy::{prelude::*, app::AppExit};
 use bevy_rapier2d::prelude::RapierConfiguration;
 
+use crate::resources::*;
 use crate::{AppState, game::{SimulationState, ball::CueBallState}};
+
+pub fn get_cursor_position(
+    mut cursor_moved: EventReader<CursorMoved>,
+    primary_window_query: Query<&Window, With<PrimaryWindow>>,
+    mut cursor_position_resource: ResMut<CursorPosition>,
+) {
+    let Ok(primary) = primary_window_query.get_single() else {
+        return;
+    };
+    let mut cursor_position = match cursor_moved.iter().last() {
+        Some(cursor) => cursor.position,
+        None => return,
+    };
+
+    cursor_position.x -= 0.5 * primary.width();
+    cursor_position.y -= 0.5 * primary.height();
+
+    cursor_position_resource.0 = cursor_position;
+}
+
 
 /// Handles transitions between AppState, SimulationState, CueBallState states.
 pub fn state_transitions(
