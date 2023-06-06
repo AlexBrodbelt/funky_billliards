@@ -7,3 +7,4 @@ use bevy::{
 pub struct Scoreboard {
     pub score: usize,
 }
+

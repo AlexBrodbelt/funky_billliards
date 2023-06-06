@@ -21,7 +21,7 @@ use systems::*;
 pub enum AppState {
     #[default]
     Menu,
-    Edit,
+    GameSetup,
     Game,
     GameOver,
 }

@@ -66,7 +66,7 @@ pub fn toggle_simulation(
             }
             SimulationState::Paused => {
                 commands.insert_resource(NextState(Some(SimulationState::Running)));
-            } 
+            }
         }
     }
 }
