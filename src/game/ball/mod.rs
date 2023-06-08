@@ -7,8 +7,6 @@ mod resources;
 use systems::*;
 
 use crate::AppState;
-
-
 pub struct BallPlugin;
 
 impl Plugin for BallPlugin {
@@ -20,9 +18,9 @@ impl Plugin for BallPlugin {
             // On Enter AppState::Game Systems
             .add_system(despawn_balls.in_schedule(OnExit(AppState::Game)))
             // OnUpdate AppState::GameSetup Systems
-            .add_system(set_cue_ball.in_set(OnUpdate(AppState::GameSetup)))
+            .add_system(set_cueball.in_set(OnUpdate(AppState::GameSetup)))
             // OnUpdate CueBallState::InPlay Systems
-            .add_system(spawn_cue_ball.in_schedule(OnEnter(AppState::GameSetup)));
+            .add_system(spawn_cueball.in_schedule(OnEnter(AppState::GameSetup)));
     }
 }
 

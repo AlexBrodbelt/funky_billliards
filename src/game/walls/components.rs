@@ -71,7 +71,8 @@ pub struct WallBundle {
     collider: Collider,
     rigid_body : RigidBody,
     restitution_coefficient: Restitution,
-    wall: Wall
+    wall: Wall,
+    collision_group: CollisionGroups
 }
 
 impl WallBundle {
@@ -96,6 +97,7 @@ impl WallBundle {
                 ..default()
             },
             collider: Collider::cuboid(wall.dimensions().x, wall.dimensions().y),
+            collision_group: CollisionGroups::new( Group::GROUP_1, Group::GROUP_1),
             rigid_body: RigidBody::Fixed,
             restitution_coefficient:  Restitution::coefficient(0.95),
             wall

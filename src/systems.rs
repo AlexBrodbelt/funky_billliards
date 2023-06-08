@@ -1,4 +1,3 @@
-use bevy::input::mouse::MouseButtonInput;
 use bevy::window::PrimaryWindow;
 use bevy::{prelude::*, app::AppExit};
 use bevy_rapier2d::prelude::RapierConfiguration;

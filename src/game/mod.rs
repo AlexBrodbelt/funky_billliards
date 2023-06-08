@@ -6,7 +6,7 @@ pub mod systems;
 pub mod events;
 
 pub mod ball;
-pub mod cue_stick;
+pub mod cuestick;
 pub mod pocket;
 pub mod walls;
 pub mod scoreboard;

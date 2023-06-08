@@ -1,6 +1,5 @@
 use bevy::{
     prelude::*,
-    window::PrimaryWindow,
     input::{
         mouse::{
         MouseWheel,
@@ -11,8 +10,8 @@ use bevy::{
 use bevy_rapier2d::prelude::*;
 
 use crate::{
-    systems::get_cursor_position,
-    resources::CursorPosition};
+    resources::CursorPosition,
+    config::{LEFT_WALL, RIGHT_WALL, BOTTOM_WALL, TOP_WALL}};
 
 use crate::game::ball::{
     components::*,
@@ -40,7 +39,7 @@ pub fn spawn_balls(
     
 }
 
-pub fn spawn_cue_ball(
+pub fn spawn_cueball(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
@@ -56,12 +55,12 @@ pub fn spawn_cue_ball(
 }
 
 
-pub fn strike_cue_ball(
-    mut cue_ball_query: Query<(&Transform, &mut Velocity), With<CueBall>>,
+pub fn strike_cueball(
+    mut cueball_query: Query<(&Transform, &mut Velocity), With<CueBall>>,
     mut mouse_wheel: EventReader<MouseWheel>,
     cursor_position: Res<CursorPosition>,
 ) {
-    let Ok((transform, mut velocity)) = cue_ball_query.get_single_mut() else {
+    let Ok((transform, mut velocity)) = cueball_query.get_single_mut() else {
         return;
     };
     
@@ -70,18 +69,21 @@ pub fn strike_cue_ball(
     *velocity = Velocity::linear(new_velocity);
 
 }
-
-pub fn set_cue_ball(
+/// click to set the cue ball initial position
+pub fn set_cueball(
     mut commands: Commands,
     mut mouse_button_input: EventReader<MouseButtonInput>,
-    mut cue_ball_query: Query<&mut Transform, With<CueBall>>,
-    primary_window_query: Query<&Window, With<PrimaryWindow>>,
+    mut cueball_query: Query<&mut Transform, With<CueBall>>,
     cursor_position: Res<CursorPosition>,
 ) {
     if let Some(button_pressed) = mouse_button_input.iter().last() {
-        info!("{:?}", &button_pressed);
-        if let Ok(mut cue_ball_position) = cue_ball_query.get_single_mut() {
-            cue_ball_position.translation = cursor_position.0.extend(1.0);
+        // info!("{:?}", &button_pressed);
+        if let Ok(mut cueball_position) = cueball_query.get_single_mut() {
+            let mut new_cueball_position = cursor_position.0;
+            // making sure it doesn't cause the paddle to leave the arena
+            new_cueball_position = new_cueball_position.clamp(Vec2::new(LEFT_WALL, BOTTOM_WALL), Vec2::new(RIGHT_WALL, TOP_WALL));
+            cueball_position.translation = new_cueball_position.extend(1.0);
+            // Change CueBallState to InPlay
             commands.insert_resource(NextState(Some(CueBallState::InPlay)));
         }           
     }

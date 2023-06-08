@@ -91,40 +91,45 @@ impl From<&Ball> for Velocity {
     }
 }
 
+/// Bundle of components for the Ball.
 #[derive(Bundle)]
 pub struct BallBundle {
     ball: Ball,
-    material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
-    velocity: Velocity,
     collider: Collider,
-    rigid_body: RigidBody,
-    external_force: ExternalForce,
+    collision_group: CollisionGroups,
     damping: Damping,
+    external_force: ExternalForce,
+    material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
     restitution_coefficient: Restitution,
+    rigid_body: RigidBody,
+    velocity: Velocity,
 }
 
+
 impl BallBundle {
+    /// Given a Ball Type, the meshes and materials creates a new BallBundle
     pub fn new(ball: Ball, meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<ColorMaterial>>) -> BallBundle {
         BallBundle {
-        material_mesh_bundle: MaterialMesh2dBundle {
-            mesh: meshes.add(shape::Circle::new(BALL_RADIUS).into()).into(),
-            material: materials.add(ColorMaterial::from(&ball)),
-            transform: Transform::from(&ball),
-            ..default()
-        },
-        velocity: Velocity::from(&ball),
-        ball: ball,
-        collider: Collider::ball(BALL_RADIUS),
-        rigid_body: RigidBody::Dynamic,
-        external_force: ExternalForce {
-            force: Vec2::ZERO,
-            torque: 0.0,
+            collider: Collider::ball(BALL_RADIUS),
+            collision_group: CollisionGroups::new( Group::GROUP_1 | Group::GROUP_2, Group::GROUP_1 | Group::GROUP_2 ),
+            damping: Damping {
+                linear_damping: FRICTION_COEFFICIENT,
+                angular_damping: FRICTION_COEFFICIENT,
             },
-        damping: Damping {
-            linear_damping: FRICTION_COEFFICIENT,
-            angular_damping: FRICTION_COEFFICIENT,
+            external_force: ExternalForce {
+                force: Vec2::ZERO,
+                torque: 0.0,
             },
-        restitution_coefficient: Restitution::coefficient(0.90), 
+            material_mesh_bundle: MaterialMesh2dBundle {
+                mesh: meshes.add(shape::Circle::new(BALL_RADIUS).into()).into(),
+                material: materials.add(ColorMaterial::from(&ball)),
+                transform: Transform::from(&ball),
+                ..default()
+            },
+            rigid_body: RigidBody::Dynamic,
+            restitution_coefficient: Restitution::coefficient(0.90), 
+            velocity: Velocity::from(&ball),
+            ball,
         }
     }
 }
