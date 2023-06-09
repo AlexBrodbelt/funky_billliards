@@ -5,7 +5,7 @@ pub const TIME_STEP: f32 = 1.0 / 60.0;
 
 // Defines the friction coefficient for the material of the table
 pub const FRICTION_COEFFICIENT: f32 = 0.3;
-pub const STOPPING_THRESHOLD: f32 = 100.0;
+// pub const STOPPING_THRESHOLD: f32 = 100.0;
 
 // Ball
 pub const BALL_RADIUS: f32 = TABLE_WIDTH / 136.0;
@@ -17,6 +17,8 @@ pub const POCKET_RADIUS: f32 = 20.0;
 // Cuestick
 pub const CUESTICK_COLOR: Color = Color::rgb(0.3, 0.3, 0.7);
 pub const CUESTICK_SIZE: Vec2 = Vec2::new(120.0, 20.0);
+pub const MAX_IMPULSE: f32 = 100.0;
+pub const MIN_IMPULSE: f32 = 0.0;
 
 // Gaps
 pub const GAP_BETWEEN_BALLS: f32 = 8.0;

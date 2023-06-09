@@ -16,9 +16,10 @@ use crate::{
     AppState
 };
 
-use self::systems::*;
+use systems::*;
 
 use ball::BallPlugin;
+use cuestick::CueStickPlugin;
 use pocket::PocketPlugin;
 use scoreboard::ScoreboardPlugin;
 use walls::WallPlugin;
@@ -32,6 +33,7 @@ impl Plugin for GamePlugin {
         // Configure how frequently our gameplay systems are run
 
         app.add_state::<SimulationState>()
+            .add_state::<GameSetupState>()
             // Resources
             .insert_resource(FixedTime::new_from_secs(TIME_STEP))
             .insert_resource(ClearColor(BACKGROUND_COLOR))
@@ -61,12 +63,12 @@ pub struct GamePlugins;
 impl PluginGroup for GamePlugins {
     fn build(self) -> PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
+            .add(GamePlugin)
             .add(BallPlugin)
             // .add(CueStickPlugin)
             .add(PocketPlugin)
             .add(ScoreboardPlugin)  
             .add(WallPlugin)
-            .add(GamePlugin)
     }
 }
 
@@ -74,6 +76,14 @@ impl PluginGroup for GamePlugins {
 pub enum SimulationState {
     #[default]
     Paused,
-    Running,
-    
+    Running, 
+}
+
+#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
+pub enum GameSetupState {
+    WallSetup,
+    PocketSetup,
+    #[default]
+    CueBallSetup,
+    ShotSetup,
 }

@@ -98,7 +98,7 @@ pub struct BallBundle {
     collider: Collider,
     collision_group: CollisionGroups,
     damping: Damping,
-    external_force: ExternalForce,
+    // external_force: ExternalForce,
     material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
     restitution_coefficient: Restitution,
     rigid_body: RigidBody,
@@ -116,10 +116,10 @@ impl BallBundle {
                 linear_damping: FRICTION_COEFFICIENT,
                 angular_damping: FRICTION_COEFFICIENT,
             },
-            external_force: ExternalForce {
-                force: Vec2::ZERO,
-                torque: 0.0,
-            },
+            // external_force: ExternalForce {
+            //     force: Vec2::ZERO,
+            //     torque: 0.0,
+            // },
             material_mesh_bundle: MaterialMesh2dBundle {
                 mesh: meshes.add(shape::Circle::new(BALL_RADIUS).into()).into(),
                 material: materials.add(ColorMaterial::from(&ball)),

@@ -2,6 +2,7 @@ use bevy::window::PrimaryWindow;
 use bevy::{prelude::*, app::AppExit};
 use bevy_rapier2d::prelude::RapierConfiguration;
 
+use crate::game::GameSetupState;
 use crate::resources::*;
 use crate::{AppState, game::{SimulationState, ball::CueBallState}};
 
@@ -37,6 +38,7 @@ pub fn state_transitions(
         && app_state.0 != AppState::GameSetup 
         {
         commands.insert_resource(NextState(Some(AppState::GameSetup)));
+        commands.insert_resource(NextState(Some(GameSetupState::default())));
         commands.insert_resource(NextState(Some(CueBallState::InHand)));
     }
     // Press M: _ -> AppState::Menu
@@ -46,17 +48,19 @@ pub fn state_transitions(
         commands.insert_resource(NextState(Some(AppState::Menu)));
     }
     // Press Return/Enter: AppState::GameSetup -> AppState::Game and SimulationState::Paused
+    // Press Return/Enter: GameSetupState::CueBallSetup -> GameSetupState::ShotSetup
     if keyboard_input.just_pressed( KeyCode::Return) 
         && cue_ball_state.0 == CueBallState::InPlay
         && app_state.0 == AppState::GameSetup
         {
         commands.insert_resource(NextState(Some(AppState::Game)));
+        commands.insert_resource(NextState(Some(GameSetupState::ShotSetup)));
         commands.insert_resource(NextState(Some(SimulationState::Paused)));
     } 
 }
 
 pub fn toggle_physics_pipeline(
-    app_state: Res<State<AppState>> ,
+    app_state: Res<State<AppState>>,
     simulation_state: Res<State<SimulationState>>,
     mut rapier_config: ResMut<RapierConfiguration>,
 ) {

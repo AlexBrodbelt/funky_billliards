@@ -1,7 +1,4 @@
-use bevy::{
-    prelude::*,
-    window::PrimaryWindow, input::{ButtonState, mouse::{MouseButtonInput, self}},
-};
+use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use super::{resources::*, SimulationState};
@@ -38,7 +35,7 @@ pub fn play_collision_sound(
 
 
 
-
+/// Pauses/Resumes the Game simulation
 pub fn toggle_simulation(
     mut commands: Commands,
     keyboard_input: Res<Input<KeyCode>>,

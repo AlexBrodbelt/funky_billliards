@@ -14,9 +14,10 @@ pub struct CueStickBundle {
     cue_stick: CueStick,
     collider: Collider,
     collision_group: CollisionGroups,
+    external_force: ExternalForce,
     material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
     // velocity: Velocity,
-    // rigid_body: RigidBody,
+    rigid_body: RigidBody,
     // external_force: ExternalForce,
     // damping: Damping,
     // restitution_coefficient: Restitution,
@@ -38,8 +39,9 @@ impl CueStickBundle {
                     rotation: Quat::IDENTITY,
                     ..Default::default()
                 }, 
-                 ..default()
-            }  
+                ..default()
+            },
+            rigid_body: RigidBody::KinematicPositionBased,
         }
     }   
 }
