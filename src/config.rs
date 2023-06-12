@@ -16,7 +16,7 @@ pub const POCKET_RADIUS: f32 = 20.0;
 
 // Cuestick
 pub const CUESTICK_COLOR: Color = Color::rgb(0.3, 0.3, 0.7);
-pub const CUESTICK_SIZE: Vec2 = Vec2::new(120.0, 20.0);
+pub const CUESTICK_SIZE: Vec2 = Vec2::new(120.0, 5.0);
 pub const MAX_IMPULSE: f32 = 100.0;
 pub const MIN_IMPULSE: f32 = 0.0;
 

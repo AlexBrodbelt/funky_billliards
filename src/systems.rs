@@ -38,7 +38,7 @@ pub fn state_transitions(
         && app_state.0 != AppState::GameSetup 
         {
         commands.insert_resource(NextState(Some(AppState::GameSetup)));
-        commands.insert_resource(NextState(Some(GameSetupState::default())));
+        commands.insert_resource(NextState(Some(GameSetupState::CueBallSetup)));
         commands.insert_resource(NextState(Some(CueBallState::InHand)));
     }
     // Press M: _ -> AppState::Menu
@@ -47,15 +47,14 @@ pub fn state_transitions(
         {
         commands.insert_resource(NextState(Some(AppState::Menu)));
     }
-    // Press Return/Enter: AppState::GameSetup -> AppState::Game and SimulationState::Paused
     // Press Return/Enter: GameSetupState::CueBallSetup -> GameSetupState::ShotSetup
-    if keyboard_input.just_pressed( KeyCode::Return) 
+    if keyboard_input.just_pressed(KeyCode::Return) 
         && cue_ball_state.0 == CueBallState::InPlay
         && app_state.0 == AppState::GameSetup
         {
-        commands.insert_resource(NextState(Some(AppState::Game)));
+        // commands.insert_resource(NextState(Some(AppState::GameSetup)));
         commands.insert_resource(NextState(Some(GameSetupState::ShotSetup)));
-        commands.insert_resource(NextState(Some(SimulationState::Paused)));
+        // commands.insert_resource(NextState(Some(SimulationState::Paused)));
     } 
 }
 
@@ -76,6 +75,7 @@ pub fn toggle_physics_pipeline(
 pub fn display_state(
     app_state: Res<State<AppState>> ,
     simulation_state: Res<State<SimulationState>>, 
+    game_setup_state: Res<State<GameSetupState>>,
     cue_ball_state: Res<State<CueBallState>>,  
 ) {
     if simulation_state.is_changed() {
@@ -86,11 +86,14 @@ pub fn display_state(
         println!("{:?}", cue_ball_state.0);
     }
 
+    if game_setup_state.is_changed() {
+        println!("{:?}", game_setup_state.0);
+    }
+
     if app_state.is_changed() {
         println!("{:?}", app_state.0);
     }  
 
-    
 }
 
 

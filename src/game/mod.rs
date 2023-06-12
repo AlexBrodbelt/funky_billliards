@@ -32,7 +32,8 @@ impl Plugin for GamePlugin {
         // Add our gameplay simulation systems to the fixed timestep schedule
         // Configure how frequently our gameplay systems are run
 
-        app.add_state::<SimulationState>()
+        app // States
+            .add_state::<SimulationState>()
             .add_state::<GameSetupState>()
             // Resources
             .insert_resource(FixedTime::new_from_secs(TIME_STEP))
@@ -65,7 +66,7 @@ impl PluginGroup for GamePlugins {
         PluginGroupBuilder::start::<Self>()
             .add(GamePlugin)
             .add(BallPlugin)
-            // .add(CueStickPlugin)
+            .add(CueStickPlugin)
             .add(PocketPlugin)
             .add(ScoreboardPlugin)  
             .add(WallPlugin)

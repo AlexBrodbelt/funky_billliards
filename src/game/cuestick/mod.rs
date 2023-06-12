@@ -4,7 +4,8 @@ use crate::AppState;
 
 use self::{
     systems::*,
-    resources::{MouseWheelActive, StrikeImpulse}};
+    resources::StrikeForce
+};
 
 use super::{ball::CueBallState, GameSetupState};
 
@@ -19,20 +20,19 @@ impl Plugin for CueStickPlugin {
     fn  build(&self, app: &mut App) {
         app.add_system(
                 spawn_cuestick
-                    // .in_schedule(OnEnter(CueBallState::InPlay))
                     .in_schedule(OnEnter(GameSetupState::ShotSetup))
+                    // .in_schedule(OnEnter(GameSetupState::ShotSetup))
             )
-            .add_system(
-                set_cuestick
-                    .in_set(OnUpdate(GameSetupState::ShotSetup))
-            )
-            .add_system(
-                strike_cueball
+            .add_systems(
+                (
+                    set_cuestick,
+                    strike_cueball
+                )
                     .in_set(OnUpdate(GameSetupState::ShotSetup))
             )
             .add_system(
                 despawn_cuestick
-                    .in_schedule(OnEnter(AppState::Game))
+                    .in_schedule(OnExit(GameSetupState::ShotSetup))
             );                  
     }
 }

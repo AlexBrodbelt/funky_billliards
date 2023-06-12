@@ -66,7 +66,7 @@ impl Ball {
 
     pub fn velocity(&self) -> Vec2 {
         match *self {
-            Ball::White => Vec2::new(600.0, 10.0),
+            // Ball::White => Vec2::new(600.0, 10.0),
             _ => Vec2::ZERO,
         }
     }
