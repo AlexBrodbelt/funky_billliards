@@ -33,8 +33,9 @@ impl Plugin for GamePlugin {
         // Configure how frequently our gameplay systems are run
 
         app // States
-            .add_state::<SimulationState>()
             .add_state::<GameSetupState>()
+            .add_state::<GameState>()
+            .add_state::<SimulationState>()
             // Resources
             .insert_resource(FixedTime::new_from_secs(TIME_STEP))
             .insert_resource(ClearColor(BACKGROUND_COLOR))
@@ -88,3 +89,11 @@ pub enum GameSetupState {
     CueBallSetup,
     ShotSetup,
 }
+
+#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
+pub enum GameState {
+    #[default]
+    ShotCooldown,
+    Playing
+}
+

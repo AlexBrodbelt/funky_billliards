@@ -17,13 +17,14 @@ pub const POCKET_RADIUS: f32 = 20.0;
 // Cuestick
 pub const CUESTICK_COLOR: Color = Color::rgb(0.3, 0.3, 0.7);
 pub const CUESTICK_SIZE: Vec2 = Vec2::new(120.0, 5.0);
-pub const MAX_IMPULSE: f32 = 100.0;
-pub const MIN_IMPULSE: f32 = 0.0;
+pub const MAX_FORCE: f32 = 5000.0;
+pub const MIN_FORCE: f32 = 0.0;
+pub const PULL_BACK_DISPLACEMENT_CONVERSION_FACTOR: f32 = 5.0;
 
 // Gaps
 pub const GAP_BETWEEN_BALLS: f32 = 8.0;
 pub const GAP_BETWEEN_POCKET_AND_WALL: f32 = 25.0;
-pub const GAP_BETWEEN_CUESTICK_AND_CUEBALL: f32 = 1.0;
+pub const GAP_BETWEEN_CUESTICK_AND_CUEBALL: f32 = 5.0;
 
 // Table
 pub const BACKGROUND_COLOR: Color = Color::rgb(0.04, 0.42, 0.01);
@@ -53,5 +54,8 @@ pub const SCORE_COLOR: Color = Color::rgb(1.0, 0.5, 0.5);
 pub const SCOREBOARD_FONT_SIZE: f32 = 40.0;
 pub const SCOREBOARD_TEXT_PADDING: Val = Val::Px(5.0);
 pub const TEXT_COLOR: Color = Color::rgb(0.5, 0.5, 1.0);
+
+
+pub const FORCE_CONVERSION_FACTOR: f32 = 1500.0;
 
 

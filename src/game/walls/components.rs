@@ -27,22 +27,23 @@ impl Wall {
         }
     }
     
-    pub fn size(&self) -> Vec2 {
-        let arena_height = TOP_WALL - BOTTOM_WALL;
-        let arena_width = RIGHT_WALL - LEFT_WALL;
-        // Make sure we haven't messed up our constants
-        assert!(arena_height > 0.0);
-        assert!(arena_width > 0.0);
+    // pub fn size(&self) -> Vec2 {
+    //     let arena_height = TOP_WALL - BOTTOM_WALL;
+    //     let arena_width = RIGHT_WALL - LEFT_WALL;
+    //     // Make sure we haven't messed up our constants
+    //     assert!(arena_height > 0.0);
+    //     assert!(arena_width > 0.0);
         
-        match self {
-            Wall::Left | Wall::Right => {
-                Vec2::new(WALL_THICKNESS, arena_height + WALL_THICKNESS)
-            }
-            Wall::Bottom | Wall::Top => {
-                Vec2::new(arena_width + WALL_THICKNESS, WALL_THICKNESS)
-            }
-        }
-    }
+    //     match self {
+    //         Wall::Left | Wall::Right => {
+    //             Vec2::new(WALL_THICKNESS, arena_height + WALL_THICKNESS)
+    //         }
+    //         Wall::Bottom | Wall::Top => {
+    //             Vec2::new(arena_width + WALL_THICKNESS, WALL_THICKNESS)
+    //         }
+    //     }
+    // }
+    
     pub fn dimensions(&self) -> Vec2 {
         let arena_height = TOP_WALL - BOTTOM_WALL;
         let arena_width = RIGHT_WALL - LEFT_WALL;

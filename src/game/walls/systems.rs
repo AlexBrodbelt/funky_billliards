@@ -6,7 +6,7 @@ pub fn spawn_walls(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    asset_server: Res<AssetServer>, 
+    // asset_server: Res<AssetServer>, 
 ) {
     // Walls
     commands.spawn(WallBundle::new(Wall::Left, &mut meshes, &mut materials));

@@ -3,13 +3,13 @@ use bevy_rapier2d::prelude::*;
 
 use super::components::*;
 
-use crate::game::{scoreboard::resources::*, ball::components::Ball};
+use crate::game::scoreboard::resources::*;
 
 pub fn spawn_pockets(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    asset_server: Res<AssetServer>, 
+    // asset_server: Res<AssetServer>, 
 ) {
     commands.spawn(PocketBundle::new(Pocket::BottomLeft, &mut meshes, &mut materials ));
     commands.spawn(PocketBundle::new(Pocket::BotttomCenter, &mut meshes, &mut materials ));

@@ -2,7 +2,7 @@ use bevy::window::PrimaryWindow;
 use bevy::{prelude::*, app::AppExit};
 use bevy_rapier2d::prelude::RapierConfiguration;
 
-use crate::game::GameSetupState;
+use crate::game::{GameSetupState, GameState};
 use crate::resources::*;
 use crate::{AppState, game::{SimulationState, ball::CueBallState}};
 
@@ -64,7 +64,7 @@ pub fn toggle_physics_pipeline(
     mut rapier_config: ResMut<RapierConfiguration>,
 ) {
     if app_state.is_changed() || simulation_state.is_changed() {
-        if app_state.0 != AppState::Game || simulation_state.0 != SimulationState::Running {
+        if app_state.0 == AppState::Game || simulation_state.0 != SimulationState::Running {
             rapier_config.physics_pipeline_active = false;
         } else {
             rapier_config.physics_pipeline_active = true;
@@ -74,9 +74,10 @@ pub fn toggle_physics_pipeline(
 
 pub fn display_state(
     app_state: Res<State<AppState>> ,
-    simulation_state: Res<State<SimulationState>>, 
     game_setup_state: Res<State<GameSetupState>>,
+    game_state: Res<State<GameState>>,
     cue_ball_state: Res<State<CueBallState>>,  
+    simulation_state: Res<State<SimulationState>>, 
 ) {
     if simulation_state.is_changed() {
         println!("{:?}", simulation_state.0);
@@ -90,10 +91,13 @@ pub fn display_state(
         println!("{:?}", game_setup_state.0);
     }
 
+    if game_state.is_changed() {
+        println!("{:?}", game_state.0);
+    }
+
     if app_state.is_changed() {
         println!("{:?}", app_state.0);
     }  
-
 }
 
 
