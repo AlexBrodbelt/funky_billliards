@@ -18,7 +18,7 @@ pub fn insert_cue_stick_lifetime_timer(
 ) {
     commands.insert_resource(
         CueStickLifetimeTimer {
-            timer: Timer::new(Duration::from_secs(5), TimerMode::Once)
+            timer: Timer::new(Duration::from_secs(2), TimerMode::Once)
         }
     );
 }
@@ -107,7 +107,7 @@ pub fn strike_cue_ball(
         let (_axis, angle) = cue_stick_transform.rotation.to_axis_angle(); // how to convert from quaternion to angle?
         // println!("{:?}", axis);
         // println!("axis {:?} - force {:?}", axis, force);
-        cue_stick_external_force.force = - (FORCE_CONVERSION_FACTOR * force).clamp(MIN_FORCE, MAX_FORCE) * Vec2::from_angle(angle);
+        cue_stick_external_force.force = (FORCE_CONVERSION_FACTOR * force).clamp(MIN_FORCE, MAX_FORCE) * Vec2::from_angle(angle);
         println!("{:?}", cue_stick_external_force.force);
         commands.insert_resource(NextState(Some(AppState::Game)));
         commands.insert_resource(NextState(Some(GameState::ShotCooldown)))

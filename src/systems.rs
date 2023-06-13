@@ -64,7 +64,7 @@ pub fn toggle_physics_pipeline(
     mut rapier_config: ResMut<RapierConfiguration>,
 ) {
     if app_state.is_changed() || simulation_state.is_changed() {
-        if app_state.0 == AppState::Game || simulation_state.0 != SimulationState::Running {
+        if app_state.0 != AppState::Game || simulation_state.0 != SimulationState::Running {
             rapier_config.physics_pipeline_active = false;
         } else {
             rapier_config.physics_pipeline_active = true;

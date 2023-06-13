@@ -76,8 +76,8 @@ impl PluginGroup for GamePlugins {
 
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
 pub enum SimulationState {
-    #[default]
     Paused,
+    #[default]
     Running, 
 }
 

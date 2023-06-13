@@ -55,7 +55,6 @@ pub const SCOREBOARD_FONT_SIZE: f32 = 40.0;
 pub const SCOREBOARD_TEXT_PADDING: Val = Val::Px(5.0);
 pub const TEXT_COLOR: Color = Color::rgb(0.5, 0.5, 1.0);
 
-
-pub const FORCE_CONVERSION_FACTOR: f32 = 1500.0;
+pub const FORCE_CONVERSION_FACTOR: f32 = 1.0;
 
 
