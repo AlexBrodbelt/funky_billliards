@@ -24,6 +24,8 @@ use pocket::PocketPlugin;
 use scoreboard::ScoreboardPlugin;
 use walls::WallPlugin;
 
+use self::resources::TableStatus;
+
 
 pub struct GamePlugin;
 
@@ -37,6 +39,7 @@ impl Plugin for GamePlugin {
             .add_state::<GameState>()
             .add_state::<SimulationState>()
             // Resources
+            .insert_resource(TableStatus::default())
             .insert_resource(FixedTime::new_from_secs(TIME_STEP))
             .insert_resource(ClearColor(BACKGROUND_COLOR))
             // Events

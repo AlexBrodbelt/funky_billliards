@@ -14,7 +14,7 @@ pub struct CueStickBundle {
     cue_stick: CueStick,
     collider: Collider,
     collision_group: CollisionGroups,
-    external_force: ExternalForce,
+    // external_force: ExternalForce,
     material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
     rigid_body: RigidBody,
     velocity: Velocity,
@@ -30,7 +30,7 @@ impl CueStickBundle {
             cue_stick: CueStick,
             collider: Collider::cuboid(CUESTICK_SIZE.x, CUESTICK_SIZE.y),
             collision_group: CollisionGroups::new( Group::GROUP_2, Group::GROUP_2),
-            external_force: ExternalForce { force: Vec2::ZERO, torque: 0.0 },
+            // external_force: ExternalForce { force: Vec2::ZERO, torque: 0.0 },
             material_mesh_bundle: MaterialMesh2dBundle { 
                 mesh: meshes
                 .add(shape::Quad::new(2.0 * CUESTICK_SIZE ).into())
@@ -43,7 +43,7 @@ impl CueStickBundle {
                 }, 
                 ..default()
             },
-            rigid_body: RigidBody::Dynamic,
+            rigid_body: RigidBody::KinematicVelocityBased,
             velocity: Velocity::zero(),
         }
     }   

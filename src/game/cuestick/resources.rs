@@ -10,19 +10,15 @@ use bevy::prelude::*;
 // }
 
 
-type Force = f32;
+type Distance = f32;
 
 /// Keeps track of the total impulse that must be exerted on the Cue Stick.
 #[derive(Resource)]
-pub struct StrikeForce(pub Force);
+pub struct WindUpDistance(pub Distance);
 
-impl Default for StrikeForce {
+impl Default for WindUpDistance {
     fn default() -> Self {
-        StrikeForce(0.0)        
+        WindUpDistance(0.0)        
     }
 }
 
-#[derive(Resource)]
-pub struct CueStickLifetimeTimer {
-    pub timer: Timer
-}

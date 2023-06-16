@@ -4,30 +4,14 @@ use bevy::{
     prelude::*, input::mouse::{MouseButtonInput, MouseWheel},
 
 };
-use bevy_rapier2d::prelude::ExternalForce;
+use bevy_rapier2d::prelude::Velocity;
 
-use crate::{config::*, resources::CursorPosition, game::{ball::components::CueBall, GameState}, AppState};
+use crate::{config::*, resources::CursorPosition, game::{ball::components::CueBall, GameState, resources::TableStatus}, AppState};
 
 use super::{
     components::*,
-    resources::{StrikeForce, CueStickLifetimeTimer}
+    resources::WindUpDistance
 };
-
-pub fn insert_cue_stick_lifetime_timer(
-    mut commands: Commands,
-) {
-    commands.insert_resource(
-        CueStickLifetimeTimer {
-            timer: Timer::new(Duration::from_secs(2), TimerMode::Once)
-        }
-    );
-}
-
-pub fn remove_cue_stick_lifetime_timer(
-    mut commands: Commands
-) {
-    commands.remove_resource::<CueStickLifetimeTimer>();
-}
 
 pub fn spawn_cue_stick(
     mut commands: Commands,
@@ -38,32 +22,9 @@ pub fn spawn_cue_stick(
 ) {
     let cue_ball_transform = cue_ball_query.single();
     commands.spawn(CueStickBundle::new(cue_ball_transform ,meshes, materials));
-    commands.insert_resource(StrikeForce::default());
+    commands.insert_resource(WindUpDistance::default());
 }
 
-/// updates the timer which manages the cool down period for the cue_stick once it has been thrusted.
-pub fn cue_stick_cooldown(
-    time: Res<Time>,
-    mut cue_stick_lifetime_timer: ResMut<CueStickLifetimeTimer>
-) {
-    cue_stick_lifetime_timer.timer.tick(time.delta());
-}
-
-/// despawns the cue_stick after the cooldown period has elapsed and modifies the state of the game:
-/// AppState::GameSetup -> AppState::Game
-pub fn despawn_cue_stick(
-    mut commands: Commands,
-    cue_stick_query: Query<Entity, With<CueStick>>,
-    config: Res<CueStickLifetimeTimer>,
-) { 
-    if config.timer.finished() { 
-        let cue_stick_entity = cue_stick_query.single();
-        commands.entity(cue_stick_entity).despawn();
-        commands.remove_resource::<StrikeForce>();
-
-        commands.insert_resource(NextState(Some(GameState::Playing)));
-    }  
-}
 
 /// manages the placement of the cue_stick given mouse position input.
 pub fn set_cue_stick(
@@ -94,31 +55,36 @@ pub fn set_cue_stick(
     }
 }
 
-/// Drag back with two fingers to set the force applied to the cue_stick.
+/// When there wind up distance has been computed set the initial velocity of the cue ball.
+/// Handle appropriate state transitions and resources.
 pub fn strike_cue_ball(
     mut commands: Commands,
-    mut cue_stick_query: Query<(&Transform, &mut ExternalForce), With<CueStick>>,
-    strike_force: Res<StrikeForce>,
+    mut cue_stick_query: Query<(&Transform, &mut Velocity), With<CueStick>>,
+    wind_up_distance_resource: Res<WindUpDistance>,
+    mut table_status: ResMut<TableStatus>,
 ) { 
     // If the mouse is not scrolled any further in the next frame then strike the cue ball and change to the next state
-    if !strike_force.is_changed() && strike_force.0 != 0.0  {
-        let (cue_stick_transform, mut cue_stick_external_force) = cue_stick_query.single_mut();
-        let force = strike_force.0;
-        let (_axis, angle) = cue_stick_transform.rotation.to_axis_angle(); // how to convert from quaternion to angle?
-        // println!("{:?}", axis);
-        // println!("axis {:?} - force {:?}", axis, force);
-        cue_stick_external_force.force = (FORCE_CONVERSION_FACTOR * force).clamp(MIN_FORCE, MAX_FORCE) * Vec2::from_angle(angle);
-        println!("{:?}", cue_stick_external_force.force);
+    if !wind_up_distance_resource.is_changed() && wind_up_distance_resource.0 != 0.0  {
+        let (cue_stick_transform, mut cue_stick_velocity) = cue_stick_query.single_mut();
+        let wind_up_distance = wind_up_distance_resource.0;
+        let (axis, angle) = cue_stick_transform.rotation.to_axis_angle();
+        // println!("axis {:?} - angle {:?} - force {:?}", axis, angle, wind_up_distance);
+        // set the velocity of the cue stick
+        cue_stick_velocity.linvel =  - (VELOCITY_SCALING * wind_up_distance).clamp(MIN_VELOCITY, MAX_VELOCITY) * Vec2::from_angle(axis.z * angle);
+        // record initial position of the cue stick
+        table_status.cue_stick_status.initial_position =  Some(cue_stick_transform.translation.truncate());
+        println!("{:?}", cue_stick_velocity);
         commands.insert_resource(NextState(Some(AppState::Game)));
         commands.insert_resource(NextState(Some(GameState::ShotCooldown)))
     }
 }
 
-pub fn compute_strike_force(
+/// Drag back with two fingers to wind up the cue stick.
+pub fn compute_wind_up_distance(
     mut mouse_wheel_events: EventReader<MouseWheel>,
     cue_ball_query: Query<&Transform, (With<CueBall>, Without<CueStick>)>,
     mut cue_stick_query: Query<&mut Transform, With<CueStick>>,
-    mut strike_force: ResMut<StrikeForce>,
+    mut strike_force: ResMut<WindUpDistance>,
 ) {
     for mouse_wheel_event in mouse_wheel_events.iter() {
         strike_force.0 += mouse_wheel_event.y.abs();
@@ -129,4 +95,36 @@ pub fn compute_strike_force(
             println!("there is no cue sitick entity");
         }
     }
+}
+
+/// The force acting on the cue stick is proportional to the displacement with respect to the initial position of the cue ball.
+/// The cue stick will despawn once it's position is past a threshold value relative to the cue ball's initial position. 
+pub fn handle_cue_stick_motion(
+    mut commands: Commands,
+    mut cue_stick_query: Query<(Entity, &Transform, &mut Velocity), With<CueStick>>,
+    mut table_status: ResMut<TableStatus>,
+    time: Res<Time>,
+) {
+    if let Ok((cue_stick_entity, cue_stick_transform, mut cue_stick_velocity)) = cue_stick_query.get_single_mut() {
+        if let Some(cue_ball_initial_position) = table_status.cue_ball_status.initial_position {
+            // tick timer
+            table_status.cue_stick_status.lifetime_timer.tick(time.delta());
+            let cue_stick_distance_from_initial_cue_ball_position = (cue_stick_transform.translation.truncate() - cue_ball_initial_position).length();
+            println!("cue stick initial distance from cue ball {:?}", cue_stick_distance_from_initial_cue_ball_position);
+
+            // despawn cue stick condition
+            if cue_stick_distance_from_initial_cue_ball_position < 0.125 * BALL_RADIUS || table_status.cue_stick_status.lifetime_timer.finished() {
+                println!("timer ran out {:?}", table_status.cue_stick_status.lifetime_timer.finished());
+                commands.entity(cue_stick_entity).despawn();
+                // remove WindUpDistance resource
+                commands.remove_resource::<WindUpDistance>();
+    
+                commands.insert_resource(NextState(Some(GameState::Playing)));
+            }
+        } else {
+            println!("the cue ball has not been placed or the cue ball initial position resource is None");
+        }        
+    } else {
+        println!("there is either no cue stick or there are too many cue sticks");
+    } 
 }

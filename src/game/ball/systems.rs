@@ -9,7 +9,7 @@ use bevy::{
 
 use crate::{
     resources::CursorPosition,
-    config::{LEFT_WALL, RIGHT_WALL, BOTTOM_WALL, TOP_WALL}};
+    config::{LEFT_WALL, RIGHT_WALL, BOTTOM_WALL, TOP_WALL}, game::cuestick::resources::CueBallInitialPosition};
 
 use crate::game::ball::{
     components::*,
@@ -71,12 +71,16 @@ pub fn set_cue_ball(
     mut mouse_button_input: EventReader<MouseButtonInput>,
     mut cue_ball_query: Query<&mut Transform, With<CueBall>>,
     cursor_position: Res<CursorPosition>,
+    mut cue_ball_initial_positon: ResMut<CueBallInitialPosition>,
 ) {
     if let Some(_button_pressed) = mouse_button_input.iter().last() {
         if let Ok(mut cue_ball_position) = cue_ball_query.get_single_mut() {
             let mut new_cue_ball_position = cursor_position.0;
-            // making sure it doesn't cause the paddle to leave the arena
+            // Making sure the ball does not leave the arena
             new_cue_ball_position = new_cue_ball_position.clamp(Vec2::new(LEFT_WALL, BOTTOM_WALL), Vec2::new(RIGHT_WALL, TOP_WALL));
+            // Set cue ball initial position resource
+            cue_ball_initial_positon.0 = Some(new_cue_ball_position);
+            // Set the position of the cue ball
             cue_ball_position.translation = new_cue_ball_position.extend(1.0);
             // Change CueBallState to InPlay
             commands.insert_resource(NextState(Some(CueBallState::InPlay)));
