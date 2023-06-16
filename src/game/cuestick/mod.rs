@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::AppState;
 
-use self::{systems::*, resources::{CueStickLifetimeTimer, CueBallInitialPosition}};
+use self::systems::*;
 
 use super::{GameSetupState, GameState};
 
@@ -35,7 +35,6 @@ impl Plugin for CueStickPlugin {
                 )
                     .in_set(OnUpdate(GameState::ShotCooldown))
                     .in_set(OnUpdate(AppState::Game))
-                    .distributive_run_if(resource_exists::<CueStickLifetimeTimer>())
                 );
     }
 }
