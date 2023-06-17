@@ -5,17 +5,19 @@ use bevy::prelude::*;
 #[derive(Resource)]
 pub struct CollisionSound(pub Handle<AudioSource>);
 
-#[derive(Resource)]
+#[derive(Resource, Debug)]
 pub struct TableStatus {
     pub cue_stick_status: CueStickStatus,
     pub cue_ball_status: CueBallStatus,
 }
 
+#[derive(Debug)]
 pub struct CueStickStatus {
     pub lifetime_timer: Timer,
     pub initial_position: Option<Vec2>, // position after wind up 
 }
 
+#[derive(Debug)]
 pub struct CueBallStatus {
     pub initial_position: Option<Vec2>,
 }

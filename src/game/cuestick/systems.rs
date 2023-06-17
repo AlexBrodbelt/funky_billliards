@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use bevy::{
     prelude::*, input::mouse::{MouseButtonInput, MouseWheel},
 
@@ -105,20 +103,28 @@ pub fn handle_cue_stick_motion(
     mut table_status: ResMut<TableStatus>,
     time: Res<Time>,
 ) {
-    if let Ok((cue_stick_entity, cue_stick_transform, mut cue_stick_velocity)) = cue_stick_query.get_single_mut() {
+    if let Ok((cue_stick_entity, cue_stick_transform, cue_stick_velocity)) = cue_stick_query.get_single_mut() {
         if let Some(cue_ball_initial_position) = table_status.cue_ball_status.initial_position {
             // tick timer
             table_status.cue_stick_status.lifetime_timer.tick(time.delta());
-            let cue_stick_distance_from_initial_cue_ball_position = (cue_stick_transform.translation.truncate() - cue_ball_initial_position).length();
-            println!("cue stick initial distance from cue ball {:?}", cue_stick_distance_from_initial_cue_ball_position);
+
+            let ball_stick_initial_distance = (table_status.cue_ball_status.initial_position.unwrap() - table_status.cue_stick_status.initial_position.unwrap()).length();
+            let _cue_stick_distance_from_initial_cue_ball_position = (cue_stick_transform.translation.truncate() - cue_ball_initial_position).length();
+            // println!("cue stick initial distance from cue ball {:?}", cue_stick_distance_from_initial_cue_ball_position);
+            // println!("{:?}", table_status);
+
 
             // despawn cue stick condition
-            if cue_stick_distance_from_initial_cue_ball_position < 0.125 * BALL_RADIUS || table_status.cue_stick_status.lifetime_timer.finished() {
+            if table_status.cue_stick_status.lifetime_timer.elapsed_secs() * cue_stick_velocity.linvel.length() >= ball_stick_initial_distance + BALL_RADIUS
+            || table_status.cue_stick_status.lifetime_timer.finished() {
                 println!("timer ran out {:?}", table_status.cue_stick_status.lifetime_timer.finished());
+                // reset the timer
+                table_status.cue_stick_status.lifetime_timer.reset();
+                // despawn cue stick
                 commands.entity(cue_stick_entity).despawn();
                 // remove WindUpDistance resource
                 commands.remove_resource::<WindUpDistance>();
-    
+                // set next state to Playing
                 commands.insert_resource(NextState(Some(GameState::Playing)));
             }
         } else {
