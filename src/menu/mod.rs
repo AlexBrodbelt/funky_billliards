@@ -1,5 +1,9 @@
 use bevy::prelude::*;
 
+mod systems;
+mod styles;
+mod components;
+
 pub struct MenuPlugin;
 
 impl Plugin for MenuPlugin {

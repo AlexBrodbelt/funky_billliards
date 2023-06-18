@@ -43,7 +43,7 @@ fn main() {
             gravity : Vec2::ZERO,
             ..Default::default()
         })
-        .insert_resource(CursorPosition(Vec2::default()))
+        .insert_resource(CursorPosition::default())
         // Startup Systems
         .add_startup_system(spawn_camera)
         .add_startup_system(spawn_sound)

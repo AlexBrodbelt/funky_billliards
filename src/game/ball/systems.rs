@@ -1,16 +1,14 @@
 use bevy::{
     prelude::*,
-    input::{
-        mouse::{
-        MouseButtonInput
-        },
-    },
+    input::mouse::MouseButtonInput,
 };
 
 use crate::{
     resources::CursorPosition,
-    config::{LEFT_WALL, RIGHT_WALL, BOTTOM_WALL, TOP_WALL}, game::resources::TableStatus,
- };
+    config::{LEFT_WALL, RIGHT_WALL, BOTTOM_WALL, TOP_WALL},
+};
+
+use crate::game::resources::TableStatus;
 
 use crate::game::ball::{
     components::*,
@@ -52,27 +50,13 @@ pub fn spawn_cue_ball(
     ); 
 }
 
-// pub fn strike_cue_ball(
-//     mut cue_ball_query: Query<(&Transform, &mut Velocity), With<CueBall>>,
-//     mut mouse_wheel: EventReader<MouseWheel>,
-//     cursor_position: Res<CursorPosition>,
-// ) {
-//     let Ok((transform, mut velocity)) = cue_ball_query.get_single_mut() else {
-//         return;
-//     };
-    
-//     let new_velocity = cursor_position.0 - transform.translation.truncate();
-
-//     *velocity = Velocity::linear(new_velocity);
-
-// }
 /// click to set the cue ball initial position
 pub fn set_cue_ball(
-    mut commands: Commands,
     mut mouse_button_input: EventReader<MouseButtonInput>,
     mut cue_ball_query: Query<&mut Transform, With<CueBall>>,
     cursor_position: Res<CursorPosition>,
     mut table_status: ResMut<TableStatus>,
+    mut next_cue_ball_state: ResMut<NextState<CueBallState>>,
 ) {
     if let Some(_button_pressed) = mouse_button_input.iter().last() {
         if let Ok(mut cue_ball_position) = cue_ball_query.get_single_mut() {
@@ -84,9 +68,9 @@ pub fn set_cue_ball(
             // Set the position of the cue ball
             cue_ball_position.translation = new_cue_ball_position.extend(1.0);
             // Change CueBallState to InPlay
-            commands.insert_resource(NextState(Some(CueBallState::InPlay)));
+            next_cue_ball_state.set(CueBallState::InPlay);
         } else {
-            println!("multiple ball entities have been spawned")
+            println!("either none or multiple ball entities have been spawned");
         }          
     }
 }

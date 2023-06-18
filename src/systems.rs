@@ -28,33 +28,33 @@ pub fn get_cursor_position(
 
 /// Handles transitions between AppState, SimulationState, CueBallState states.
 pub fn state_transitions(
-    mut commands: Commands,
     keyboard_input: Res<Input<KeyCode>>,
     app_state: Res<State<AppState>>,
     cue_ball_state: Res<State<CueBallState>>,
+    mut next_app_state: ResMut<NextState<AppState>>,
+    mut next_game_setup_state: ResMut<NextState<GameSetupState>>,
+    mut next_cue_ball_state: ResMut<NextState<CueBallState>>,
 ) {
     // Press G: _ -> AppState::GameSetup and CueBallState::InHand
     if keyboard_input.just_pressed(KeyCode::G)
         && app_state.0 != AppState::GameSetup 
         {
-        commands.insert_resource(NextState(Some(AppState::GameSetup)));
-        commands.insert_resource(NextState(Some(GameSetupState::CueBallSetup)));
-        commands.insert_resource(NextState(Some(CueBallState::InHand)));
+        next_app_state.set(AppState::GameSetup);
+        next_game_setup_state.set(GameSetupState::CueBallSetup);
+        next_cue_ball_state.set(CueBallState::InHand);
     }
     // Press M: _ -> AppState::Menu
     if keyboard_input.just_pressed(KeyCode::M)
         && app_state.0 != AppState::Menu
         {
-        commands.insert_resource(NextState(Some(AppState::Menu)));
+        next_app_state.set(AppState::Menu);
     }
     // Press Return/Enter: GameSetupState::CueBallSetup -> GameSetupState::ShotSetup
     if keyboard_input.just_pressed(KeyCode::Return) 
         && cue_ball_state.0 == CueBallState::InPlay
         && app_state.0 == AppState::GameSetup
         {
-        // commands.insert_resource(NextState(Some(AppState::GameSetup)));
-        commands.insert_resource(NextState(Some(GameSetupState::ShotSetup)));
-        // commands.insert_resource(NextState(Some(SimulationState::Paused)));
+        next_game_setup_state.set(GameSetupState::ShotSetup);
     } 
 }
 

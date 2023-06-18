@@ -56,10 +56,11 @@ pub fn set_cue_stick(
 /// When there wind up distance has been computed set the initial velocity of the cue ball.
 /// Handle appropriate state transitions and resources.
 pub fn strike_cue_ball(
-    mut commands: Commands,
     mut cue_stick_query: Query<(&Transform, &mut Velocity), With<CueStick>>,
     wind_up_distance_resource: Res<WindUpDistance>,
     mut table_status: ResMut<TableStatus>,
+    mut next_app_state: ResMut<NextState<AppState>>,
+    mut next_game_state: ResMut<NextState<GameState>>,
 ) { 
     // If the mouse is not scrolled any further in the next frame then strike the cue ball and change to the next state
     if !wind_up_distance_resource.is_changed() && wind_up_distance_resource.0 != 0.0  {
@@ -72,8 +73,9 @@ pub fn strike_cue_ball(
         // record initial position of the cue stick
         table_status.cue_stick_status.initial_position =  Some(cue_stick_transform.translation.truncate());
         println!("{:?}", cue_stick_velocity);
-        commands.insert_resource(NextState(Some(AppState::Game)));
-        commands.insert_resource(NextState(Some(GameState::ShotCooldown)))
+
+        next_app_state.set(AppState::Game);
+        next_game_state.set(GameState::ShotCooldown);
     }
 }
 
@@ -100,8 +102,9 @@ pub fn compute_wind_up_distance(
 pub fn handle_cue_stick_motion(
     mut commands: Commands,
     mut cue_stick_query: Query<(Entity, &Transform, &mut Velocity), With<CueStick>>,
-    mut table_status: ResMut<TableStatus>,
     time: Res<Time>,
+    mut table_status: ResMut<TableStatus>,
+    mut next_game_state: ResMut<NextState<GameState>>,
 ) {
     if let Ok((cue_stick_entity, cue_stick_transform, cue_stick_velocity)) = cue_stick_query.get_single_mut() {
         if let Some(cue_ball_initial_position) = table_status.cue_ball_status.initial_position {
@@ -112,7 +115,6 @@ pub fn handle_cue_stick_motion(
             let _cue_stick_distance_from_initial_cue_ball_position = (cue_stick_transform.translation.truncate() - cue_ball_initial_position).length();
             // println!("cue stick initial distance from cue ball {:?}", cue_stick_distance_from_initial_cue_ball_position);
             // println!("{:?}", table_status);
-
 
             // despawn cue stick condition
             if table_status.cue_stick_status.lifetime_timer.elapsed_secs() * cue_stick_velocity.linvel.length() >= ball_stick_initial_distance + BALL_RADIUS
@@ -125,7 +127,7 @@ pub fn handle_cue_stick_motion(
                 // remove WindUpDistance resource
                 commands.remove_resource::<WindUpDistance>();
                 // set next state to Playing
-                commands.insert_resource(NextState(Some(GameState::Playing)));
+                next_game_state.set(GameState::Playing);
             }
         } else {
             println!("the cue ball has not been placed or the cue ball initial position resource is None");
