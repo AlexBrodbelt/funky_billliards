@@ -88,15 +88,18 @@ pub enum SimulationState {
 pub enum GameSetupState {
     WallSetup,
     PocketSetup,
-    #[default]
     CueBallSetup,
     ShotSetup,
+    #[default]
+    Disabled,
 }
 
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
 pub enum GameState {
-    #[default]
+    
     ShotCooldown,
-    Playing
+    Playing,
+    #[default]
+    Disabled,
 }
 

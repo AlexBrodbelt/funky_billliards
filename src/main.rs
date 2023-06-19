@@ -15,6 +15,7 @@ use game::{
     systems::*,
 };
 
+use menu::MenuPlugin;
 use resources::CursorPosition;
 use systems::*;
 
@@ -38,6 +39,7 @@ fn main() {
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(1500.0)) // needs to be tweaked
         // My Plugins
         .add_plugins(GamePlugins)
+        .add_plugin(MenuPlugin)
         // Bevy Rapier Resources
         .insert_resource( RapierConfiguration {
             gravity : Vec2::ZERO,
