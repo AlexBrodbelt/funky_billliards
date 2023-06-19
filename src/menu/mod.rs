@@ -5,6 +5,7 @@ mod styles;
 mod components;
 
 use systems::layout::*;
+use systems::interactions::*;
 
 use crate::AppState;
 
@@ -16,7 +17,7 @@ impl Plugin for MenuPlugin {
             // OnEnter Systems
             .add_system(spawn_menu.in_schedule(OnEnter(AppState::Menu)))
             // OnUpdate Systems
-
+            .add_system(interact_with_button.in_set(OnUpdate(AppState::Menu)))
             // OnExit Systems
             .add_system(despawn_menu.in_schedule(OnExit(AppState::Menu)));
     }

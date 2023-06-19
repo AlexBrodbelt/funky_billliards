@@ -1,6 +1,9 @@
-use bevy::{prelude::*, utils::petgraph::graph::Node};
+use bevy::prelude::*;
 
-use crate::menu::{components::{Menu, PlayButton, QuitButton}, styles::{NORMAL_BUTTON_STYLE, NORMAL_BUTTON_COLOR, get_button_text_style}};
+use crate::menu::{
+    components::{Menu, MenuButton}, 
+    styles::*,
+};
 
 pub fn spawn_menu(
     mut commands: Commands,
@@ -26,14 +29,7 @@ fn build_main_menu (
         .spawn(
     (
                 NodeBundle {
-                style: Style {
-                    flex_direction: FlexDirection::Column,
-                    justify_content: JustifyContent::Center,
-                    align_items: AlignItems::Center,
-                    size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
-                    gap: Size::new( Val::Px(8.0), Val::Px(8.0)),
-                    ..default()
-                },
+                style: MENU_STYLE,
                 background_color: Color::YELLOW_GREEN.into(),
                 ..default()
                 },
@@ -44,13 +40,7 @@ fn build_main_menu (
             // === Title ===
             parent.spawn(
                 NodeBundle {
-                    style: Style {
-                        flex_direction: FlexDirection::Row,
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        size: Size::new( Val::Px(300.0), Val::Px(120.0) ),
-                        ..default()
-                    },
+                    style: TITLE_STYLE,
                     ..default()
                 }
             )
@@ -79,11 +69,11 @@ fn build_main_menu (
             parent.spawn(
                 (
                     ButtonBundle {
-                        style: NORMAL_BUTTON_STYLE,
+                        style: BUTTON_STYLE,
                         background_color: NORMAL_BUTTON_COLOR.into(),
                         ..default()
                     },
-                    PlayButton,
+                    MenuButton::Play,
                 )
             )
             .with_children(|parent| {
@@ -107,11 +97,11 @@ fn build_main_menu (
             parent.spawn(
                 (
                     ButtonBundle {
-                        style: NORMAL_BUTTON_STYLE,
+                        style: BUTTON_STYLE,
                         background_color: NORMAL_BUTTON_COLOR.into(),
                         ..default()
                     },
-                    QuitButton,
+                    MenuButton::Quit,
                 )
             )
             .with_children(|parent| {
