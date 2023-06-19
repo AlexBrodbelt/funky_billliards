@@ -1,6 +1,6 @@
 use bevy::{prelude::*, app::AppExit};
 
-use crate::{menu::{styles::{CLICKED_BUTTON_COLOR, HOVERED_BUTTON_COLOR, NORMAL_BUTTON_COLOR}, components::MenuButton}, AppState};
+use crate::{menu::{styles::{CLICKED_BUTTON_COLOR, HOVERED_BUTTON_COLOR, NORMAL_BUTTON_COLOR}, components::MenuButton}, AppState, game::GameSetupState};
 
 pub fn interact_with_button(
     mut app_exit_event_writer: EventWriter<AppExit>,
@@ -9,6 +9,7 @@ pub fn interact_with_button(
     (Changed<Interaction>, With<MenuButton>)
     >,
     mut next_app_state: ResMut<NextState<AppState>>,
+    mut next_game_setup_state: ResMut<NextState<GameSetupState>>,
 ) {
     if let Ok((interaction, mut background_color, menu_button_type)) = button_query.get_single_mut() {
         match *interaction {
@@ -17,6 +18,7 @@ pub fn interact_with_button(
                 match *menu_button_type {
                     MenuButton::Play => {
                         next_app_state.set(AppState::GameSetup);
+                        next_game_setup_state.set(GameSetupState::CueBallSetup);
                     },
                     MenuButton::Quit => {
                         app_exit_event_writer.send(AppExit);

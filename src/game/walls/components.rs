@@ -18,7 +18,8 @@ pub enum Wall {
 
 /// Which side of the arena is this wall located on?
 impl Wall {
-    pub fn position(&self) -> Vec2 {
+    /// returns the default position of the wall.
+    pub fn position(&self) -> Vec2 {       
         match self {
             Wall::Left => Vec2::new(LEFT_WALL, 0.),
             Wall::Right => Vec2::new(RIGHT_WALL, 0.),
@@ -27,44 +28,50 @@ impl Wall {
         }
     }
     
-    // pub fn size(&self) -> Vec2 {
-    //     let arena_height = TOP_WALL - BOTTOM_WALL;
-    //     let arena_width = RIGHT_WALL - LEFT_WALL;
-    //     // Make sure we haven't messed up our constants
-    //     assert!(arena_height > 0.0);
-    //     assert!(arena_width > 0.0);
-        
-    //     match self {
-    //         Wall::Left | Wall::Right => {
-    //             Vec2::new(WALL_THICKNESS, arena_height + WALL_THICKNESS)
-    //         }
-    //         Wall::Bottom | Wall::Top => {
-    //             Vec2::new(arena_width + WALL_THICKNESS, WALL_THICKNESS)
-    //         }
-    //     }
-    // }
-    
-    pub fn dimensions(&self) -> Vec2 {
+    /// returns a vector with the base and height of the rectangle.
+    pub fn size(&self) -> Vec2 {
         let arena_height = TOP_WALL - BOTTOM_WALL;
         let arena_width = RIGHT_WALL - LEFT_WALL;
         // Make sure we haven't messed up our constants
         assert!(arena_height > 0.0);
         assert!(arena_width > 0.0);
-        
+
         match self {
             Wall::Left | Wall::Right => {
-                Vec2::new(WALL_THICKNESS / 2.0, arena_height / 2.0 - GAP_BETWEEN_POCKET_AND_WALL)
-            }
+                Vec2::new(WALL_THICKNESS, arena_height - 1.0 * WALL_THICKNESS)
+            },
             Wall::Bottom | Wall::Top => {
-                Vec2::new(arena_width / 2.0  - GAP_BETWEEN_POCKET_AND_WALL, WALL_THICKNESS / 2.0)
-            }
+                Vec2::new(arena_width + 1.0 * WALL_THICKNESS, WALL_THICKNESS)
+            },
         }
-    }   
+
+    }
+    /// returns a vector with the half extents of the rectangle.
+    pub fn half_extents_(&self) -> Vec2 {
+        let arena_height = TOP_WALL - BOTTOM_WALL;
+        let arena_width = RIGHT_WALL - LEFT_WALL;
+        // Make sure we haven't messed up our constants
+        assert!(arena_height > 0.0);
+        assert!(arena_width > 0.0);
+
+        match self {
+            Wall::Left | Wall::Right => {
+                Vec2::new(0.5 * WALL_THICKNESS, 0.5 * arena_height)
+            },
+            Wall::Bottom | Wall::Top => {
+                Vec2::new(0.5 * arena_width, 0.5 * WALL_THICKNESS)
+            },
+        }
+    }  
+    /// returns a vector with the half extents of the rectangle.
+    pub fn half_extents(&self) -> Vec2 {
+        0.5 * self.size()
+    }  
 }
 
 
 #[derive(Bundle)]
-pub struct WallBundle {
+pub struct DefaultWallBundle {
     // You can nest bundles inside of other bundles like this
     // Allowing you to compose their functionality
     material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
@@ -76,7 +83,7 @@ pub struct WallBundle {
     collision_group: CollisionGroups
 }
 
-impl WallBundle {
+impl DefaultWallBundle {
     // This "builder method" allows us to reuse logic across our wall entities,
     // making our code easier to read and less prone to bugs when we change the logic
 
@@ -87,17 +94,17 @@ impl WallBundle {
                     // or their ordering will be affected in surprising ways.
                     // See https://github.com/bevyengine/bevy/issues/4149
             //         scale: location.size().extend(1.0),
-    pub fn new(wall: Wall,  meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<ColorMaterial>>) -> WallBundle {
-        WallBundle {
+    pub fn new(wall: Wall,  meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<ColorMaterial>>) -> DefaultWallBundle {
+        DefaultWallBundle {
             material_mesh_bundle: MaterialMesh2dBundle {
                 mesh: meshes
-                    .add(shape::Quad::new(2.0 * (wall.dimensions())).into())
+                    .add(shape::Quad::new(wall.size()).into())
                     .into(),
                 material: materials.add(ColorMaterial::from(WALL_COLOR)),
                 transform: Transform::from_translation(wall.position().extend(1.0)),
                 ..default()
             },
-            collider: Collider::cuboid(wall.dimensions().x, wall.dimensions().y),
+            collider: Collider::cuboid(wall.half_extents().x, wall.half_extents().y),
             collision_group: CollisionGroups::new( Group::GROUP_1, Group::GROUP_1),
             rigid_body: RigidBody::Fixed,
             restitution_coefficient:  Restitution::coefficient(0.95),
@@ -105,3 +112,5 @@ impl WallBundle {
         }
     }
 }
+
+
