@@ -29,13 +29,7 @@ pub enum AppState {
     GameOver,
 }
 
-/// Which player is currently active
-#[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
-pub enum Player {
-    #[default]
-    One,
-    Two,
-}
+
 
 fn main() {
     App::new()

@@ -24,7 +24,7 @@ use pocket::PocketPlugin;
 use scoreboard::ScoreboardPlugin;
 use walls::WallPlugin;
 
-use self::resources::TableStatus;
+use self::resources::{TableStatus, ActivePlayer};
 
 
 pub struct GamePlugin;
@@ -40,6 +40,7 @@ impl Plugin for GamePlugin {
             .add_state::<SimulationState>()
             // Resources
             .insert_resource(TableStatus::default())
+            .insert_resource(ActivePlayer::default())
             .insert_resource(FixedTime::new_from_secs(TIME_STEP))
             .insert_resource(ClearColor(BACKGROUND_COLOR))
             // Events
@@ -50,6 +51,7 @@ impl Plugin for GamePlugin {
                     toggle_simulation,
                 )
                 .in_set(OnUpdate(AppState::Game))
+                .in_set(OnUpdate(GameState::Playing))
             )
             // On Update Systems when SimulationState::Running
             .add_systems(
@@ -96,7 +98,6 @@ pub enum GameSetupState {
 
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
 pub enum GameState {
-    
     ShotCooldown,
     Playing,
     #[default]

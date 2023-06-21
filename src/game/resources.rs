@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{time::Duration, iter::Cycle};
 
 use bevy::prelude::*;
 
@@ -22,8 +22,6 @@ pub struct CueBallStatus {
     pub initial_position: Option<Vec2>,
 }
 
-
-
 impl Default for TableStatus {
     fn default() -> Self {
         TableStatus {
@@ -37,3 +35,33 @@ impl Default for TableStatus {
         }
     }
 }
+
+/// Which player is currently active
+#[derive(Resource)]
+pub struct ActivePlayer(pub Player);
+    
+
+impl ActivePlayer {
+    pub fn switch_player(&mut self) {
+        self.0 = match self.0 {
+            Player::One => Player::Two,
+            Player::Two => Player::One,
+        }                
+    }
+}
+
+impl Default for ActivePlayer {
+    fn default() -> Self {
+        ActivePlayer(Player::default())
+    }
+}
+
+#[derive(Default)]
+pub enum Player {
+    #[default]
+    One,
+    Two,
+}
+
+
+

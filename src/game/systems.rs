@@ -1,7 +1,9 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use super::{resources::*, SimulationState, ball::{components::Ball, self}};
+use crate::AppState;
+
+use super::{resources::*, SimulationState, ball::{components::{Ball, CueBall}, self}, GameSetupState};
 
 
 pub fn spawn_camera(
@@ -55,16 +57,26 @@ pub fn toggle_simulation(
 
 /// detects if sprites are not moving
 fn balls_not_moving(
-    ball_query: &Query<Entity, (With<Ball>, Changed<Transform>)>,
+    ball_query: Query<Entity, (With<Ball>, Changed<Transform>)>,
 ) -> bool {
     ball_query.is_empty() 
 }
 
-// pub player_hand_over(
-//     ball_query: Query<Entity, (With<Ball>, Changed<Transform>)>,   
+
+
+
+// pub fn switch_player_condition(
+//     ball_query: Query<Entity, (With<Ball>, Changed<Transform>)>, 
+//     cue_ball_query: Query<Entity, With<CueBall>>,
+//     mut active_player: ResMut<ActivePlayer>,
+//     mut next_app_state: ResMut<NextState<AppState>>,
+//     mut next_game_setup_state: ResMut<NextState<GameSetupState>>,
 // ) {
 //     if balls_not_moving(ball_query) {
-//         hand_over_to_next_player()
+//         active_player.switch_player();
+//         next_app_state.set(AppState::GameSetup);
+
+//         // next_game_setup_state.set(GameSetupState::CueBallSetup or GameSetupState::ShotSetup);
 //     }
 // }
 
