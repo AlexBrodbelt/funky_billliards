@@ -36,7 +36,6 @@ fn main() {
         // Bevy Plugins
         .add_plugins(DefaultPlugins)
         .add_state::<AppState>()
-        .add_state::<Player>()
         // Bevy Rapier Plugins
         .add_plugin(RapierDebugRenderPlugin::default()) // Debugger Plugin
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(1500.0)) // needs to be tweaked

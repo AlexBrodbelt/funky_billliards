@@ -3,7 +3,7 @@ use bevy::{prelude::*, app::AppExit};
 use bevy_rapier2d::prelude::RapierConfiguration;
 
 use crate::game::{GameSetupState, GameState};
-use crate::{resources::*, Player};
+use crate::{resources::*};
 use crate::{AppState, game::{SimulationState, ball::CueBallState}};
 
 pub fn get_cursor_position(
@@ -72,37 +72,32 @@ pub fn toggle_physics_pipeline(
     }
 }
 
+macro_rules! print_if_state_changed {
+    ( $( $state:ident ),* ) => {
+        {
+            $(
+            if $state.is_changed() {
+            println!("{:?}", $state.0);
+            }
+            )*
+        }
+    };
+}
+
 pub fn display_state(
     app_state: Res<State<AppState>>,
-    player_state: Res<State<Player>>,
     game_setup_state: Res<State<GameSetupState>>,
     game_state: Res<State<GameState>>,
     cue_ball_state: Res<State<CueBallState>>,  
     simulation_state: Res<State<SimulationState>>, 
 ) {
-    if simulation_state.is_changed() {
-        println!("{:?}", simulation_state);
-    }
-
-    if cue_ball_state.is_changed() {
-        println!("{:?}", cue_ball_state);
-    }
-
-    if game_setup_state.is_changed() {
-        println!("{:?}", game_setup_state);
-    }
-
-    if game_state.is_changed() {
-        println!("{:?}", game_state);
-    }
-
-    if player_state.is_changed() {
-        println!("{:?}", player_state)
-    }
-
-    if app_state.is_changed() {
-        println!("{:?}", app_state);
-    }  
+    print_if_state_changed!(
+        app_state,
+        game_setup_state,
+        game_state,
+        cue_ball_state,
+        simulation_state
+    );
 }
 
 

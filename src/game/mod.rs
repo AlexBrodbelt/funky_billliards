@@ -49,6 +49,7 @@ impl Plugin for GamePlugin {
             .add_systems(
                 (
                     toggle_simulation,
+                    switch_player_condition,
                 )
                 .in_set(OnUpdate(AppState::Game))
                 .in_set(OnUpdate(GameState::Playing))

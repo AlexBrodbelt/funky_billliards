@@ -1,4 +1,4 @@
-use std::{time::Duration, iter::Cycle};
+use std::time::Duration;
 
 use bevy::prelude::*;
 
@@ -56,7 +56,7 @@ impl Default for ActivePlayer {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub enum Player {
     #[default]
     One,

@@ -3,7 +3,7 @@ use bevy_rapier2d::prelude::*;
 
 use crate::AppState;
 
-use super::{resources::*, SimulationState, ball::{components::{Ball, CueBall}, self}, GameSetupState};
+use super::{resources::*, SimulationState, ball::{components::{Ball, CueBall}}, GameSetupState};
 
 
 pub fn spawn_camera(
@@ -63,22 +63,25 @@ fn balls_not_moving(
 }
 
 
-
-
-// pub fn switch_player_condition(
-//     ball_query: Query<Entity, (With<Ball>, Changed<Transform>)>, 
-//     cue_ball_query: Query<Entity, With<CueBall>>,
-//     mut active_player: ResMut<ActivePlayer>,
-//     mut next_app_state: ResMut<NextState<AppState>>,
-//     mut next_game_setup_state: ResMut<NextState<GameSetupState>>,
-// ) {
-//     if balls_not_moving(ball_query) {
-//         active_player.switch_player();
-//         next_app_state.set(AppState::GameSetup);
-
-//         // next_game_setup_state.set(GameSetupState::CueBallSetup or GameSetupState::ShotSetup);
-//     }
-// }
+pub fn switch_player_condition(
+    ball_query: Query<Entity, (With<Ball>, Changed<Transform>)>, 
+    cue_ball_query: Query<Entity, With<CueBall>>,
+    mut active_player: ResMut<ActivePlayer>,
+    mut next_app_state: ResMut<NextState<AppState>>,
+    mut next_game_setup_state: ResMut<NextState<GameSetupState>>,
+) {
+    if balls_not_moving(ball_query) {
+        active_player.switch_player();
+        println!("{:?}", active_player.0);
+        next_app_state.set(AppState::GameSetup);
+        // If the cue ball is still on the table set the GameSetupState to ShotSetup otherwise set to CueBallSetup
+        if cue_ball_query.is_empty() {
+            next_game_setup_state.set(GameSetupState::CueBallSetup);
+        } else {
+            next_game_setup_state.set(GameSetupState::ShotSetup);
+        } 
+    }
+}
 
 
 
