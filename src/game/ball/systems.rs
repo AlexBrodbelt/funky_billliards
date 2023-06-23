@@ -5,7 +5,7 @@ use bevy::{
 
 use crate::{
     resources::CursorPosition,
-    config::{LEFT_WALL, RIGHT_WALL, BOTTOM_WALL, TOP_WALL},
+    config::{LEFT_WALL, RIGHT_WALL, BOTTOM_WALL, TOP_WALL}, game::GameSetupState,
 };
 
 use crate::game::resources::TableStatus;
@@ -20,6 +20,7 @@ pub fn spawn_balls(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
+    mut next_game_setup_state: ResMut<NextState<GameSetupState>>,
     // asset_server: Res<AssetServer>, 
 ) {
     // commands.spawn(BallBundle::new(Ball::Yellow, &mut meshes, &mut materials));
@@ -33,7 +34,7 @@ pub fn spawn_balls(
             commands.spawn(BallBundle::new(Ball::Red(RedBallIdentifier::new(level, index)), &mut meshes, &mut materials));
         }
     }
-    
+    next_game_setup_state.set(GameSetupState::CueBallSetup);    
 }
 
 pub fn spawn_cue_ball(
@@ -45,7 +46,7 @@ pub fn spawn_cue_ball(
     commands.spawn(
         (
             BallBundle::new(Ball::White,  &mut meshes, &mut materials),
-        CueBall
+            CueBall
         )
     ); 
 }
@@ -77,7 +78,7 @@ pub fn set_cue_ball(
 
 pub fn despawn_balls(
     mut commands: Commands,
-    ball_query: Query<Entity, With<Ball>>,
+    ball_query: Query<Entity, (With<Ball>,)>,
 ) {
     for ball in &ball_query {
         commands.entity(ball).despawn();

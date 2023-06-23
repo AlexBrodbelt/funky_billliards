@@ -56,7 +56,7 @@ impl Default for ActivePlayer {
     }
 }
 
-#[derive(Default, Debug)]
+#[derive(Component, Default, Debug)]
 pub enum Player {
     #[default]
     One,

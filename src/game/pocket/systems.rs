@@ -3,7 +3,10 @@ use bevy_rapier2d::prelude::*;
 
 use super::components::*;
 
-use crate::game::scoreboard::resources::*;
+use crate::game::{
+    scoreboard::resources::*,
+    resources::ActivePlayer,
+    ball::{components::Ball, self}};
 
 pub fn spawn_pockets(
     mut commands: Commands,
@@ -24,17 +27,23 @@ pub fn pocket_condition(
     mut commands: Commands,
     mut scoreboard: ResMut<Scoreboard>,
     rapier_context: Res<RapierContext>,
-    pocket_query: Query<Entity, With<Pocket>>
+    active_player: Res<ActivePlayer>,
+    pocket_query: Query<Entity, With<Pocket>>,
+    ball_query: Query<&Ball, With<Ball>>,
 ) {
     for pocket in pocket_query.iter() {
         for (entity1, entity2, intersecting) in rapier_context.intersections_with(pocket){
             if intersecting {
-                if entity1 == pocket {
-                    commands.entity(entity2).despawn();
-                } else {
-                    commands.entity(entity1).despawn();
-                }
-                scoreboard.score += 1;
+
+                // if Ok then entity1 is the ball entity otherwise entity2 is the ball entity, the pocket entity is the alternative entity option
+                let (entity, ball_type) = match ball_query.get(entity1) {
+                    Ok(ball_type) => (entity1, ball_type),
+                    Err(_) => (entity2, ball_query.get(entity2).unwrap()),
+                };
+
+                scoreboard.pocket(&active_player.0, ball_type);
+                commands.entity(entity).despawn(); 
+                             
             }
         }
     }

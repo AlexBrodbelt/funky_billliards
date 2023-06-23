@@ -6,7 +6,7 @@ use bevy_rapier2d::prelude::*;
 
 use crate::config::*;
 
-#[derive(Eq, PartialEq, Hash)]
+#[derive(Eq, PartialEq, Hash, Debug)]
 pub struct RedBallIdentifier {
     level: usize,
     index: usize,
@@ -18,7 +18,7 @@ impl RedBallIdentifier {
     }
 }
 
-#[derive(Component, Eq, PartialEq, Hash)]
+#[derive(Component, Eq, PartialEq, Hash, Debug)]
 pub enum Ball {
     Black,
     White,
@@ -70,6 +70,19 @@ impl Ball {
             _ => Vec2::ZERO,
         }
     }
+
+    pub fn score(&self) -> usize {
+        match *self {
+            Ball::Black => BLACK_SCORE,
+            Ball::White => WHITE_SCORE,
+            Ball::Yellow => YELLOW_SCORE,
+            Ball::Red(_) => RED_SCORE,
+            Ball::Blue => BLUE_SCORE,
+            Ball::Green => GREEN_SCORE,
+            Ball::Pink => PINK_SCORE,
+            Ball::Brown => BROWN_SCORE,
+        }
+    }
 }
 
 impl From<&Ball> for ColorMaterial {
@@ -111,7 +124,11 @@ impl BallBundle {
     pub fn new(ball: Ball, meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<ColorMaterial>>) -> BallBundle {
         BallBundle {
             collider: Collider::ball(BALL_RADIUS),
-            collision_group: CollisionGroups::new( Group::GROUP_1 | Group::GROUP_2, Group::GROUP_1 | Group::GROUP_2 ),
+            collision_group: if ball == Ball::White {
+                    CollisionGroups::new( Group::GROUP_1 | Group::GROUP_2, Group::GROUP_1 | Group::GROUP_2 )
+                } else {
+                    CollisionGroups::new( Group::GROUP_1, Group::GROUP_1)
+                },
             damping: Damping {
                 linear_damping: FRICTION_COEFFICIENT,
                 angular_damping: FRICTION_COEFFICIENT,

@@ -1,7 +1,9 @@
 use bevy::prelude::*;
 
 pub mod resources;
+mod styles;
 mod systems;
+mod components;
 
 use systems::*;
 use resources::*;
@@ -15,13 +17,13 @@ impl Plugin for ScoreboardPlugin {
         app.add_system(
                 spawn_scoreboard
                     .run_if(not(resource_exists::<Scoreboard>()))
-                    .in_schedule(OnEnter(AppState::Game))
+                    .in_schedule(OnExit(AppState::Menu))
             )
             .add_system(update_scoreboard.in_set(OnUpdate(AppState::Game)))
             .add_system(
                 despawn_scoreboard
                     .run_if(resource_exists::<Scoreboard>())
-                    .in_schedule(OnExit(AppState::Game))
+                    .in_schedule(OnEnter(AppState::Menu))
             );
     }
 }

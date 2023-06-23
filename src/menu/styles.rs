@@ -34,7 +34,7 @@ pub const MENU_STYLE: Style = Style {
     ..Style::DEFAULT
 };
 
-pub const IMAGE_STYLE: Style = Style {
+pub const _IMAGE_STYLE: Style = Style {
     size: Size::new(Val::Px(200.0), Val::Px(64.0)),
     margin: UiRect { 
         left: Val::Px(8.0),

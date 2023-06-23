@@ -5,10 +5,18 @@ pub const TIME_STEP: f32 = 1.0 / 60.0;
 
 /// Defines the friction coefficient for the material of the table
 pub const FRICTION_COEFFICIENT: f32 = 0.5;
-// pub const STOPPING_THRESHOLD: f32 = 100.0;
+pub const STOPPING_THRESHOLD: f32 = 100.0;
 
 // Ball
 pub const BALL_RADIUS: f32 = TABLE_WIDTH / 136.0;
+pub const BLACK_SCORE: usize = 10;
+pub const WHITE_SCORE: usize = 0;
+pub const YELLOW_SCORE: usize = 3;
+pub const RED_SCORE: usize = 1;
+pub const BLUE_SCORE: usize = 5;
+pub const GREEN_SCORE: usize = 4;
+pub const PINK_SCORE: usize = 6;
+pub const BROWN_SCORE: usize = 8;
 
 // Pocket
 pub const POCKET_COLOR: Color = Color::BLACK;

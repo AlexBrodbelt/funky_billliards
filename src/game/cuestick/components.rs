@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use bevy::{
     prelude::*, 
     sprite::MaterialMesh2dBundle,
@@ -37,8 +39,8 @@ impl CueStickBundle {
                 .into(),
                 material: materials.add(ColorMaterial::from(CUESTICK_COLOR)), 
                 transform: Transform { 
-                    translation: cuestick_position.extend(1.0),
-                    rotation: Quat::IDENTITY,
+                    translation: cuestick_position.extend(1.1),
+                    rotation: Quat::from_rotation_z(PI),
                     ..Default::default()
                 }, 
                 ..default()

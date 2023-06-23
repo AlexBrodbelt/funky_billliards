@@ -67,12 +67,11 @@ pub fn strike_cue_ball(
         let (cue_stick_transform, mut cue_stick_velocity) = cue_stick_query.single_mut();
         let wind_up_distance = wind_up_distance_resource.0;
         let (axis, angle) = cue_stick_transform.rotation.to_axis_angle();
-        // println!("axis {:?} - angle {:?} - force {:?}", axis, angle, wind_up_distance);
+        println!("sign: {:?}", axis.z * angle);
         // set the velocity of the cue stick
         cue_stick_velocity.linvel =  - (VELOCITY_SCALING * wind_up_distance).clamp(MIN_VELOCITY, MAX_VELOCITY) * Vec2::from_angle(axis.z * angle);
         // record initial position of the cue stick
         table_status.cue_stick_status.initial_position =  Some(cue_stick_transform.translation.truncate());
-        println!("{:?}", cue_stick_velocity);
 
         next_app_state.set(AppState::Game);
         next_game_state.set(GameState::ShotCooldown);

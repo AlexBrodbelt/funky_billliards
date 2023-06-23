@@ -49,6 +49,7 @@ impl Plugin for GamePlugin {
             .add_systems(
                 (
                     toggle_simulation,
+                    stopping_threshold,
                     switch_player_condition,
                 )
                 .in_set(OnUpdate(AppState::Game))
@@ -91,6 +92,7 @@ pub enum SimulationState {
 pub enum GameSetupState {
     WallSetup,
     PocketSetup,
+    BallSetup,
     CueBallSetup,
     ShotSetup,
     #[default]

@@ -18,7 +18,7 @@ pub fn interact_with_button(
                 match *menu_button_type {
                     MenuButton::Play => {
                         next_app_state.set(AppState::GameSetup);
-                        next_game_setup_state.set(GameSetupState::CueBallSetup);
+                        next_game_setup_state.set(GameSetupState::BallSetup);
                     },
                     MenuButton::Quit => {
                         app_exit_event_writer.send(AppExit);

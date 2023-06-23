@@ -1,45 +1,32 @@
 use bevy::prelude::*;
 
-use crate::config::*;
+use crate::game::resources::Player;
 
-use super::resources::*;
+use super::{resources::*, components::ScoreboardBundle};
 
 pub fn spawn_scoreboard(
     mut commands: Commands,
     asset_server: Res<AssetServer>, 
 ) {
-    commands.spawn(
-        TextBundle::from_sections([
-            TextSection::new(
-                "Score: ",
-                TextStyle {
-                    font: asset_server.load("fonts\\FiraSans-Bold.ttf"),
-                    font_size: SCOREBOARD_FONT_SIZE,
-                    color: TEXT_COLOR,
-                },
-            ),
-            TextSection::from_style(TextStyle {
-                font: asset_server.load("fonts\\FiraMono-Medium.ttf"),
-                font_size: SCOREBOARD_FONT_SIZE,
-                color: SCORE_COLOR,
-            }),
-        ])
-        .with_style(Style {
-            position_type: PositionType::Absolute,
-            position: UiRect {
-                top: SCOREBOARD_TEXT_PADDING,
-                left: SCOREBOARD_TEXT_PADDING,
-                ..default()
-            },
-            ..default()
-        }),
-    );
-    commands.insert_resource(Scoreboard { score: 0 })
+    commands.insert_resource( Scoreboard {
+        player_1_score: 0,
+        player_2_score: 0 
+    });
+    commands.spawn( ScoreboardBundle::new(&asset_server, Player::One));
+    commands.spawn( ScoreboardBundle::new(&asset_server, Player::Two));
 }
 
-pub fn update_scoreboard(scoreboard: Res<Scoreboard>, mut query: Query<&mut Text>) {
-    let mut text = query.single_mut();
-    text.sections[1].value = scoreboard.score.to_string();
+pub fn update_scoreboard(scoreboard_resource: Res<Scoreboard>, mut scoreboard_query: Query<(&Player, &mut Text)>) {
+    for (player, mut text) in &mut scoreboard_query {
+        match *player {
+            Player::One => {
+                text.sections[1].value = scoreboard_resource.player_1_score.to_string();
+            },
+            Player::Two => {
+                text.sections[1].value = scoreboard_resource.player_2_score.to_string();
+            },
+        }
+    }    
 }
 
 pub fn despawn_scoreboard(
@@ -48,9 +35,9 @@ pub fn despawn_scoreboard(
 ) {
     commands.remove_resource::<Scoreboard>();
     
-    let scoreboard_text_entity = scoreboard_text_query.single();
-
-    commands.entity(scoreboard_text_entity).despawn();
+    for  scoreboard_text_entity in  &scoreboard_text_query {
+        commands.entity(scoreboard_text_entity).despawn();
+    }
 
 }
 

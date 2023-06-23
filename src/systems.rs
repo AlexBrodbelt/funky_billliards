@@ -3,9 +3,10 @@ use bevy::{prelude::*, app::AppExit};
 use bevy_rapier2d::prelude::RapierConfiguration;
 
 use crate::game::{GameSetupState, GameState};
-use crate::{resources::*};
+use crate::resources::*;
 use crate::{AppState, game::{SimulationState, ball::CueBallState}};
 
+/// Gets the cursors current position and updates the [`CursorPosition`] Resource
 pub fn get_cursor_position(
     mut cursor_moved: EventReader<CursorMoved>,
     primary_window_query: Query<&Window, With<PrimaryWindow>>,
@@ -26,7 +27,7 @@ pub fn get_cursor_position(
 }
 
 
-/// Handles transitions between AppState, SimulationState, CueBallState states.
+/// Handles transitions between [`AppState`], [`SimulationState`], [`CueBallState`] states.
 pub fn state_transitions(
     keyboard_input: Res<Input<KeyCode>>,
     app_state: Res<State<AppState>>,
@@ -58,6 +59,7 @@ pub fn state_transitions(
     } 
 }
 
+/// pauses/resumes the physics pipeline in [`RapierConfiguration`] depending if in the appropriate app state.
 pub fn toggle_physics_pipeline(
     app_state: Res<State<AppState>>,
     simulation_state: Res<State<SimulationState>>,
@@ -72,6 +74,8 @@ pub fn toggle_physics_pipeline(
     }
 }
 
+/// This macro expands into if statement that checks if the state has changed
+/// and if so prints the current state.
 macro_rules! print_if_state_changed {
     ( $( $state:ident ),* ) => {
         {
@@ -84,6 +88,7 @@ macro_rules! print_if_state_changed {
     };
 }
 
+/// Prints if any state has changed.
 pub fn display_state(
     app_state: Res<State<AppState>>,
     game_setup_state: Res<State<GameSetupState>>,
@@ -100,8 +105,8 @@ pub fn display_state(
     );
 }
 
-
-pub fn exit_game(
+/// Exit the app by pressing Escape.
+pub fn exit_app(
     keyboard_input: Res<Input<KeyCode>>,
     mut app_exit_event_writer: EventWriter<AppExit>,
 ) {

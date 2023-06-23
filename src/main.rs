@@ -58,7 +58,7 @@ fn main() {
                 display_state,
                 state_transitions,
                 toggle_physics_pipeline,
-                exit_game
+                exit_app
             )
         )
         // .add_system(bevy::window::close_on_esc)
