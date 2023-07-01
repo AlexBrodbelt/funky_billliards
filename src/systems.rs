@@ -2,7 +2,7 @@ use bevy::window::PrimaryWindow;
 use bevy::{prelude::*, app::AppExit};
 use bevy_rapier2d::prelude::RapierConfiguration;
 
-use crate::game::{GameSetupState, GameState};
+use crate::game::{GameSetUpState, GameState};
 use crate::resources::*;
 use crate::{AppState, game::{SimulationState, ball::CueBallState}};
 
@@ -33,7 +33,7 @@ pub fn state_transitions(
     app_state: Res<State<AppState>>,
     cue_ball_state: Res<State<CueBallState>>,
     mut next_app_state: ResMut<NextState<AppState>>,
-    mut next_game_setup_state: ResMut<NextState<GameSetupState>>,
+    mut next_game_setup_state: ResMut<NextState<GameSetUpState>>,
     mut next_cue_ball_state: ResMut<NextState<CueBallState>>,
 ) {
     // Press G: _ -> AppState::GameSetup and CueBallState::InHand
@@ -41,7 +41,7 @@ pub fn state_transitions(
         && app_state.0 != AppState::GameSetup 
         {
         next_app_state.set(AppState::GameSetup);
-        next_game_setup_state.set(GameSetupState::CueBallSetup);
+        next_game_setup_state.set(GameSetUpState::CueBallSetup);
         next_cue_ball_state.set(CueBallState::InHand);
     }
     // Press M: _ -> AppState::Menu
@@ -55,7 +55,7 @@ pub fn state_transitions(
         && cue_ball_state.0 == CueBallState::InPlay
         && app_state.0 == AppState::GameSetup
         {
-        next_game_setup_state.set(GameSetupState::ShotSetup);
+        next_game_setup_state.set(GameSetUpState::ShotSetup);
     } 
 }
 
@@ -91,7 +91,7 @@ macro_rules! print_if_state_changed {
 /// Prints if any state has changed.
 pub fn display_state(
     app_state: Res<State<AppState>>,
-    game_setup_state: Res<State<GameSetupState>>,
+    game_setup_state: Res<State<GameSetUpState>>,
     game_state: Res<State<GameState>>,
     cue_ball_state: Res<State<CueBallState>>,  
     simulation_state: Res<State<SimulationState>>, 

@@ -67,7 +67,6 @@ pub fn strike_cue_ball(
         let (cue_stick_transform, mut cue_stick_velocity) = cue_stick_query.single_mut();
         let wind_up_distance = wind_up_distance_resource.0;
         let (axis, angle) = cue_stick_transform.rotation.to_axis_angle();
-        println!("sign: {:?}", axis.z * angle);
         // set the velocity of the cue stick
         cue_stick_velocity.linvel =  - (VELOCITY_SCALING * wind_up_distance).clamp(MIN_VELOCITY, MAX_VELOCITY) * Vec2::from_angle(axis.z * angle);
         // record initial position of the cue stick
@@ -112,13 +111,10 @@ pub fn handle_cue_stick_motion(
 
             let ball_stick_initial_distance = (table_status.cue_ball_status.initial_position.unwrap() - table_status.cue_stick_status.initial_position.unwrap()).length();
             let _cue_stick_distance_from_initial_cue_ball_position = (cue_stick_transform.translation.truncate() - cue_ball_initial_position).length();
-            // println!("cue stick initial distance from cue ball {:?}", cue_stick_distance_from_initial_cue_ball_position);
-            // println!("{:?}", table_status);
 
             // despawn cue stick condition
             if table_status.cue_stick_status.lifetime_timer.elapsed_secs() * cue_stick_velocity.linvel.length() >= ball_stick_initial_distance + BALL_RADIUS
             || table_status.cue_stick_status.lifetime_timer.finished() {
-                println!("timer ran out {:?}", table_status.cue_stick_status.lifetime_timer.finished());
                 // reset the timer
                 table_status.cue_stick_status.lifetime_timer.reset();
                 // despawn cue stick

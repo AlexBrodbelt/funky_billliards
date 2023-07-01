@@ -4,7 +4,7 @@ use crate::AppState;
 
 use self::systems::*;
 
-use super::{GameSetupState, GameState};
+use super::{GameSetUpState, GameState, SimulationState};
 
 mod components;
 pub mod resources;
@@ -18,7 +18,7 @@ impl Plugin for CueStickPlugin {
         app
             .add_system(
                 spawn_cue_stick
-                    .in_schedule(OnEnter(GameSetupState::ShotSetup))
+                    .in_schedule(OnEnter(GameSetUpState::ShotSetup))
             )
             .add_systems(
                 (
@@ -26,8 +26,9 @@ impl Plugin for CueStickPlugin {
                     compute_wind_up_distance,
                     strike_cue_ball,
                 )
-                    .in_set(OnUpdate(GameSetupState::ShotSetup))
+                    .in_set(OnUpdate(GameSetUpState::ShotSetup))
                     .in_set(OnUpdate(AppState::GameSetup))
+                    .in_set(OnUpdate(SimulationState::Running))
             )
             .add_systems(
                 (
@@ -35,6 +36,7 @@ impl Plugin for CueStickPlugin {
                 )
                     .in_set(OnUpdate(GameState::ShotCooldown))
                     .in_set(OnUpdate(AppState::Game))
+                    .in_set(OnUpdate(SimulationState::Running))
                 );
     }
 }

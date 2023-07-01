@@ -8,8 +8,9 @@ pub mod events;
 pub mod ball;
 pub mod cuestick;
 pub mod pocket;
-pub mod walls;
 pub mod scoreboard;
+pub mod ui;
+pub mod walls;
 
 use crate::{
     config::*,
@@ -35,7 +36,7 @@ impl Plugin for GamePlugin {
         // Configure how frequently our gameplay systems are run
 
         app // States
-            .add_state::<GameSetupState>()
+            .add_state::<GameSetUpState>()
             .add_state::<GameState>()
             .add_state::<SimulationState>()
             // Resources
@@ -89,7 +90,7 @@ pub enum SimulationState {
 }
 
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
-pub enum GameSetupState {
+pub enum GameSetUpState {
     WallSetup,
     PocketSetup,
     BallSetup,

@@ -1,19 +1,18 @@
 use bevy::prelude::*;
 
-use crate::menu::{
+use crate::main_menu::{
     components::{Menu, MenuButton}, 
     styles::*,
 };
 
-pub fn spawn_menu(
+pub fn spawn_main_menu(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
-    let _main_menu_entity = build_main_menu(&mut commands, &asset_server);
-
+    build_main_menu(&mut commands, &asset_server);
 }
 
-pub fn despawn_menu (
+pub fn despawn_main_menu (
     mut commands: Commands,
     menu_query: Query<Entity, With<Menu>>
 ) {
@@ -23,7 +22,8 @@ pub fn despawn_menu (
 }
 
 fn build_main_menu (
-    commands: &mut Commands, asset_server: &Res<AssetServer>
+    commands: &mut Commands,
+    asset_server: &Res<AssetServer>
 ) -> Entity {
     let main_menu_entity = commands
         .spawn(
@@ -45,7 +45,6 @@ fn build_main_menu (
                 }
             )
             .with_children(|parent| {
-                // Image 1
                 // Text
                 parent.spawn(
                     TextBundle {
@@ -62,7 +61,6 @@ fn build_main_menu (
                         ..default()
                     }
                 );
-                // Image 2
             });
 
             // === Play Button ===

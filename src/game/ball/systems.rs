@@ -5,7 +5,7 @@ use bevy::{
 
 use crate::{
     resources::CursorPosition,
-    config::{LEFT_WALL, RIGHT_WALL, BOTTOM_WALL, TOP_WALL}, game::GameSetupState,
+    config::{LEFT_WALL, RIGHT_WALL, BOTTOM_WALL, TOP_WALL}, game::GameSetUpState,
 };
 
 use crate::game::resources::TableStatus;
@@ -20,7 +20,7 @@ pub fn spawn_balls(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    mut next_game_setup_state: ResMut<NextState<GameSetupState>>,
+    mut next_game_setup_state: ResMut<NextState<GameSetUpState>>,
     // asset_server: Res<AssetServer>, 
 ) {
     // commands.spawn(BallBundle::new(Ball::Yellow, &mut meshes, &mut materials));
@@ -34,7 +34,7 @@ pub fn spawn_balls(
             commands.spawn(BallBundle::new(Ball::Red(RedBallIdentifier::new(level, index)), &mut meshes, &mut materials));
         }
     }
-    next_game_setup_state.set(GameSetupState::CueBallSetup);    
+    next_game_setup_state.set(GameSetUpState::CueBallSetup);    
 }
 
 pub fn spawn_cue_ball(

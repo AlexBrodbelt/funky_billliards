@@ -114,3 +114,14 @@ impl DefaultWallBundle {
 }
 
 
+#[derive(Bundle)]
+pub struct WallBundle {
+    material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
+    // sprite_bundle: SpriteBundle,
+    collider: Collider,
+    rigid_body: RigidBody,
+    restitution_coefficient: Restitution,
+    wall: Wall,
+    collision_group: CollisionGroups,
+}
+

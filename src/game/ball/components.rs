@@ -83,6 +83,19 @@ impl Ball {
             Ball::Brown => BROWN_SCORE,
         }
     }
+
+    pub fn name(&self) -> String {
+        match *self {
+            Ball::Black => "Black".to_string(),
+            Ball::White => "White".to_string(),
+            Ball::Yellow => "Yellow".to_string(),
+            Ball::Red(RedBallIdentifier { level, index }) => format!("Red {} {}", level, index),
+            Ball::Blue => "Blue".to_string(),
+            Ball::Green => "Green".to_string(),
+            Ball::Pink => "Pink".to_string(),
+            Ball::Brown => "Brown".to_string(),
+        }
+    }
 }
 
 impl From<&Ball> for ColorMaterial {
@@ -104,6 +117,12 @@ impl From<&Ball> for Velocity {
     }
 }
 
+impl From<&Ball> for Name {
+    fn from(ball: &Ball) -> Name {
+        Name::new(ball.name())
+    }
+}
+
 /// Bundle of components for the Ball.
 #[derive(Bundle)]
 pub struct BallBundle {
@@ -112,6 +131,7 @@ pub struct BallBundle {
     collision_group: CollisionGroups,
     damping: Damping,
     // external_force: ExternalForce,
+    name: Name,
     material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
     restitution_coefficient: Restitution,
     rigid_body: RigidBody,
@@ -133,16 +153,13 @@ impl BallBundle {
                 linear_damping: FRICTION_COEFFICIENT,
                 angular_damping: FRICTION_COEFFICIENT,
             },
-            // external_force: ExternalForce {
-            //     force: Vec2::ZERO,
-            //     torque: 0.0,
-            // },
             material_mesh_bundle: MaterialMesh2dBundle {
                 mesh: meshes.add(shape::Circle::new(BALL_RADIUS).into()).into(),
                 material: materials.add(ColorMaterial::from(&ball)),
                 transform: Transform::from(&ball),
                 ..default()
             },
+            name: Name::from(&ball),
             rigid_body: RigidBody::Dynamic,
             restitution_coefficient: Restitution::coefficient(0.90), 
             velocity: Velocity::from(&ball),

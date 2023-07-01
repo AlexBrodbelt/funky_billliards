@@ -18,6 +18,7 @@ pub struct CueStickBundle {
     collision_group: CollisionGroups,
     // external_force: ExternalForce,
     material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
+    name: Name,
     rigid_body: RigidBody,
     velocity: Velocity,
     // damping: Damping,
@@ -45,6 +46,7 @@ impl CueStickBundle {
                 }, 
                 ..default()
             },
+            name: Name::new("cue stick"),
             rigid_body: RigidBody::KinematicVelocityBased,
             velocity: Velocity::zero(),
         }

@@ -1,12 +1,30 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, input::mouse::{MouseButtonInput, self}};
 use bevy_rapier2d::prelude::*;
 
 use super::components::*;
 
-use crate::game::{
+use crate::{game::{
     scoreboard::resources::*,
     resources::ActivePlayer,
-    ball::{components::Ball, self}};
+    ball::components::Ball
+    },
+    resources::CursorPosition
+};
+
+
+pub fn set_pockets(
+    mut commands: Commands,
+    mut mouse_button_input: EventReader<MouseButtonInput>,
+    cursor_position: Res<CursorPosition>,
+    // mut cue_ball_query: Query<&mut Transform, With<CueBall>>,
+    // mut table_status: ResMut<TableStatus>,
+    // mut next_cue_ball_state: ResMut<NextState<CueBallState>>,
+) {
+    if let Some(_button_pressed) = mouse_button_input.iter().last() {
+        commands.spawn(PocketBundle::from())
+    }
+        
+}
 
 pub fn spawn_pockets(
     mut commands: Commands,

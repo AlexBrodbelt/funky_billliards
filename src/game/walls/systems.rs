@@ -24,5 +24,9 @@ pub fn despawn_walls(
     }
 }
 
+// pub fn set_wall_points(
+
+// )
+
 
 
