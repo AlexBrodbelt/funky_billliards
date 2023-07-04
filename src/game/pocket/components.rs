@@ -17,9 +17,9 @@ pub enum Pocket {
     HandPlaced(PocketIdentifier),
 }
 
-struct PocketIdentifier {
-    id: usize,
-    position: Vec2,
+pub struct PocketIdentifier {
+    pub id: usize,
+    pub position: Vec2,
 }
 
 impl Pocket {
@@ -88,8 +88,10 @@ impl PocketBundle {
     }
 
     /// Returns a [`PocketBundle`] given the [`CursorPosition`] and sets it to said position 
-    fn from_cursor_position(cursor_position: &CursorPosition, meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<ColorMaterial>>) -> Self {
-        let pocket = Pocket::HandPlaced(PocketIdentifier { id: 0, position: cursor_position.0 });
+    pub fn from_cursor_position(cursor_position: Vec2, meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<ColorMaterial>>) -> Self {
+
+        let pocket = Pocket::HandPlaced(PocketIdentifier { id: 0, position: cursor_position });
+
         PocketBundle { 
             active_events: ActiveEvents::COLLISION_EVENTS,
             collider: Collider::ball(POCKET_RADIUS - BALL_RADIUS),
@@ -104,8 +106,7 @@ impl PocketBundle {
             pocket,
             rigid_body: RigidBody::Fixed,
             sensor: Sensor, 
-        }
-        
+        }  
     }
 }
 

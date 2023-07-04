@@ -1,127 +1,60 @@
-use bevy::{
-    prelude::*, 
-    sprite::MaterialMesh2dBundle,
-};
+use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
+use bevy_prototype_lyon::prelude::*;
 
 use crate::config::*;
 
 
 
 #[derive(Component)]
-pub enum Wall {
-    Left,
-    Right,
-    Bottom,
-    Top,
-}
-
-/// Which side of the arena is this wall located on?
-impl Wall {
-    /// returns the default position of the wall.
-    pub fn position(&self) -> Vec2 {       
-        match self {
-            Wall::Left => Vec2::new(LEFT_WALL, 0.),
-            Wall::Right => Vec2::new(RIGHT_WALL, 0.),
-            Wall::Bottom => Vec2::new(0., BOTTOM_WALL),
-            Wall::Top => Vec2::new(0., TOP_WALL),
-        }
-    }
-    
-    /// returns a vector with the base and height of the rectangle.
-    pub fn size(&self) -> Vec2 {
-        let arena_height = TOP_WALL - BOTTOM_WALL;
-        let arena_width = RIGHT_WALL - LEFT_WALL;
-        // Make sure we haven't messed up our constants
-        assert!(arena_height > 0.0);
-        assert!(arena_width > 0.0);
-
-        match self {
-            Wall::Left | Wall::Right => {
-                Vec2::new(WALL_THICKNESS, arena_height - 1.0 * WALL_THICKNESS)
-            },
-            Wall::Bottom | Wall::Top => {
-                Vec2::new(arena_width + 1.0 * WALL_THICKNESS, WALL_THICKNESS)
-            },
-        }
-
-    }
-    /// returns a vector with the half extents of the rectangle.
-    pub fn half_extents_(&self) -> Vec2 {
-        let arena_height = TOP_WALL - BOTTOM_WALL;
-        let arena_width = RIGHT_WALL - LEFT_WALL;
-        // Make sure we haven't messed up our constants
-        assert!(arena_height > 0.0);
-        assert!(arena_width > 0.0);
-
-        match self {
-            Wall::Left | Wall::Right => {
-                Vec2::new(0.5 * WALL_THICKNESS, 0.5 * arena_height)
-            },
-            Wall::Bottom | Wall::Top => {
-                Vec2::new(0.5 * arena_width, 0.5 * WALL_THICKNESS)
-            },
-        }
-    }  
-    /// returns a vector with the half extents of the rectangle.
-    pub fn half_extents(&self) -> Vec2 {
-        0.5 * self.size()
-    }  
-}
-
+pub struct Wall;
 
 #[derive(Bundle)]
-pub struct DefaultWallBundle {
+pub struct WallBundle {
     // You can nest bundles inside of other bundles like this
     // Allowing you to compose their functionality
-    material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
+    shape_bundle: ShapeBundle,
     // sprite_bundle: SpriteBundle,
     collider: Collider,
     rigid_body : RigidBody,
     restitution_coefficient: Restitution,
     wall: Wall,
-    collision_group: CollisionGroups
+    collision_group: CollisionGroups,
+    // fill: Fill,
+    stroke: Stroke
 }
 
-impl DefaultWallBundle {
-    // This "builder method" allows us to reuse logic across our wall entities,
-    // making our code easier to read and less prone to bugs when we change the logic
-
-     // We need to convert our Vec2 into a Vec3, by giving it a z-coordinate
-                    // This is used to determine the order of our sprites
-                    // translation: location.position().extend(0.0),
-                    // The z-scale of 2D objects must always be 1.0,
-                    // or their ordering will be affected in surprising ways.
-                    // See https://github.com/bevyengine/bevy/issues/4149
-            //         scale: location.size().extend(1.0),
-    pub fn new(wall: Wall,  meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<ColorMaterial>>) -> DefaultWallBundle {
-        DefaultWallBundle {
-            material_mesh_bundle: MaterialMesh2dBundle {
-                mesh: meshes
-                    .add(shape::Quad::new(wall.size()).into())
-                    .into(),
-                material: materials.add(ColorMaterial::from(WALL_COLOR)),
-                transform: Transform::from_translation(wall.position().extend(1.0)),
+impl Default for WallBundle {
+    fn default() -> Self {
+        let mut path_builder = PathBuilder::new();
+        path_builder.move_to(BOTTOM_LEFT_CORNER);
+        path_builder.line_to(TOP_LEFT_CORNER);
+        path_builder.line_to(TOP_RIGHT_CORNER);
+        path_builder.line_to(BOTTOM_RIGHT_CORNER);
+        path_builder.line_to(BOTTOM_LEFT_CORNER);
+        let path = path_builder.build();
+        WallBundle {
+            shape_bundle: ShapeBundle {
+                path,
+                transform: Transform::from_xyz(0., 0., 0.),
                 ..default()
             },
-            collider: Collider::cuboid(wall.half_extents().x, wall.half_extents().y),
+            stroke: Stroke::new(WALL_COLOR, WALL_THICKNESS),
+            // fill: Fill::color(WALL_COLOR),
+            collider: Collider::polyline(
+                WALL_VERTEX_BUFFER.to_vec()
+                                            .iter()
+                                            .map(|&v| {
+                                                v * 0.95
+                                            })
+                                            .collect::<Vec<Vec2>>(),
+                Some(WALL_INDEX_BUFFER.to_vec()),
+            ),
             collision_group: CollisionGroups::new( Group::GROUP_1, Group::GROUP_1),
             rigid_body: RigidBody::Fixed,
             restitution_coefficient:  Restitution::coefficient(0.95),
-            wall
+            wall: Wall,
         }
     }
-}
-
-
-#[derive(Bundle)]
-pub struct WallBundle {
-    material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
-    // sprite_bundle: SpriteBundle,
-    collider: Collider,
-    rigid_body: RigidBody,
-    restitution_coefficient: Restitution,
-    wall: Wall,
-    collision_group: CollisionGroups,
 }
 

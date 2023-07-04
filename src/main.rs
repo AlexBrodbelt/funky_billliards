@@ -8,6 +8,7 @@ mod systems;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_prototype_lyon::prelude::*;
 // use bevy_inspector_egui_rapier::InspectableRapierPlugin;
 
 
@@ -41,22 +42,19 @@ fn main() {
         // Bevy Rapier Plugins
         .add_plugin(RapierDebugRenderPlugin::default()) 
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(1500.0)) // needs to be tweaked
+        // Bevy Prototype Lyon
+        .add_plugin(ShapePlugin)
         // Bevy Rapier Egui Plugin
         // .add_plugin(InspectableRapierPlugin)
         // My Plugins
         .add_plugins(GamePlugins)
         .add_plugin(MainMenuPlugin)
-
-        // Register App States
-        
-
         // Bevy Rapier Resources
         .insert_resource( RapierConfiguration {
             gravity : Vec2::ZERO,
             ..Default::default()
         })
         .insert_resource(CursorPosition::default())
-
         // Startup Systems
         .add_startup_system(spawn_camera)
         .add_startup_system(spawn_sound)

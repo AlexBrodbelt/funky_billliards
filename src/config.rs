@@ -51,6 +51,31 @@ pub const RIGHT_WALL: f32 = TABLE_WIDTH / 2.0;
 pub const BOTTOM_WALL: f32 = - TABLE_HEIGHT / 2.0;
 pub const TOP_WALL: f32 = TABLE_HEIGHT / 2.0;
 
+// default wall vertices
+pub const BOTTOM_LEFT_CORNER: Vec2 = Vec2::new(LEFT_WALL, BOTTOM_WALL);
+pub const TOP_LEFT_CORNER: Vec2 = Vec2::new(LEFT_WALL, TOP_WALL);
+pub const TOP_RIGHT_CORNER: Vec2 = Vec2::new(RIGHT_WALL, TOP_WALL);
+pub const BOTTOM_RIGHT_CORNER: Vec2 = Vec2::new(RIGHT_WALL, BOTTOM_WALL);
+// default wall vertex buffer
+pub const WALL_VERTEX_BUFFER: [Vec2; 4] = [BOTTOM_LEFT_CORNER, TOP_LEFT_CORNER, TOP_RIGHT_CORNER, BOTTOM_RIGHT_CORNER];
+
+/// Index for the corners of the [`WallBundle`]
+pub enum Index {
+    BottomLeft,
+    TopLeft,
+    TopRight,
+    BottomRight,
+}
+
+// default wall indices for vertices
+pub const LEFT_WALL_INDICES: [u32; 2] = [Index::BottomLeft as u32, Index::TopLeft as u32];
+pub const TOP_WALL_INDICES: [u32; 2] = [Index::TopLeft as u32, Index::TopRight as u32];
+pub const RIGHT_WALL_INDICES: [u32; 2] = [Index::TopRight as u32, Index::BottomRight as u32];
+pub const LEFT_WALL_INDEX: [u32; 2] = [Index::BottomRight as u32, Index::BottomLeft as u32];
+
+/// default wall index buffer for the vertices - define which vertices have an edge between them
+pub const WALL_INDEX_BUFFER: [[u32; 2]; 4] = [LEFT_WALL_INDICES, TOP_WALL_INDICES, RIGHT_WALL_INDICES, LEFT_WALL_INDEX];
+
 // Snooker table features
 pub const X_BAULK_LINE : f32 = LEFT_WALL + (TABLE_WIDTH / 5.0); // x coordinate for Baulk Line
 pub const R_BAULK_D : f32 = TABLE_HEIGHT / 6.0; // radius of Baulk D
