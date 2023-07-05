@@ -9,6 +9,8 @@ pub struct CollisionSound(pub Handle<AudioSource>);
 pub struct TableStatus {
     pub cue_stick_status: CueStickStatus,
     pub cue_ball_status: CueBallStatus,
+    pub wall_status: WallStatus,
+    pub pocket_status: PocketStatus,
 }
 
 #[derive(Debug)]
@@ -22,6 +24,18 @@ pub struct CueBallStatus {
     pub initial_position: Option<Vec2>,
 }
 
+/// struct containing relevant information of the wall vertices and which vertices are connected
+#[derive(Debug)]
+pub struct WallStatus {
+    pub vertex_buffer: Vec<Vec2>,
+    pub index_buffer: Vec<[u32; 2]>,
+}
+
+#[derive(Debug)]
+pub struct PocketStatus {
+    vertex_buffer: Vec<Vec2>,
+}
+
 impl Default for TableStatus {
     fn default() -> Self {
         TableStatus {
@@ -32,6 +46,13 @@ impl Default for TableStatus {
             cue_ball_status: CueBallStatus {
                 initial_position: None 
             },
+            wall_status: WallStatus {
+                vertex_buffer: Vec::new(),
+                index_buffer: Vec::new(),
+            },
+            pocket_status: PocketStatus { 
+                vertex_buffer: Vec::new(), 
+            }
         }
     }
 }

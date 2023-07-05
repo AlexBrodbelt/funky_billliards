@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::game::ui::pocket_set_up_ui::{
+use crate::game::ui::pocket_set_up_menu::{
     components::{PocketSetUpMenu, PocketSetUpMenuButton},
     styles::*
 };

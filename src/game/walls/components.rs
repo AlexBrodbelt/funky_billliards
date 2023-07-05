@@ -1,9 +1,9 @@
 use bevy::prelude::*;
+use bevy_inspector_egui::egui::epaint::tessellator::path;
 use bevy_rapier2d::prelude::*;
 use bevy_prototype_lyon::prelude::*;
 
 use crate::config::*;
-
 
 
 #[derive(Component)]
@@ -20,7 +20,7 @@ pub struct WallBundle {
     restitution_coefficient: Restitution,
     wall: Wall,
     collision_group: CollisionGroups,
-    // fill: Fill,
+    fill: Fill,
     stroke: Stroke
 }
 
@@ -32,6 +32,7 @@ impl Default for WallBundle {
         path_builder.line_to(TOP_RIGHT_CORNER);
         path_builder.line_to(BOTTOM_RIGHT_CORNER);
         path_builder.line_to(BOTTOM_LEFT_CORNER);
+        path_builder.close();
         let path = path_builder.build();
         WallBundle {
             shape_bundle: ShapeBundle {
@@ -40,7 +41,7 @@ impl Default for WallBundle {
                 ..default()
             },
             stroke: Stroke::new(WALL_COLOR, WALL_THICKNESS),
-            // fill: Fill::color(WALL_COLOR),
+            fill: Fill::color(PLAY_FIELD_COLOR),
             collider: Collider::polyline(
                 WALL_VERTEX_BUFFER.to_vec()
                                             .iter()

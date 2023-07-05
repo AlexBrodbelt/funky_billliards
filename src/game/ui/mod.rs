@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-pub mod pocket_set_up_ui;
+pub mod pocket_set_up_menu;
 
 pub struct GameUIPlugin;
 

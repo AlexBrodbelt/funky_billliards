@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{
     game::{
-        ui::pocket_set_up_ui::{
+        ui::pocket_set_up_menu::{
             components::PocketSetUpMenuButton,
             styles::*
         },

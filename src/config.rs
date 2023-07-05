@@ -35,7 +35,8 @@ pub const GAP_BETWEEN_POCKET_AND_WALL: f32 = 25.0;
 pub const GAP_BETWEEN_CUESTICK_AND_CUEBALL: f32 = 5.0;
 
 // Table
-pub const BACKGROUND_COLOR: Color = Color::rgb(0.04, 0.42, 0.01);
+pub const BACKGROUND_COLOR: Color = Color::MIDNIGHT_BLUE;
+pub const PLAY_FIELD_COLOR: Color = Color::rgb(0.04, 0.42, 0.01);
 pub const TABLE_HEIGHT: f32 = 600.0;
 pub const TABLE_WIDTH: f32 = 1200.0;
 // These pub constants are defined in `Transform` units.
@@ -45,11 +46,11 @@ pub const TABLE_WIDTH: f32 = 1200.0;
 pub const WALL_COLOR: Color = Color::rgb(0.8, 0.8, 0.8);
 pub const WALL_THICKNESS: f32 = 10.0;
 // x coordinates
-pub const LEFT_WALL: f32 = - TABLE_WIDTH / 2.0;
-pub const RIGHT_WALL: f32 = TABLE_WIDTH / 2.0;
+pub const LEFT_WALL: f32 = -0.5 * TABLE_WIDTH;
+pub const RIGHT_WALL: f32 = 0.5 * TABLE_WIDTH;
 // y coordinates
-pub const BOTTOM_WALL: f32 = - TABLE_HEIGHT / 2.0;
-pub const TOP_WALL: f32 = TABLE_HEIGHT / 2.0;
+pub const BOTTOM_WALL: f32 = -0.5 * TABLE_HEIGHT;
+pub const TOP_WALL: f32 = 0.5 * TABLE_HEIGHT;
 
 // default wall vertices
 pub const BOTTOM_LEFT_CORNER: Vec2 = Vec2::new(LEFT_WALL, BOTTOM_WALL);
