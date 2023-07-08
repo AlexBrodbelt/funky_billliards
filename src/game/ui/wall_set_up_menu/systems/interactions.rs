@@ -60,7 +60,7 @@ pub fn interact_with_button(
                 match *interaction {
                     Interaction::Clicked => {
                         *background_color = CLICKED_DEFAULT_BUTTON_COLOR.into();
-                        spawn_default_walls(&mut commands);
+                        // spawn_default_walls(&mut commands);
                     },
                     Interaction::Hovered => {
                         *background_color = HOVERED_DEFAULT_BUTTON_COLOR.into();                        
