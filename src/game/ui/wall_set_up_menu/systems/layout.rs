@@ -1,19 +1,19 @@
 use bevy::prelude::*;
 
-use crate::game::ui::pocket_set_up_menu::{
-    components::{PocketSetUpMenu, PocketSetUpMenuButton},
+use crate::game::ui::wall_set_up_menu::{
+    components::{WallSetUpMenu, WallSetUpMenuButton},
     styles::*
 };
 
 
-pub fn spawn_pocket_set_up_menu(
+pub fn spawn_wall_set_up_menu(
     mut commands: Commands,
     asset_server: Res<AssetServer>
 ) {
-    build_pocket_set_up_menu(&mut commands, &asset_server);
+    build_wall_set_up_menu(&mut commands, &asset_server);
 }
 
-fn build_pocket_set_up_menu(
+fn build_wall_set_up_menu(
     commands: &mut Commands,
     asset_server: &Res<AssetServer>, 
 ) {
@@ -25,7 +25,7 @@ fn build_pocket_set_up_menu(
                     background_color: Color::ANTIQUE_WHITE.into(), 
                     ..default()
                 },
-                PocketSetUpMenu,
+                WallSetUpMenu,
             )
         )
         .with_children(|parent| {
@@ -37,7 +37,7 @@ fn build_pocket_set_up_menu(
                         background_color: NORMAL_DONE_BUTTON_COLOR.into(),
                         ..default()
                     },
-                    PocketSetUpMenuButton::Done,
+                    WallSetUpMenuButton::Done,
                 )
             )
             .with_children(|parent| {
@@ -65,7 +65,7 @@ fn build_pocket_set_up_menu(
                         background_color: NORMAL_CLEAR_BUTTON_COLOR.into(),
                         ..default()
                     },
-                    PocketSetUpMenuButton::Clear,                
+                    WallSetUpMenuButton::Clear,                
                 )
             )
             .with_children(|parent| {
@@ -88,11 +88,11 @@ fn build_pocket_set_up_menu(
     });
 }
 
-pub fn despawn_pocket_set_up_menu(
+pub fn despawn_wall_set_up_menu(
     mut commands: Commands,
-    pocket_set_up_menu_query: Query<Entity, With<PocketSetUpMenu>>,
+    wall_set_up_menu_query: Query<Entity, With<WallSetUpMenu>>,
 ) {
-    if let Ok(pause_menu_entity) = pocket_set_up_menu_query.get_single() {
+    if let Ok(pause_menu_entity) = wall_set_up_menu_query.get_single() {
         commands.entity(pause_menu_entity).despawn_recursive();
     }
 }

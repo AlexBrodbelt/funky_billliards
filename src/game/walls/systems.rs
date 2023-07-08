@@ -9,8 +9,8 @@ use super::components::*;
 
 pub fn spawn_default_walls(
     mut commands: Commands,
-    mut _meshes: ResMut<Assets<Mesh>>,
-    mut _materials: ResMut<Assets<ColorMaterial>>,
+    // mut _meshes: ResMut<Assets<Mesh>>,
+    // mut _materials: ResMut<Assets<ColorMaterial>>,
     // asset_server: Res<AssetServer>, 
 ) {
     commands.spawn(WallBundle::default());
@@ -19,7 +19,7 @@ pub fn spawn_default_walls(
 pub fn build_wall(
     mut commands: Commands,
 ) {
-    let mut path_builder = PathBuilder::new();
+    let path_builder = PathBuilder::new();
     let path = path_builder.build();
 
     commands.spawn((
@@ -44,23 +44,33 @@ pub fn add_wall_segment(
         if let Ok((mut wall_collider, mut wall_path)) = wall_query.get_single_mut() {
             // push new vertex into wall vertex buffer
             table_status.wall_status.vertex_buffer.push(cursor_position.0);
-            let indices = 0..(table_status.wall_status.vertex_buffer.len());
+            let indices = 0..(table_status.wall_status.vertex_buffer.len() as u32);
             // generate index buffer - Vec<[0,1], [1,2], .., [n-1, n], [n, 0]>
-            table_status.wall_status.index_buffer = indices.clone().into_iter().zip_longest(indices.skip(1).into_iter())
-                                                                        .map(|both_or_left| -> [u32; 2] {
-                                                                            match both_or_left {
-                                                                                Both(i , j) => [i as u32, j as u32],
-                                                                                Left(i)     => [i as u32, 0],
-                                                                                Right(j)    => [j as u32, 0],
-                                                                            }
-                                                                        })
-                                                                        .collect::<Vec<[u32; 2]>>();
+            // table_status.wall_status.index_buffer = indices.clone()
+            //                                                 .into_iter()
+            //                                                 .zip_longest(indices.skip(1)
+            //                                                                     .into_iter()
+            //                                                 )
+            //                                                 .map(|both_or_left| -> [u32; 2] {
+            //                                                     match both_or_left {
+            //                                                         Both(i , j) => [i as u32, j as u32],
+            //                                                         Left(i)     => [i as u32, 0],
+            //                                                         Right(j)    => [j as u32, 0],
+            //                                                     }
+            //                                                 })
+            //                                                 .collect::<Vec<[u32; 2]>>();
+            table_status.wall_status.index_buffer = indices.circular_tuple_windows::<(_, _)>()
+                                                            .map(|(i,j)| { [i, j] })
+                                                            .collect::<Vec<[u32; 2]>>();
             let mut wall_path_builder = PathBuilder::new();
-            wall_path_builder.move_to(*table_status.wall_status.vertex_buffer.first().unwrap());
-            for vertex in table_status.wall_status.vertex_buffer.iter().rev() {
-                wall_path_builder.line_to(*vertex);                
+            for (i, vertex) in table_status.wall_status.vertex_buffer.iter().enumerate() {
+                if i == 0 {
+                    wall_path_builder.move_to(*vertex);
+                } else {
+                    wall_path_builder.line_to(*vertex);
+                }                
             }
-            wall_path_builder.close();
+            wall_path_builder.close(); // connects the current position with the starting position closing the shape
             // update the Path component
             *wall_path = wall_path_builder.build();
             // update the Collider component
@@ -70,6 +80,17 @@ pub fn add_wall_segment(
             );
         } 
     }
+}
+
+pub fn clear_wall(
+    commands: &mut Commands,
+    wall_query: &mut Query<Entity, With<Wall>>,
+    table_status: &mut ResMut<TableStatus>,
+) {
+    if let Ok(wall_entity) = wall_query.get_single_mut() {
+        commands.entity(wall_entity).despawn();
+    }
+    table_status.clear_wall_buffers();
 }
 
 // pub fn spawn_walls(

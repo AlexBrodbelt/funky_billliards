@@ -31,6 +31,13 @@ pub struct WallStatus {
     pub index_buffer: Vec<[u32; 2]>,
 }
 
+impl WallStatus {
+    pub fn clear_buffers(&mut self) {
+        self.index_buffer.clear();
+        self.vertex_buffer.clear();
+    }
+}
+
 #[derive(Debug)]
 pub struct PocketStatus {
     vertex_buffer: Vec<Vec2>,
@@ -56,6 +63,14 @@ impl Default for TableStatus {
         }
     }
 }
+
+impl TableStatus {
+    pub fn clear_wall_buffers(&mut self) {
+        self.wall_status.clear_buffers()
+    }
+}
+
+
 
 /// Which player is currently active
 #[derive(Resource)]
