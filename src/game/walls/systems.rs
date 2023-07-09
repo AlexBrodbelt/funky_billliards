@@ -8,7 +8,7 @@ use crate::{config::{WALL_COLOR, WALL_THICKNESS, PLAY_FIELD_COLOR}, game::resour
 use super::components::*;
 
 pub fn spawn_default_walls(
-    mut commands: Commands,
+    commands: &mut Commands,
     // mut _meshes: ResMut<Assets<Mesh>>,
     // mut _materials: ResMut<Assets<ColorMaterial>>,
     // asset_server: Res<AssetServer>, 
@@ -16,7 +16,7 @@ pub fn spawn_default_walls(
     commands.spawn(WallBundle::default());
 }
 
-pub fn build_wall(
+pub fn spawn_wall(
     mut commands: Commands,
 ) {
     let path_builder = PathBuilder::new();
@@ -35,13 +35,14 @@ pub fn build_wall(
 
 /// When in [`GameSetupState::WallSetup`] if the the cursor is pressed then a new vertex is added to the wall
 pub fn add_wall_segment(
+    mut commands: Commands,
     mut mouse_button_input: EventReader<MouseButtonInput>,
-    mut wall_query: Query<(&mut Collider ,&mut Path), With<Wall>>,
+    mut wall_query: Query<(Entity, &mut Collider, &mut Path), With<Wall>>,
     cursor_position: Res<CursorPosition>,
     mut table_status: ResMut<TableStatus>,
 ) {
     if let Some(_button_pressed) = mouse_button_input.iter().last() {
-        if let Ok((mut wall_collider, mut wall_path)) = wall_query.get_single_mut() {
+        if let Ok((wall_entity, mut wall_collider, mut wall_path)) = wall_query.get_single_mut() {
             // push new vertex into wall vertex buffer
             table_status.wall_status.vertex_buffer.push(cursor_position.0);
             let indices = 0..(table_status.wall_status.vertex_buffer.len() as u32);
@@ -78,6 +79,8 @@ pub fn add_wall_segment(
                 table_status.wall_status.vertex_buffer.clone(),
                 Some(table_status.wall_status.index_buffer.clone())
             );
+            
+            
         } 
     }
 }
