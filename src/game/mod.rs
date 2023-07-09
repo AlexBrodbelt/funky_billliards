@@ -25,7 +25,7 @@ use pocket::PocketPlugin;
 use scoreboard::ScoreboardPlugin;
 use walls::WallPlugin;
 
-use self::resources::{TableStatus, ActivePlayer};
+use self::{resources::{TableStatus, ActivePlayer}, ui::GameUIPlugin};
 
 
 pub struct GamePlugin;
@@ -79,6 +79,7 @@ impl PluginGroup for GamePlugins {
             .add(PocketPlugin)
             .add(ScoreboardPlugin)  
             .add(WallPlugin)
+            .add(GameUIPlugin)
     }
 }
 

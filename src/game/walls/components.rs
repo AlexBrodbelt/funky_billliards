@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_inspector_egui::egui::epaint::tessellator::path;
 use bevy_rapier2d::prelude::*;
 use bevy_prototype_lyon::prelude::*;
 
@@ -13,6 +12,7 @@ pub struct Wall;
 pub struct WallBundle {
     // You can nest bundles inside of other bundles like this
     // Allowing you to compose their functionality
+    name: Name,
     shape_bundle: ShapeBundle,
     // sprite_bundle: SpriteBundle,
     collider: Collider,
@@ -35,6 +35,7 @@ impl Default for WallBundle {
         path_builder.close();
         let path = path_builder.build();
         WallBundle {
+            name: Name::new("Wall"),
             shape_bundle: ShapeBundle {
                 path,
                 transform: Transform::from_xyz(0., 0., 0.),
@@ -59,3 +60,20 @@ impl Default for WallBundle {
     }
 }
 
+impl WallBundle {
+    pub fn new() -> Self {
+        let path_builder = PathBuilder::new();
+        let path = path_builder.build();    
+        Self {
+        shape_bundle: ShapeBundle {
+                path,
+                transform: Transform::from_xyz(0., 75., 0.),
+                ..default()
+            },
+        collider: Collider::ball(10.0),
+        stroke: Stroke::new(WALL_COLOR, WALL_THICKNESS),
+        fill: Fill::color(PLAY_FIELD_COLOR),
+        ..default() 
+        }   
+    }
+}

@@ -17,7 +17,7 @@ impl Plugin for ScoreboardPlugin {
         app.add_system(
                 spawn_scoreboard
                     .run_if(not(resource_exists::<Scoreboard>()))
-                    .in_schedule(OnExit(AppState::Menu))
+                    .in_schedule(OnEnter(AppState::Game))
             )
             .add_system(update_scoreboard.in_set(OnUpdate(AppState::Game)))
             .add_system(

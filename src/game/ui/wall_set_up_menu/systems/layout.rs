@@ -46,7 +46,7 @@ fn build_wall_set_up_menu(
                         text: Text {
                             sections: vec![
                                 TextSection::new(
-                                    "Done ✔",
+                                    "Done",
                                     get_button_text_style(asset_server)
                                 )
                             ],
@@ -74,7 +74,35 @@ fn build_wall_set_up_menu(
                     text: Text {
                         sections: vec![
                             TextSection::new(
-                                "Clear ✖",
+                                "Clear",
+                                get_button_text_style(asset_server)
+                            )
+                        ],
+                        alignment: TextAlignment::Center,
+                        ..default()
+                    },
+                    ..default()
+                }
+                );
+            });
+            // Default Button
+            parent.spawn(
+                (
+                    ButtonBundle {
+                        style: DEFAULT_BUTTON_STYLE,
+                        background_color: NORMAL_CLEAR_BUTTON_COLOR.into(),
+                        ..default()
+                    },
+                    WallSetUpMenuButton::Default,                
+                )
+            )
+            .with_children(|parent| {
+                parent.spawn(
+                TextBundle {
+                    text: Text {
+                        sections: vec![
+                            TextSection::new(
+                                "Default",
                                 get_button_text_style(asset_server)
                             )
                         ],

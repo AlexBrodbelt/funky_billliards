@@ -2,6 +2,8 @@ use std::time::Duration;
 
 use bevy::prelude::*;
 
+use crate::config::{WALL_VERTEX_BUFFER, WALL_INDEX_BUFFER};
+
 #[derive(Resource)]
 pub struct CollisionSound(pub Handle<AudioSource>);
 
@@ -29,6 +31,15 @@ pub struct CueBallStatus {
 pub struct WallStatus {
     pub vertex_buffer: Vec<Vec2>,
     pub index_buffer: Vec<[u32; 2]>,
+}
+
+impl Default for WallStatus {
+    fn default() -> Self {
+        Self { 
+            vertex_buffer: WALL_VERTEX_BUFFER.to_vec(),
+            index_buffer: WALL_INDEX_BUFFER.to_vec()
+        }
+    }
 }
 
 impl WallStatus {

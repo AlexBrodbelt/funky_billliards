@@ -1,48 +1,40 @@
 use bevy::{prelude::*, input::mouse::MouseButtonInput};
 use bevy_rapier2d::prelude::*;
 use bevy_prototype_lyon::prelude::*;
-use itertools::{Itertools, EitherOrBoth::*};
+use itertools::Itertools;
 
-use crate::{config::{WALL_COLOR, WALL_THICKNESS, PLAY_FIELD_COLOR}, game::resources::TableStatus, resources::CursorPosition};
+use crate::{config::{WALL_COLOR, WALL_THICKNESS, PLAY_FIELD_COLOR}, game::resources::{TableStatus, WallStatus}, resources::CursorPosition};
 
 use super::components::*;
 
 pub fn spawn_default_walls(
     commands: &mut Commands,
+    table_status: &mut ResMut<TableStatus>,
     // mut _meshes: ResMut<Assets<Mesh>>,
     // mut _materials: ResMut<Assets<ColorMaterial>>,
     // asset_server: Res<AssetServer>, 
 ) {
     commands.spawn(WallBundle::default());
+    table_status.wall_status = WallStatus::default();
 }
 
 pub fn spawn_wall(
     mut commands: Commands,
 ) {
-    let path_builder = PathBuilder::new();
-    let path = path_builder.build();
-
-    commands.spawn((
-        ShapeBundle {
-            path,
-            transform: Transform::from_xyz(0., 75., 0.),
-            ..default()
-        },
-        Stroke::new(WALL_COLOR, WALL_THICKNESS),
-        Fill::color(PLAY_FIELD_COLOR),
-    ));
+    println!("wall spawned");
+    
+    commands.spawn(WallBundle::new());
 }
 
 /// When in [`GameSetupState::WallSetup`] if the the cursor is pressed then a new vertex is added to the wall
 pub fn add_wall_segment(
-    mut commands: Commands,
     mut mouse_button_input: EventReader<MouseButtonInput>,
-    mut wall_query: Query<(Entity, &mut Collider, &mut Path), With<Wall>>,
+    mut wall_query: Query<(&mut Collider, &mut Path), With<Wall>>,
     cursor_position: Res<CursorPosition>,
     mut table_status: ResMut<TableStatus>,
 ) {
     if let Some(_button_pressed) = mouse_button_input.iter().last() {
-        if let Ok((wall_entity, mut wall_collider, mut wall_path)) = wall_query.get_single_mut() {
+        if let Ok((mut wall_collider, mut wall_path)) = wall_query.get_single_mut() {
             // push new vertex into wall vertex buffer
             table_status.wall_status.vertex_buffer.push(cursor_position.0);
             let indices = 0..(table_status.wall_status.vertex_buffer.len() as u32);
@@ -78,9 +70,7 @@ pub fn add_wall_segment(
             *wall_collider = Collider::polyline(
                 table_status.wall_status.vertex_buffer.clone(),
                 Some(table_status.wall_status.index_buffer.clone())
-            );
-            
-            
+            ); 
         } 
     }
 }
@@ -90,33 +80,21 @@ pub fn clear_wall(
     wall_query: &mut Query<Entity, With<Wall>>,
     table_status: &mut ResMut<TableStatus>,
 ) {
-    if let Ok(wall_entity) = wall_query.get_single_mut() {
+    if let Ok(wall_entity) = wall_query.get_single() {
         commands.entity(wall_entity).despawn();
     }
     table_status.clear_wall_buffers();
-}
 
-// pub fn spawn_walls(
-//     mut commands: Commands,
-//     mut meshes: ResMut<Assets<Mesh>>,
-//     mut materials: ResMut<Assets<ColorMaterial>>,
-// ) {
-// commands.spawn(
-//         ShapeBundle {
-//             path,
-//             transform: Transform::default(),
-//             ..default()
-//         }
-//     );
-// }
+    commands.spawn(WallBundle::new());
+}
 
 pub fn despawn_walls(
     mut commands: Commands,
-    walls_query: Query<Entity, With<Wall>>,
+    wall_query: Query<Entity, With<Wall>>,
 ) {
-    for wall in &walls_query {
+    if let Ok(wall) = wall_query.get_single() {
         commands.entity(wall).despawn();
-    }
+    } 
 }
 
 
