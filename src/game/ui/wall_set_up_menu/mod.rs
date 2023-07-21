@@ -11,13 +11,15 @@ use self::systems::{
     layout::*,
 };
 
+
+
 pub struct WallSetUpMenuPlugin;
 
 impl Plugin for WallSetUpMenuPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_system(spawn_wall_set_up_menu.in_schedule(OnEnter(GameSetUpState::WallSetup)))
-            .add_system(interact_with_button.in_set(OnUpdate(GameSetUpState::WallSetup)))
-            .add_system(despawn_wall_set_up_menu.in_schedule(OnExit(GameSetUpState::WallSetup)));
+            .add_system(spawn_wall_set_up_menu.in_schedule(OnEnter(GameSetUpState::WallSetUp)))
+            .add_system(interact_with_button.in_set(OnUpdate(GameSetUpState::WallSetUp)))
+            .add_system(despawn_wall_set_up_menu.in_schedule(OnExit(GameSetUpState::WallSetUp)));
     }
 }

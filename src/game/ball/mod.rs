@@ -18,15 +18,15 @@ impl Plugin for BallPlugin {
             .add_system(
                 spawn_balls
                     .in_schedule(OnEnter(AppState::GameSetup))
-                    .run_if(in_state(GameSetUpState::BallSetup))
+                    .run_if(in_state(GameSetUpState::BallSetUp))
             )
             .add_system(
                 spawn_cue_ball
-                    .in_schedule(OnEnter(GameSetUpState::CueBallSetup))
+                    .in_schedule(OnEnter(GameSetUpState::CueBallSetUp))
                     .run_if(in_state(AppState::GameSetup))
             )
             // OnUpdate GameSetup::CueBallSetup Systems
-            .add_system(set_cue_ball.in_set(OnUpdate(GameSetUpState::CueBallSetup)))            
+            .add_system(set_cue_ball.in_set(OnUpdate(GameSetUpState::CueBallSetUp)))            
             // On Exit AppState::Game Systems
             .add_system(despawn_balls.in_schedule(OnEnter(AppState::Menu)));
     }

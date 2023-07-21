@@ -25,7 +25,7 @@ use pocket::PocketPlugin;
 use scoreboard::ScoreboardPlugin;
 use walls::WallPlugin;
 
-use self::{resources::{TableStatus, ActivePlayer}, ui::GameUIPlugin};
+use self::{resources::{ActivePlayer, PocketStatus, CueBallStatus, WallStatus, CueStickStatus}, ui::GameUIPlugin};
 
 
 pub struct GamePlugin;
@@ -40,7 +40,10 @@ impl Plugin for GamePlugin {
             .add_state::<GameState>()
             .add_state::<SimulationState>()
             // Resources
-            .insert_resource(TableStatus::default())
+            .insert_resource(WallStatus::default())
+            .insert_resource(PocketStatus::default())
+            .insert_resource(CueBallStatus::default())
+            .insert_resource(CueStickStatus::default())
             .insert_resource(ActivePlayer::default())
             .insert_resource(FixedTime::new_from_secs(TIME_STEP))
             .insert_resource(ClearColor(BACKGROUND_COLOR))
@@ -92,11 +95,11 @@ pub enum SimulationState {
 
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
 pub enum GameSetUpState {
-    WallSetup,
-    PocketSetup,
-    BallSetup,
-    CueBallSetup,
-    ShotSetup,
+    WallSetUp,
+    PocketSetUp,
+    BallSetUp,
+    CueBallSetUp,
+    ShotSetUp,
     #[default]
     Disabled,
 }

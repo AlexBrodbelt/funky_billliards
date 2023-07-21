@@ -19,7 +19,7 @@ pub fn set_pockets(
     mut materials: ResMut<Assets<ColorMaterial>>,
     cursor_position: Res<CursorPosition>,
     // mut cue_ball_query: Query<&mut Transform, With<CueBall>>,
-    // mut table_status: ResMut<TableStatus>,
+    // mut pocket_status: ResMut<PocketStatus>,
     // mut next_cue_ball_state: ResMut<NextState<CueBallState>>,
 ) {
     if let Some(_button_pressed) = mouse_button_input.iter().last() {

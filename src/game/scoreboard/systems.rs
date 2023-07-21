@@ -17,16 +17,19 @@ pub fn spawn_scoreboard(
 }
 
 pub fn update_scoreboard(scoreboard_resource: Res<Scoreboard>, mut scoreboard_query: Query<(&Player, &mut Text)>) {
-    for (player, mut text) in &mut scoreboard_query {
-        match *player {
-            Player::One => {
-                text.sections[1].value = scoreboard_resource.player_1_score.to_string();
-            },
-            Player::Two => {
-                text.sections[1].value = scoreboard_resource.player_2_score.to_string();
-            },
+    if scoreboard_resource.is_changed() {
+        for (player, mut text) in &mut scoreboard_query {
+            match *player {
+                Player::One => {
+                    text.sections[1].value = scoreboard_resource.player_1_score.to_string();
+                },
+                Player::Two => {
+                    text.sections[1].value = scoreboard_resource.player_2_score.to_string();
+                },
+            }
         }
-    }    
+    }
+        
 }
 
 pub fn despawn_scoreboard(

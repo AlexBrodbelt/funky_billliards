@@ -4,7 +4,16 @@ use bevy::{
 };
 use bevy_rapier2d::prelude::Velocity;
 
-use crate::{config::*, resources::CursorPosition, game::{ball::components::CueBall, GameState, resources::TableStatus}, AppState};
+use crate::{
+    config::*, 
+    resources::CursorPosition, 
+    game::{ball::components::CueBall, 
+        GameState, 
+        resources::{
+            CueStickStatus, 
+            CueBallStatus}
+        },
+        AppState};
 
 use super::{
     components::*,
@@ -58,7 +67,7 @@ pub fn set_cue_stick(
 pub fn strike_cue_ball(
     mut cue_stick_query: Query<(&Transform, &mut Velocity), With<CueStick>>,
     wind_up_distance_resource: Res<WindUpDistance>,
-    mut table_status: ResMut<TableStatus>,
+    mut cue_stick_status: ResMut<CueStickStatus>,
     mut next_app_state: ResMut<NextState<AppState>>,
     mut next_game_state: ResMut<NextState<GameState>>,
 ) { 
@@ -70,7 +79,7 @@ pub fn strike_cue_ball(
         // set the velocity of the cue stick
         cue_stick_velocity.linvel =  - (VELOCITY_SCALING * wind_up_distance).clamp(MIN_VELOCITY, MAX_VELOCITY) * Vec2::from_angle(axis.z * angle);
         // record initial position of the cue stick
-        table_status.cue_stick_status.initial_position =  Some(cue_stick_transform.translation.truncate());
+        cue_stick_status.initial_position =  Some(cue_stick_transform.translation.truncate());
 
         next_app_state.set(AppState::Game);
         next_game_state.set(GameState::ShotCooldown);
@@ -101,22 +110,23 @@ pub fn handle_cue_stick_motion(
     mut commands: Commands,
     mut cue_stick_query: Query<(Entity, &Transform, &mut Velocity), With<CueStick>>,
     time: Res<Time>,
-    mut table_status: ResMut<TableStatus>,
+    mut cue_stick_status: ResMut<CueStickStatus>,
+    mut cue_ball_status: ResMut<CueBallStatus>,
     mut next_game_state: ResMut<NextState<GameState>>,
 ) {
     if let Ok((cue_stick_entity, cue_stick_transform, cue_stick_velocity)) = cue_stick_query.get_single_mut() {
-        if let Some(cue_ball_initial_position) = table_status.cue_ball_status.initial_position {
+        if let Some(cue_ball_initial_position) = cue_ball_status.initial_position {
             // tick timer
-            table_status.cue_stick_status.lifetime_timer.tick(time.delta());
+            cue_stick_status.lifetime_timer.tick(time.delta());
 
-            let ball_stick_initial_distance = (table_status.cue_ball_status.initial_position.unwrap() - table_status.cue_stick_status.initial_position.unwrap()).length();
+            let ball_stick_initial_distance = (cue_ball_status.initial_position.unwrap() - cue_stick_status.initial_position.unwrap()).length();
             let _cue_stick_distance_from_initial_cue_ball_position = (cue_stick_transform.translation.truncate() - cue_ball_initial_position).length();
 
             // despawn cue stick condition
-            if table_status.cue_stick_status.lifetime_timer.elapsed_secs() * cue_stick_velocity.linvel.length() >= ball_stick_initial_distance + BALL_RADIUS
-            || table_status.cue_stick_status.lifetime_timer.finished() {
+            if cue_stick_status.lifetime_timer.elapsed_secs() * cue_stick_velocity.linvel.length() >= ball_stick_initial_distance + BALL_RADIUS
+            || cue_stick_status.lifetime_timer.finished() {
                 // reset the timer
-                table_status.cue_stick_status.lifetime_timer.reset();
+                cue_stick_status.lifetime_timer.reset();
                 // despawn cue stick
                 commands.entity(cue_stick_entity).despawn();
                 // remove WindUpDistance resource

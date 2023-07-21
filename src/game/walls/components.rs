@@ -4,6 +4,8 @@ use bevy_prototype_lyon::prelude::*;
 
 use crate::config::*;
 
+use super::systems::{build_wall_shape_bundle, build_wall_collider};
+
 
 #[derive(Component)]
 pub struct Wall;
@@ -61,16 +63,10 @@ impl Default for WallBundle {
 }
 
 impl WallBundle {
-    pub fn new() -> Self {
-        let path_builder = PathBuilder::new();
-        let path = path_builder.build();    
+    pub fn new(vertex_buffer: Vec<Vec2>,  maybe_index_buffer: Option<Vec<[u32; 2]>>) -> Self {
         Self {
-        shape_bundle: ShapeBundle {
-                path,
-                transform: Transform::from_xyz(0., 75., 0.),
-                ..default()
-            },
-        collider: Collider::ball(10.0),
+        shape_bundle: build_wall_shape_bundle(&vertex_buffer),
+        collider: build_wall_collider(vertex_buffer, maybe_index_buffer),
         stroke: Stroke::new(WALL_COLOR, WALL_THICKNESS),
         fill: Fill::color(PLAY_FIELD_COLOR),
         ..default() 

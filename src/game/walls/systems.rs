@@ -3,99 +3,154 @@ use bevy_rapier2d::prelude::*;
 use bevy_prototype_lyon::prelude::*;
 use itertools::Itertools;
 
-use crate::{config::{WALL_COLOR, WALL_THICKNESS, PLAY_FIELD_COLOR}, game::resources::{TableStatus, WallStatus}, resources::CursorPosition};
+use crate::{
+    game::resources::WallStatus,
+    resources::CursorPosition
+};
 
 use super::components::*;
 
 pub fn spawn_default_walls(
     commands: &mut Commands,
-    table_status: &mut ResMut<TableStatus>,
+    wall_status: &mut ResMut<WallStatus>,
     // mut _meshes: ResMut<Assets<Mesh>>,
     // mut _materials: ResMut<Assets<ColorMaterial>>,
     // asset_server: Res<AssetServer>, 
 ) {
-    commands.spawn(WallBundle::default());
-    table_status.wall_status = WallStatus::default();
+    // commands.spawn(WallBundle::default());
+    wall_status.set_to_default();
 }
 
 pub fn spawn_wall(
-    mut commands: Commands,
+    commands: &mut Commands,
+    vertices:Vec<Vec2>,
+    indices: Option<Vec<[u32; 2]>> ,
 ) {
     println!("wall spawned");
-    
-    commands.spawn(WallBundle::new());
+    commands.spawn(WallBundle::new(vertices, indices));
 }
 
-/// When in [`GameSetupState::WallSetup`] if the the cursor is pressed then a new vertex is added to the wall
-pub fn add_wall_segment(
-    mut mouse_button_input: EventReader<MouseButtonInput>,
-    mut wall_query: Query<(&mut Collider, &mut Path), With<Wall>>,
-    cursor_position: Res<CursorPosition>,
-    mut table_status: ResMut<TableStatus>,
-) {
-    if let Some(_button_pressed) = mouse_button_input.iter().last() {
-        if let Ok((mut wall_collider, mut wall_path)) = wall_query.get_single_mut() {
-            // push new vertex into wall vertex buffer
-            table_status.wall_status.vertex_buffer.push(cursor_position.0);
-            let indices = 0..(table_status.wall_status.vertex_buffer.len() as u32);
-            // generate index buffer - Vec<[0,1], [1,2], .., [n-1, n], [n, 0]>
-            // table_status.wall_status.index_buffer = indices.clone()
-            //                                                 .into_iter()
-            //                                                 .zip_longest(indices.skip(1)
-            //                                                                     .into_iter()
-            //                                                 )
-            //                                                 .map(|both_or_left| -> [u32; 2] {
-            //                                                     match both_or_left {
-            //                                                         Both(i , j) => [i as u32, j as u32],
-            //                                                         Left(i)     => [i as u32, 0],
-            //                                                         Right(j)    => [j as u32, 0],
-            //                                                     }
-            //                                                 })
-            //                                                 .collect::<Vec<[u32; 2]>>();
-            table_status.wall_status.index_buffer = indices.circular_tuple_windows::<(_, _)>()
-                                                            .map(|(i,j)| { [i, j] })
-                                                            .collect::<Vec<[u32; 2]>>();
-            let mut wall_path_builder = PathBuilder::new();
-            for (i, vertex) in table_status.wall_status.vertex_buffer.iter().enumerate() {
-                if i == 0 {
-                    wall_path_builder.move_to(*vertex);
-                } else {
-                    wall_path_builder.line_to(*vertex);
-                }                
-            }
-            wall_path_builder.close(); // connects the current position with the starting position closing the shape
-            // update the Path component
-            *wall_path = wall_path_builder.build();
-            // update the Collider component
-            *wall_collider = Collider::polyline(
-                table_status.wall_status.vertex_buffer.clone(),
-                Some(table_status.wall_status.index_buffer.clone())
-            ); 
-        } 
+// fn build_path(vertex_buffer: &Vec<Vec2>, maybe_index_buffer: &Option<Vec<[u32; 2]>>) -> Path {
+    
+
+// }
+
+pub fn build_wall_shape_bundle(vertex_buffer: &Vec<Vec2>) -> ShapeBundle {
+    let mut path_builder = PathBuilder::new();
+    path_builder.move_to(*vertex_buffer.first().unwrap());
+        for  vertex in vertex_buffer.iter().rev() {
+                path_builder.line_to(*vertex);
+        }                
+        
+    let path = path_builder.build();
+
+    ShapeBundle {
+        path,
+        transform: Transform::from_xyz(0., 75., 0.),
+        ..default()
     }
 }
 
+pub fn build_wall_collider(vertex_buffer: Vec<Vec2>, maybe_index_buffer: Option<Vec<[u32; 2]>>) -> Collider {
+    Collider::polyline(vertex_buffer, maybe_index_buffer)
+}
+
+/// When in [`GameSetupState::WallSetup`] if the the cursor is pressed then a new vertex is added to the wall
+pub fn set_wall_vertex(
+    mut commands: Commands, 
+    mut mouse_button_input: EventReader<MouseButtonInput>,
+    wall_query: Query<Entity, With<Wall>>,
+    cursor_position: Res<CursorPosition>,
+    mut wall_status: ResMut<WallStatus>,
+) {
+    if let Some(_button_pressed) = mouse_button_input.iter().last() {
+            // push new vertex into wall vertex buffer
+            wall_status.vertex_buffer.push(cursor_position.0);
+            let indices = 0..(wall_status.vertex_buffer.len() as u32);
+            // generate index buffer - Vec<[0,1], [1,2], .., [n-1, n], [n, 0]>
+            wall_status.maybe_index_buffer = Some(indices.circular_tuple_windows::<(_, _)>()
+                                                                        .map(|(i,j)| { [i, j] })
+                                                                        .collect::<Vec<[u32; 2]>>());
+        if let Ok(wall_entity) = wall_query.get_single() {
+            commands.entity(wall_entity)
+                .remove::<(Collider, ShapeBundle)>()
+                .insert( build_wall_shape_bundle(&wall_status.vertex_buffer))
+                .insert(build_wall_collider(wall_status.vertex_buffer.clone(), wall_status.maybe_index_buffer.clone()));
+
+            // let mut wall_path_builder = PathBuilder::new();
+            // for (i, vertex) in wall_status.vertex_buffer.iter().enumerate() {
+            //     if i == 0 {
+            //         wall_path_builder.move_to(*vertex);
+            //     } else {
+            //         wall_path_builder.line_to(*vertex);
+            //     }                
+            // }
+            // wall_path_builder.close(); // connects the current position with the starting position closing the shape
+            // // update the Path component
+            // *wall_path = wall_path_builder.build();
+            // // update the Collider component
+            // *wall_collider = Collider::polyline(
+            //     wall_status.vertex_buffer.clone(),
+            //     Some(wall_status.maybe_index_buffer.clone())
+            // );
+        } else {
+            if (wall_status.vertex_buffer.len() >= 2) && wall_status.is_changed() {
+                println!("vertex buffer: {:?}, index buffer: {:?}", wall_status.vertex_buffer, wall_status.maybe_index_buffer);
+                spawn_wall(&mut commands, wall_status.vertex_buffer.clone(), wall_status.maybe_index_buffer.clone());
+            }
+        }
+    }
+}
+
+// pub fn update_wall_entity(
+//     mut commands: Commands,
+//     mut wall_query: Query<(&mut Collider, &mut Path), With<Wall>>,
+//     wall_status: Res<WallStatus>,
+// ) {
+//     if let Ok((mut wall_collider, mut wall_path)) = wall_query.get_single_mut() {
+//         let mut wall_path_builder = PathBuilder::new();
+//         for (i, vertex) in wall_status.vertex_buffer.iter().enumerate() {
+//             if i == 0 {
+//                 wall_path_builder.move_to(*vertex);
+//             } else {
+//                 wall_path_builder.line_to(*vertex);
+//             }                
+//         }
+//         wall_path_builder.close(); // connects the current position with the starting position closing the shape
+//         // update the Path component
+//         *wall_path = wall_path_builder.build();
+//         // update the Collider component
+//         *wall_collider = Collider::polyline(
+//             wall_status.vertex_buffer.clone(),
+//             wall_status.maybe_index_buffer.clone()
+//         );
+//     } else {
+//         if (wall_status.vertex_buffer.len() >= 2) && wall_status.is_changed() {
+//             println!("vertex buffer: {:?}, index buffer: {:?}", wall_status.vertex_buffer, wall_status.maybe_index_buffer);
+//             spawn_wall(&mut commands, wall_status.vertex_buffer.clone(), wall_status.maybe_index_buffer.clone());
+//         }
+//     }
+// }
+
 pub fn clear_wall(
     commands: &mut Commands,
-    wall_query: &mut Query<Entity, With<Wall>>,
-    table_status: &mut ResMut<TableStatus>,
+    wall_query: &Query<Entity, With<Wall>>,
+    wall_status: &mut ResMut<WallStatus>,
 ) {
     if let Ok(wall_entity) = wall_query.get_single() {
         commands.entity(wall_entity).despawn();
     }
-    table_status.clear_wall_buffers();
-
-    commands.spawn(WallBundle::new());
+    wall_status.clear_buffers();
 }
 
-pub fn despawn_walls(
+
+pub fn despawn_wall(
     mut commands: Commands,
     wall_query: Query<Entity, With<Wall>>,
+    mut wall_status: ResMut<WallStatus>,
 ) {
-    if let Ok(wall) = wall_query.get_single() {
-        commands.entity(wall).despawn();
-    } 
+    if let Ok(wall_entity) = wall_query.get_single() {
+        commands.entity(wall_entity).despawn();
+    }
+    wall_status.clear_buffers();
 }
-
-
-

@@ -6,7 +6,8 @@ use crate::{
             components::PocketSetUpMenuButton,
             styles::*
         },
-        GameSetUpState},
+        GameSetUpState
+    },
     AppState
 };
 
@@ -38,6 +39,7 @@ pub fn interact_with_button(
                 match *interaction {
                     Interaction::Clicked => {
                         *background_color = CLICKED_DONE_BUTTON_COLOR.into();
+                        next_game_setup_state.set(GameSetUpState::BallSetUp)
                     },
                     Interaction::Hovered => {
                         *background_color = HOVERED_DONE_BUTTON_COLOR.into();                        

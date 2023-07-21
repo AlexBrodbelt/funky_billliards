@@ -41,7 +41,7 @@ pub fn state_transitions(
         && app_state.0 != AppState::GameSetup 
         {
         next_app_state.set(AppState::GameSetup);
-        next_game_setup_state.set(GameSetUpState::BallSetup);
+        next_game_setup_state.set(GameSetUpState::BallSetUp);
     }
     // Press M: _ -> AppState::Menu
     if keyboard_input.just_pressed(KeyCode::M)
@@ -54,7 +54,7 @@ pub fn state_transitions(
         && cue_ball_state.0 == CueBallState::InPlay
         && app_state.0 == AppState::GameSetup
         {
-        next_game_setup_state.set(GameSetUpState::ShotSetup);
+        next_game_setup_state.set(GameSetUpState::ShotSetUp);
     } 
 }
 

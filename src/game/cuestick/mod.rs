@@ -18,7 +18,7 @@ impl Plugin for CueStickPlugin {
         app
             .add_system(
                 spawn_cue_stick
-                    .in_schedule(OnEnter(GameSetUpState::ShotSetup))
+                    .in_schedule(OnEnter(GameSetUpState::ShotSetUp))
             )
             .add_systems(
                 (
@@ -26,7 +26,7 @@ impl Plugin for CueStickPlugin {
                     compute_wind_up_distance,
                     strike_cue_ball,
                 )
-                    .in_set(OnUpdate(GameSetUpState::ShotSetup))
+                    .in_set(OnUpdate(GameSetUpState::ShotSetUp))
                     .in_set(OnUpdate(AppState::GameSetup))
                     .in_set(OnUpdate(SimulationState::Running))
             )

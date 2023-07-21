@@ -1,8 +1,6 @@
-use bevy::{
-    prelude::*,
-};
+use bevy::prelude::*;
 
-use crate::game::{ball::components::Ball, resources::{Player}};
+use crate::game::{ball::components::Ball, resources::Player};
 
 // This resource tracks the game's score
 #[derive(Resource)]

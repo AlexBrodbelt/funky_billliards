@@ -7,87 +7,93 @@ use crate::config::{WALL_VERTEX_BUFFER, WALL_INDEX_BUFFER};
 #[derive(Resource)]
 pub struct CollisionSound(pub Handle<AudioSource>);
 
-#[derive(Resource, Debug)]
-pub struct TableStatus {
-    pub cue_stick_status: CueStickStatus,
-    pub cue_ball_status: CueBallStatus,
-    pub wall_status: WallStatus,
-    pub pocket_status: PocketStatus,
-}
 
-#[derive(Debug)]
+#[derive(Debug, Resource)]
 pub struct CueStickStatus {
     pub lifetime_timer: Timer,
     pub initial_position: Option<Vec2>, // position after wind up 
 }
 
-#[derive(Debug)]
+impl Default for CueStickStatus {
+    fn default() -> Self {
+        CueStickStatus {
+            lifetime_timer: Timer::new( Duration::from_secs(2), TimerMode::Repeating),
+            initial_position: None
+        }
+    }
+}
+
+
+#[derive(Debug, Resource)]
 pub struct CueBallStatus {
     pub initial_position: Option<Vec2>,
 }
 
+impl Default for CueBallStatus {
+    fn default() -> Self {
+        CueBallStatus {
+            initial_position: None 
+        }       
+    }
+}
+
+
 /// struct containing relevant information of the wall vertices and which vertices are connected
-#[derive(Debug)]
+#[derive(Debug, Resource)]
 pub struct WallStatus {
     pub vertex_buffer: Vec<Vec2>,
-    pub index_buffer: Vec<[u32; 2]>,
+    pub maybe_index_buffer: Option<Vec<[u32; 2]>>,
+}
+
+/// creates the default wall for the game
+impl WallStatus {
+    pub fn set_to_default(&mut self) {
+        self.vertex_buffer =  WALL_VERTEX_BUFFER.to_vec();
+        self.maybe_index_buffer = Some(WALL_INDEX_BUFFER.to_vec());   
+    }
 }
 
 impl Default for WallStatus {
     fn default() -> Self {
-        Self { 
-            vertex_buffer: WALL_VERTEX_BUFFER.to_vec(),
-            index_buffer: WALL_INDEX_BUFFER.to_vec()
+        WallStatus {
+            vertex_buffer: Vec::new(),
+            maybe_index_buffer: Some(Vec::new()),
         }
     }
 }
 
 impl WallStatus {
+
+    /// clears the wall buffers
     pub fn clear_buffers(&mut self) {
-        self.index_buffer.clear();
+        if let Some(index_buffer) = &mut self.maybe_index_buffer {
+            index_buffer.clear();
+        } else {
+            self.maybe_index_buffer = Some(Vec::new());
+        }
         self.vertex_buffer.clear();
-    }
+    }    
 }
 
-#[derive(Debug)]
+
+#[derive(Debug, Resource)]
 pub struct PocketStatus {
     vertex_buffer: Vec<Vec2>,
 }
 
-impl Default for TableStatus {
+impl Default for PocketStatus {
     fn default() -> Self {
-        TableStatus {
-            cue_stick_status: CueStickStatus {
-                lifetime_timer: Timer::new( Duration::from_secs(2), TimerMode::Repeating),
-                initial_position: None
-            },
-            cue_ball_status: CueBallStatus {
-                initial_position: None 
-            },
-            wall_status: WallStatus {
-                vertex_buffer: Vec::new(),
-                index_buffer: Vec::new(),
-            },
-            pocket_status: PocketStatus { 
-                vertex_buffer: Vec::new(), 
-            }
+        PocketStatus { 
+            vertex_buffer: Vec::new(), 
         }
     }
 }
-
-impl TableStatus {
-    pub fn clear_wall_buffers(&mut self) {
-        self.wall_status.clear_buffers()
-    }
-}
-
 
 
 /// Which player is currently active
 #[derive(Resource)]
 pub struct ActivePlayer(pub Player);
     
-
 impl ActivePlayer {
     pub fn switch_player(&mut self) {
         self.0 = match self.0 {
