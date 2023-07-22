@@ -16,27 +16,31 @@ pub struct CueStickPlugin;
 impl Plugin for CueStickPlugin {
     fn  build(&self, app: &mut App) {
         app
-            .add_system(
-                spawn_cue_stick
-                    .in_schedule(OnEnter(GameSetUpState::ShotSetUp))
+            .add_systems(
+                OnEnter(GameSetUpState::ShotSetUp),
+                (
+                    spawn_cue_stick
+                )
             )
             .add_systems(
+                Update,
                 (
                     set_cue_stick,
                     compute_wind_up_distance,
                     strike_cue_ball,
                 )
-                    .in_set(OnUpdate(GameSetUpState::ShotSetUp))
-                    .in_set(OnUpdate(AppState::GameSetup))
-                    .in_set(OnUpdate(SimulationState::Running))
+                    .run_if(in_state(GameSetUpState::ShotSetUp))
+                    .run_if(in_state(AppState::GameSetUp))
+                    .run_if(in_state(SimulationState::Running))
             )
             .add_systems(
+                Update,
                 (
                     handle_cue_stick_motion,
                 )
-                    .in_set(OnUpdate(GameState::ShotCooldown))
-                    .in_set(OnUpdate(AppState::Game))
-                    .in_set(OnUpdate(SimulationState::Running))
+                    .run_if(in_state(GameState::ShotCoolDown))
+                    .run_if(in_state(AppState::Game))
+                    .run_if(in_state(SimulationState::Running))
                 );
     }
 }

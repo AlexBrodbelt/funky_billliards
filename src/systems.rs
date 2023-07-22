@@ -38,9 +38,9 @@ pub fn state_transitions(
 ) {
     // Press G: _ -> AppState::GameSetup and CueBallState::InHand
     if keyboard_input.just_pressed(KeyCode::G)
-        && app_state.0 != AppState::GameSetup 
+        && app_state.0 != AppState::GameSetUp 
         {
-        next_app_state.set(AppState::GameSetup);
+        next_app_state.set(AppState::GameSetUp);
         next_game_setup_state.set(GameSetUpState::BallSetUp);
     }
     // Press M: _ -> AppState::Menu
@@ -52,7 +52,7 @@ pub fn state_transitions(
     // Press Return/Enter: GameSetupState::CueBallSetup -> GameSetupState::ShotSetup
     if keyboard_input.just_pressed(KeyCode::Return) 
         && cue_ball_state.0 == CueBallState::InPlay
-        && app_state.0 == AppState::GameSetup
+        && app_state.0 == AppState::GameSetUp
         {
         next_game_setup_state.set(GameSetUpState::ShotSetUp);
     } 

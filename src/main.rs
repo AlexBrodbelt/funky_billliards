@@ -26,7 +26,7 @@ use systems::*;
 pub enum AppState {
     #[default]
     Menu,
-    GameSetup,
+    GameSetUp,
     Game,
     GameOver,
 }
@@ -56,10 +56,17 @@ fn main() {
         })
         .insert_resource(CursorPosition::default())
         // Startup Systems
-        .add_startup_system(spawn_camera)
-        .add_startup_system(spawn_sound)
+        .add_systems(
+            Startup,
+            (
+                spawn_camera,
+                spawn_sound
+
+            )
+        )
         // Systems
         .add_systems(
+            Update,
             (   
                 get_cursor_position,
                 display_state,

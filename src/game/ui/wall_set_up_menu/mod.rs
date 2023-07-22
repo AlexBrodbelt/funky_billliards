@@ -18,8 +18,23 @@ pub struct WallSetUpMenuPlugin;
 impl Plugin for WallSetUpMenuPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_system(spawn_wall_set_up_menu.in_schedule(OnEnter(GameSetUpState::WallSetUp)))
-            .add_system(interact_with_button.in_set(OnUpdate(GameSetUpState::WallSetUp)))
-            .add_system(despawn_wall_set_up_menu.in_schedule(OnExit(GameSetUpState::WallSetUp)));
+            .add_systems(
+                OnEnter(GameSetUpState::WallSetUp),
+                (
+                spawn_wall_set_up_menu
+                )
+            )
+            .add_systems(
+                Update,
+                (
+                interact_with_button.run_if(in_state(GameSetUpState::WallSetUp))
+                )
+            )
+            .add_systems(
+                OnExit(GameSetUpState::WallSetUp),
+                (
+                despawn_wall_set_up_menu
+                )
+            );
     }
 }

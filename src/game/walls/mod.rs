@@ -23,14 +23,20 @@ impl Plugin for WallPlugin {
         app
             .add_state::<WallSetUpState>()
             .add_systems(
+                Update,
                 (
                     set_wall_vertex,
                 )
-                .in_set(OnUpdate(GameSetUpState::WallSetUp))
-                .in_set(OnUpdate(AppState::GameSetup))
-                .in_set(OnUpdate(WallSetUpState::Edit))
+                .run_if(in_state(GameSetUpState::WallSetUp))
+                .run_if(in_state(AppState::GameSetUp))
+                .run_if(in_state(WallSetUpState::Edit))
             )
-            .add_system(despawn_wall.in_schedule(OnEnter(AppState::Menu)));
+            .add_systems(
+                OnEnter(AppState::Menu),
+                (
+                    despawn_wall,
+                )
+            );
     }
 }
 

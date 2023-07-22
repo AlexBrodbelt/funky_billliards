@@ -18,7 +18,7 @@ pub fn interact_with_button(
                 *background_color = CLICKED_BUTTON_COLOR.into();
                 match *menu_button_type {
                     MenuButton::Play => {
-                        next_app_state.set(AppState::GameSetup);
+                        next_app_state.set(AppState::GameSetUp);
                         next_game_setup_state.set(GameSetUpState::WallSetUp);
                         next_wall_set_up_state.set(WallSetUpState::Edit);
                     },

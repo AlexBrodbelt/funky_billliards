@@ -73,7 +73,7 @@ pub fn set_wall_vertex(
                                                                         .collect::<Vec<[u32; 2]>>());
         if let Ok(wall_entity) = wall_query.get_single() {
             commands.entity(wall_entity)
-                .remove::<(Collider, ShapeBundle)>()
+                // .remove::<(Collider, ShapeBundle)>()
                 .insert( build_wall_shape_bundle(&wall_status.vertex_buffer))
                 .insert(build_wall_collider(wall_status.vertex_buffer.clone(), wall_status.maybe_index_buffer.clone()));
 

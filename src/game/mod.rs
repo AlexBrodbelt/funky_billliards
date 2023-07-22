@@ -51,21 +51,15 @@ impl Plugin for GamePlugin {
             .add_event::<CollisionEvent>()
             // On Update Systems
             .add_systems(
+                Update,
                 (
                     toggle_simulation,
                     stopping_threshold,
                     switch_player_condition,
+                    play_collision_sound.run_if(in_state(SimulationState::Running)),
                 )
-                .in_set(OnUpdate(AppState::Game))
-                .in_set(OnUpdate(GameState::Playing))
-            )
-            // On Update Systems when SimulationState::Running
-            .add_systems(
-                (
-                    play_collision_sound,
-                )
-                .in_set(OnUpdate(AppState::Game))
-                .in_set(OnUpdate(SimulationState::Running)),  
+                .run_if(in_state(AppState::Game))
+                .run_if(in_state(GameState::Playing))
             );
     }
 }
@@ -106,7 +100,7 @@ pub enum GameSetUpState {
 
 #[derive(Clone, Copy, Default, Eq, PartialEq, Debug, Hash, States)]
 pub enum GameState {
-    ShotCooldown,
+    ShotCoolDown,
     Playing,
     #[default]
     Disabled,

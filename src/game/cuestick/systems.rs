@@ -82,7 +82,7 @@ pub fn strike_cue_ball(
         cue_stick_status.initial_position =  Some(cue_stick_transform.translation.truncate());
 
         next_app_state.set(AppState::Game);
-        next_game_state.set(GameState::ShotCooldown);
+        next_game_state.set(GameState::ShotCoolDown);
     }
 }
 
