@@ -11,7 +11,10 @@ mod tests {
             .add_state::<GameSetupState>()
             .add_state::<SimulationState>()
             .add_state::<CueBallState>()
-            .add_system(state_transitions);
+            .add_systems(
+                Update,
+                state_transitions
+            );
 
         let mut input = Input::<KeyCode>::default();
         input.press(KeyCode::Space);

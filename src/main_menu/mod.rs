@@ -15,11 +15,26 @@ impl Plugin for MainMenuPlugin {
     fn build(&self, app: &mut App) {
         app
             // OnEnter Systems
-            .add_system(spawn_main_menu.in_schedule(OnEnter(AppState::Menu)))
+            .add_systems(
+                OnEnter(AppState::Menu),
+                (
+                spawn_main_menu,
+                )
+            )
             // OnUpdate Systems
-            .add_system(interact_with_button.in_set(OnUpdate(AppState::Menu)))
+            .add_systems(
+                Update,
+                (
+                    interact_with_button.run_if(in_state(AppState::Menu)),
+                )
+            )
             // OnExit Systems
-            .add_system(despawn_main_menu.in_schedule(OnExit(AppState::Menu)));
+            .add_systems(
+                OnExit(AppState::Menu),
+                (
+                    despawn_main_menu,
+                )
+            );
     }
 }
 
