@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 
-use crate::game::ui::wall_set_up_menu::{
+use crate::{game::ui::wall_set_up_menu::{
     components::{WallSetUpMenu, WallSetUpMenuButton},
     styles::*
-};
+}, styles::BUTTON_STYLE};
 
 
 pub fn spawn_wall_set_up_menu(
@@ -33,7 +33,7 @@ fn build_wall_set_up_menu(
             parent.spawn(
                 (
                     ButtonBundle {
-                        style: DONE_BUTTON_STYLE,
+                        style: BUTTON_STYLE,
                         background_color: NORMAL_DONE_BUTTON_COLOR.into(),
                         ..default()
                     },
@@ -61,7 +61,7 @@ fn build_wall_set_up_menu(
             parent.spawn(
                 (
                     ButtonBundle {
-                        style: CLEAR_BUTTON_STYLE,
+                        style: BUTTON_STYLE,
                         background_color: NORMAL_CLEAR_BUTTON_COLOR.into(),
                         ..default()
                     },
@@ -89,7 +89,7 @@ fn build_wall_set_up_menu(
             parent.spawn(
                 (
                     ButtonBundle {
-                        style: DEFAULT_BUTTON_STYLE,
+                        style: BUTTON_STYLE,
                         background_color: NORMAL_CLEAR_BUTTON_COLOR.into(),
                         ..default()
                     },

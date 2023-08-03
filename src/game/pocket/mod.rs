@@ -18,19 +18,19 @@ impl Plugin for PocketPlugin {
         app.add_systems(
             OnEnter(GameSetUpState::PocketSetUp),
             (
-                spawn_pockets
+                spawn_pockets,
                 )
             )
             .add_systems(
                 Update,
                 (
-                    pocket_condition.in_set(OnUpdate(AppState::Game))
+                    pocket_condition.run_if(in_state(AppState::Game)),
                 )
             )
             .add_systems(
                 OnEnter(AppState::Menu),
                 (
-                despawn_pockets
+                despawn_pockets,
                 )
             );
     }

@@ -18,20 +18,20 @@ impl Plugin for ScoreboardPlugin {
             OnEnter(AppState::Game),
                 (
                 spawn_scoreboard
-                    .run_if(not(resource_exists::<Scoreboard>()))
+                    .run_if(not(resource_exists::<Scoreboard>())),
                 )      
             )
             .add_systems(
                 Update,
                 (
-                update_scoreboard.run_if(in_state(AppState::Game))
+                update_scoreboard.run_if(in_state(AppState::Game)),
                 )
             )
             .add_systems(
                 OnEnter(AppState::Menu),
                 (
                 despawn_scoreboard
-                    .run_if(resource_exists::<Scoreboard>())
+                    .run_if(resource_exists::<Scoreboard>()),
                 )
             );
     }

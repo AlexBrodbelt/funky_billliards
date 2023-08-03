@@ -23,13 +23,13 @@ impl Plugin for PocketSetUpMenuPlugin {
             .add_systems(
                 Update,
                 (
-                interact_with_button.run_if(in_state(GameSetUpState::PocketSetUp))
+                interact_with_button.run_if(in_state(GameSetUpState::PocketSetUp)),
                 )
             )
             .add_systems(
                 OnExit(GameSetUpState::PocketSetUp),
                 (
-                despawn_pocket_set_up_menu
+                despawn_pocket_set_up_menu,
                 )
             );
     }

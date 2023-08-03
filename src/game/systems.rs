@@ -3,7 +3,7 @@ use bevy_rapier2d::prelude::*;
 
 use crate::{AppState, config::STOPPING_THRESHOLD};
 
-use super::{resources::*, SimulationState, ball::{components::{Ball, CueBall}}, GameSetUpState};
+use super::{resources::*, SimulationState, ball::{components::{Ball, CueBall}}, GameSetUpState, components::CollisionSound};
 
 
 pub fn spawn_camera(
@@ -17,21 +17,25 @@ pub fn spawn_sound(
     asset_server: Res<AssetServer>
 ) {
     // Sound
-    let ball_collision_sound = asset_server.load("sounds\\breakout_collision.ogg");
-    commands.insert_resource(CollisionSound(ball_collision_sound));
+    commands.spawn(
+        (
+            AudioBundle {
+            source: asset_server.load("sounds\\breakout_collision.ogg"),
+            settings: PlaybackSettings::ONCE
+                .with_volume(bevy::audio::Volume::new_relative(0.5))
+                .paused(),
+            },
+            CollisionSound,
+    ));
 }
 
 
 pub fn play_collision_sound(
-    mut collision_events: EventReader<CollisionEvent>,
-    audio: Res<Audio>,
-    sound: Res<CollisionSound>,
+    collision_sound_query: Query<&AudioSink, With<CollisionSound>>,
 ) {
     // Play a sound once per frame if a collision occurred.
-    if !collision_events.is_empty() {
-        // This prevents events staying active on the next frame.r
-        collision_events.clear();
-        audio.play(sound.0.clone());
+    if let Ok(sink) = collision_sound_query.get_single() {
+        sink.play();
     }
 }
 
@@ -42,7 +46,7 @@ pub fn toggle_simulation(
     mut next_simulation_state: ResMut<NextState<SimulationState>>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Space) {
-        match simulation_state.0 {
+        match *simulation_state.get() {
             SimulationState::Running => {
                 next_simulation_state.set(SimulationState::Paused);
             }
@@ -85,7 +89,7 @@ pub fn switch_player_condition(
     mut next_game_setup_state: ResMut<NextState<GameSetUpState>>,
     mut cue_ball_status: ResMut<CueBallStatus>,
 ) {
-    if balls_not_moving(ball_query) && simulation_state.0 == SimulationState::Running {
+    if balls_not_moving(ball_query) && *simulation_state.get() == SimulationState::Running {
         active_player.switch_player();
         println!("{:?}", active_player.0);
         next_app_state.set(AppState::GameSetUp);

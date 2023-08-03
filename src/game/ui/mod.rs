@@ -13,7 +13,11 @@ pub struct GameUIPlugin;
 impl Plugin for GameUIPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_plugin(PocketSetUpMenuPlugin)
-            .add_plugin(WallSetUpMenuPlugin);
+            .add_plugins(
+                ( 
+                    PocketSetUpMenuPlugin,
+                    WallSetUpMenuPlugin
+                )
+            );
     }
 }

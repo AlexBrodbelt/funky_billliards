@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 
-use crate::game::ui::pocket_set_up_menu::{
+use crate::{game::ui::pocket_set_up_menu::{
     components::{PocketSetUpMenu, PocketSetUpMenuButton},
     styles::*
-};
+}, styles::BUTTON_STYLE};
 
 
 pub fn spawn_pocket_set_up_menu(
@@ -33,7 +33,7 @@ fn build_pocket_set_up_menu(
             parent.spawn(
                 (
                     ButtonBundle {
-                        style: DONE_BUTTON_STYLE,
+                        style: BUTTON_STYLE,
                         background_color: NORMAL_DONE_BUTTON_COLOR.into(),
                         ..default()
                     },
@@ -61,7 +61,7 @@ fn build_pocket_set_up_menu(
             parent.spawn(
                 (
                     ButtonBundle {
-                        style: CLEAR_BUTTON_STYLE,
+                        style: BUTTON_STYLE,
                         background_color: NORMAL_CLEAR_BUTTON_COLOR.into(),
                         ..default()
                     },

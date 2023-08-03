@@ -4,7 +4,7 @@ use bevy::{
 };
 use bevy_rapier2d::prelude::*;
 
-use crate::{config::*, resources::CursorPosition};
+use crate::config::*;
 
 #[derive(Component)]
 pub enum Pocket {
@@ -31,7 +31,7 @@ impl Pocket {
             Pocket::BottomRight   => Vec2::new(RIGHT_WALL - GAP_BETWEEN_POCKET_AND_WALL, BOTTOM_WALL + GAP_BETWEEN_POCKET_AND_WALL),
             Pocket::BotttomCenter => Vec2::new(0.0, BOTTOM_WALL + GAP_BETWEEN_POCKET_AND_WALL),
             Pocket::BottomLeft    => Vec2::new(LEFT_WALL + GAP_BETWEEN_POCKET_AND_WALL, BOTTOM_WALL + GAP_BETWEEN_POCKET_AND_WALL),
-            Pocket::HandPlaced(PocketIdentifier{ id, position}) => position,    
+            Pocket::HandPlaced(PocketIdentifier{ id: _, position}) => position,    
         }
     }
 

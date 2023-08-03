@@ -21,19 +21,19 @@ impl Plugin for WallSetUpMenuPlugin {
             .add_systems(
                 OnEnter(GameSetUpState::WallSetUp),
                 (
-                spawn_wall_set_up_menu
+                spawn_wall_set_up_menu,
                 )
             )
             .add_systems(
                 Update,
                 (
-                interact_with_button.run_if(in_state(GameSetUpState::WallSetUp))
+                interact_with_button.run_if(in_state(GameSetUpState::WallSetUp)),
                 )
             )
             .add_systems(
                 OnExit(GameSetUpState::WallSetUp),
                 (
-                despawn_wall_set_up_menu
+                despawn_wall_set_up_menu,
                 )
             );
     }

@@ -4,6 +4,7 @@ mod main_menu;
 mod config;
 pub mod resources;
 mod systems;
+pub mod styles;
 
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
@@ -38,17 +39,25 @@ fn main() {
         // Bevy Plugins
         .add_plugins(DefaultPlugins)
         .add_state::<AppState>()
-        .add_plugin(WorldInspectorPlugin::new())
+        .add_plugins(WorldInspectorPlugin::new())
         // Bevy Rapier Plugins
-        .add_plugin(RapierDebugRenderPlugin::default()) 
-        .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(1500.0)) // needs to be tweaked
+        .add_plugins(
+            (
+                RapierDebugRenderPlugin::default(),
+                RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(1500.0)
+            )
+        ) 
         // Bevy Prototype Lyon
-        .add_plugin(ShapePlugin)
+        .add_plugins(ShapePlugin)
         // Bevy Rapier Egui Plugin
-        // .add_plugin(InspectableRapierPlugin)
+        // .add_plugins(InspectableRapierPlugin)
         // My Plugins
-        .add_plugins(GamePlugins)
-        .add_plugin(MainMenuPlugin)
+        .add_plugins(
+            (
+                GamePlugins,
+                MainMenuPlugin,
+            )
+        )
         // Bevy Rapier Resources
         .insert_resource( RapierConfiguration {
             gravity : Vec2::ZERO,
@@ -61,7 +70,6 @@ fn main() {
             (
                 spawn_camera,
                 spawn_sound
-
             )
         )
         // Systems

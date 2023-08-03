@@ -54,7 +54,7 @@ pub fn set_cue_stick(
     // Calculate the angle of the cue_stick      
     let new_cue_stick_angle = Vec2::X.angle_between(diff_normalized);
 
-    // Update the cue_stick transform when mouse is clicked
+    // Update the cue_stick transform when mouse is PRESSED
 
     if let Some(_button_pressed) = mouse_button_input.iter().last() {
         cue_stick_transform.translation = new_cue_stick_translation.extend(1.0);

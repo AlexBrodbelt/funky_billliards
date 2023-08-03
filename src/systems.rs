@@ -38,21 +38,21 @@ pub fn state_transitions(
 ) {
     // Press G: _ -> AppState::GameSetup and CueBallState::InHand
     if keyboard_input.just_pressed(KeyCode::G)
-        && app_state.0 != AppState::GameSetUp 
+        && *app_state.get() != AppState::GameSetUp 
         {
         next_app_state.set(AppState::GameSetUp);
         next_game_setup_state.set(GameSetUpState::BallSetUp);
     }
     // Press M: _ -> AppState::Menu
     if keyboard_input.just_pressed(KeyCode::M)
-        && app_state.0 != AppState::Menu
+        && *app_state.get() != AppState::Menu
         {
         next_app_state.set(AppState::Menu);
     }
     // Press Return/Enter: GameSetupState::CueBallSetup -> GameSetupState::ShotSetup
     if keyboard_input.just_pressed(KeyCode::Return) 
-        && cue_ball_state.0 == CueBallState::InPlay
-        && app_state.0 == AppState::GameSetUp
+        && *cue_ball_state.get() == CueBallState::InPlay
+        && *app_state.get() == AppState::GameSetUp
         {
         next_game_setup_state.set(GameSetUpState::ShotSetUp);
     } 
@@ -65,7 +65,7 @@ pub fn toggle_physics_pipeline(
     mut rapier_config: ResMut<RapierConfiguration>,
 ) {
     if app_state.is_changed() || simulation_state.is_changed() {
-        if app_state.0 != AppState::Game || simulation_state.0 != SimulationState::Running {
+        if *app_state.get() != AppState::Game || *simulation_state.get() != SimulationState::Running {
             rapier_config.physics_pipeline_active = false;
         } else {
             rapier_config.physics_pipeline_active = true;
@@ -80,7 +80,7 @@ macro_rules! print_if_state_changed {
         {
             $(
             if $state.is_changed() {
-            println!("{:?}", $state.0);
+            println!("{:?}", $state.get());
             }
             )*
         }

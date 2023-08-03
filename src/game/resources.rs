@@ -4,8 +4,7 @@ use bevy::prelude::*;
 
 use crate::config::{WALL_VERTEX_BUFFER, WALL_INDEX_BUFFER};
 
-#[derive(Resource)]
-pub struct CollisionSound(pub Handle<AudioSource>);
+
 
 
 #[derive(Debug, Resource)]

@@ -19,7 +19,7 @@ impl Plugin for CueStickPlugin {
             .add_systems(
                 OnEnter(GameSetUpState::ShotSetUp),
                 (
-                    spawn_cue_stick
+                    spawn_cue_stick,
                 )
             )
             .add_systems(

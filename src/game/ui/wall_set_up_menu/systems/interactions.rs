@@ -27,8 +27,8 @@ pub fn interact_with_button(
         match *pocket_set_up_menu_button_type {
             WallSetUpMenuButton::Clear => {
                 match *interaction {
-                    Interaction::Clicked => {
-                        *background_color = CLICKED_CLEAR_BUTTON_COLOR.into();
+                    Interaction::Pressed => {
+                        *background_color = PRESSED_CLEAR_BUTTON_COLOR.into();
                         clear_wall(&mut commands, &mut wall_query, &mut wall_status);
                         next_wall_set_up_state.set(WallSetUpState::Edit);
                     },
@@ -42,8 +42,8 @@ pub fn interact_with_button(
             },
             WallSetUpMenuButton::Done => {
                 match *interaction {
-                    Interaction::Clicked => {
-                        *background_color = CLICKED_DONE_BUTTON_COLOR.into();
+                    Interaction::Pressed => {
+                        *background_color = PRESSED_DONE_BUTTON_COLOR.into();
                         if wall_status.vertex_buffer.len() > 2 {
                             next_game_setup_state.set(GameSetUpState::PocketSetUp);
                         } else {
@@ -60,8 +60,8 @@ pub fn interact_with_button(
             },
             WallSetUpMenuButton::Default => {
                 match *interaction {
-                    Interaction::Clicked => {
-                        *background_color = CLICKED_DEFAULT_BUTTON_COLOR.into();
+                    Interaction::Pressed => {
+                        *background_color = PRESSED_DEFAULT_BUTTON_COLOR.into();
                         next_wall_set_up_state.set(WallSetUpState::Disabled);
                         clear_wall(&mut commands, &mut wall_query, &mut wall_status);
                         spawn_default_walls(&mut commands, &mut wall_status);

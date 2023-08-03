@@ -1,9 +1,10 @@
 use bevy::prelude::*;
 
-use crate::main_menu::{
+use crate::{main_menu::{
     components::{Menu, MenuButton}, 
     styles::*,
-};
+}, styles::BUTTON_STYLE};
+
 
 pub fn spawn_main_menu(
     mut commands: Commands,

@@ -1,9 +1,10 @@
 use bevy::{prelude::*, app::PluginGroupBuilder};
 use bevy_rapier2d::prelude::*;
 
+pub mod components;
+pub mod events;
 pub mod resources;
 pub mod systems;
-pub mod events;
 
 pub mod ball;
 pub mod cuestick;
@@ -56,10 +57,10 @@ impl Plugin for GamePlugin {
                     toggle_simulation,
                     stopping_threshold,
                     switch_player_condition,
-                    play_collision_sound.run_if(in_state(SimulationState::Running)),
+                    play_collision_sound,
                 )
-                .run_if(in_state(AppState::Game))
-                .run_if(in_state(GameState::Playing))
+                    .run_if(in_state(AppState::Game))
+                    .run_if(in_state(GameState::Playing))
             );
     }
 }
