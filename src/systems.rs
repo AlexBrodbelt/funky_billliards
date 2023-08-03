@@ -112,3 +112,12 @@ pub fn exit_app(
         app_exit_event_writer.send(AppExit);
     }
 }
+
+pub fn despawn<T: Component>(
+    mut commands: Commands,
+    query: Query<Entity, With<T>>,
+) {
+    for entity in &query {
+        commands.entity(entity).despawn_recursive();
+    }
+}

@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
-use crate::AppState;
+use crate::{AppState, systems::despawn};
 
-use self::systems::spawn_pockets;
+use self::{systems::spawn_pockets, components::Pocket};
 
 pub mod components;
 mod systems;
@@ -30,7 +30,7 @@ impl Plugin for PocketPlugin {
             .add_systems(
                 OnEnter(AppState::Menu),
                 (
-                despawn_pockets,
+                despawn::<Pocket>,
                 )
             );
     }

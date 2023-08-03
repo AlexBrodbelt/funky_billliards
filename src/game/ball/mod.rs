@@ -6,7 +6,9 @@ mod resources;
 
 use systems::*;
 
-use crate::AppState;
+use crate::{AppState, systems::despawn};
+
+use self::components::Ball;
 
 use super::GameSetUpState;
 pub struct BallPlugin;
@@ -36,7 +38,7 @@ impl Plugin for BallPlugin {
             // On Exit AppState::Game Systems
             .add_systems(
                 OnEnter(AppState::Menu),
-                despawn_balls
+                despawn::<Ball>,
             );
     }
 }

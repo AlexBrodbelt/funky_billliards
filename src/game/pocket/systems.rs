@@ -67,11 +67,12 @@ pub fn pocket_condition(
     }
 }
 
-pub fn despawn_pockets( // idea make despawning generic function that takes in the component to despawn
-    mut commands: Commands,
-    pocket_query: Query<Entity, With<Pocket>>,
-) {
-    for pocket in &pocket_query {
-        commands.entity(pocket).despawn();
-    }
-}
+// pub fn despawn_pockets( // idea make despawning generic function that takes in the component to despawn
+//     mut commands: Commands,
+//     pocket_query: Query<Entity, With<Pocket>>,
+// ) {
+//     for pocket in &pocket_query {
+//         commands.entity(pocket).despawn();
+//     }
+// }
+

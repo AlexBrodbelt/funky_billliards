@@ -74,11 +74,11 @@ pub fn set_cue_ball(
     }
 }
 
-pub fn despawn_balls(
-    mut commands: Commands,
-    ball_query: Query<Entity, (With<Ball>,)>,
-) {
-    for ball in &ball_query {
-        commands.entity(ball).despawn();
-    }
-}
+// pub fn despawn_balls(
+//     mut commands: Commands,
+//     ball_query: Query<Entity, With<Ball>>,
+// ) {
+//     for ball in &ball_query {
+//         commands.entity(ball).despawn();
+//     }
+// }
