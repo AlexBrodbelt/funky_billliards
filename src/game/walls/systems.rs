@@ -74,25 +74,9 @@ pub fn set_wall_vertex(
         if let Ok(wall_entity) = wall_query.get_single() {
             commands.entity(wall_entity)
                 // .remove::<(Collider, ShapeBundle)>()
-                .insert( build_wall_shape_bundle(&wall_status.vertex_buffer))
+                .insert(build_wall_shape_bundle(&wall_status.vertex_buffer))
                 .insert(build_wall_collider(wall_status.vertex_buffer.clone(), wall_status.maybe_index_buffer.clone()));
 
-            // let mut wall_path_builder = PathBuilder::new();
-            // for (i, vertex) in wall_status.vertex_buffer.iter().enumerate() {
-            //     if i == 0 {
-            //         wall_path_builder.move_to(*vertex);
-            //     } else {
-            //         wall_path_builder.line_to(*vertex);
-            //     }                
-            // }
-            // wall_path_builder.close(); // connects the current position with the starting position closing the shape
-            // // update the Path component
-            // *wall_path = wall_path_builder.build();
-            // // update the Collider component
-            // *wall_collider = Collider::polyline(
-            //     wall_status.vertex_buffer.clone(),
-            //     Some(wall_status.maybe_index_buffer.clone())
-            // );
         } else {
             if (wall_status.vertex_buffer.len() >= 2) && wall_status.is_changed() {
                 println!("vertex buffer: {:?}, index buffer: {:?}", wall_status.vertex_buffer, wall_status.maybe_index_buffer);
@@ -132,14 +116,10 @@ pub fn set_wall_vertex(
 //     }
 // }
 
+/// Clears the vertex and index buffer of the [`WallStatus`] resource 
 pub fn clear_wall(
-    commands: &mut Commands,
-    wall_query: &Query<Entity, With<Wall>>,
     wall_status: &mut ResMut<WallStatus>,
 ) {
-    if let Ok(wall_entity) = wall_query.get_single() {
-        commands.entity(wall_entity).despawn();
-    }
     wall_status.clear_buffers();
 }
 

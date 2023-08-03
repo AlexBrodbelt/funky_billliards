@@ -19,9 +19,8 @@ pub fn get_cursor_position(
         Some(cursor) => cursor.position,
         None => return,
     };
-
     cursor_position.x -= 0.5 * primary.width();
-    cursor_position.y -= 0.5 * primary.height();
+    cursor_position.y = 0.5 * primary.height() - cursor_position.y;
 
     cursor_position_resource.0 = cursor_position;
 }

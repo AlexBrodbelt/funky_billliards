@@ -10,6 +10,9 @@ pub enum WallSetUpMenuButton {
     Default,
 }
 
+#[derive(Component)]
+pub struct CanvasButton;
+
 
 
 

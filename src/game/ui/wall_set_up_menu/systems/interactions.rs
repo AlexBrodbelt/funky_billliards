@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::{
     game::{
         ui::wall_set_up_menu::{
-            components::WallSetUpMenuButton,
+            components::{WallSetUpMenuButton, CanvasButton},
             styles::*
         },
         GameSetUpState, resources::WallStatus, walls::{components::Wall, systems::{clear_wall, spawn_default_walls}, WallSetUpState}},
@@ -13,23 +13,34 @@ use crate::{
 
 pub fn interact_with_button(
     mut commands: Commands,
-    mut wall_query: Query<Entity, With<Wall>>,
+    // mut wall_query: Query<Entity, With<Wall>>,
     mut wall_status: ResMut<WallStatus>,
     mut button_query: Query<
     (&Interaction, &mut BackgroundColor, &WallSetUpMenuButton),
     (Changed<Interaction>, With<WallSetUpMenuButton>)
     >,
+    mut canvas_button: Query<
+    (&Interaction, &mut BackgroundColor),
+    (Changed<Interaction>, With<CanvasButton>)
+    >,
     mut next_app_state: ResMut<NextState<AppState>>,
     mut next_game_setup_state: ResMut<NextState<GameSetUpState>>,
     mut next_wall_set_up_state: ResMut<NextState<WallSetUpState>>,
 ) {
+    if let Ok((interaction, mut background_color)) = canvas_button.get_single_mut() {
+        match *interaction {
+            Interaction::Pressed => todo!(),
+            Interaction::Hovered => todo!(),
+            Interaction::None => todo!(),
+        }
+    }
     if let Ok((interaction, mut background_color, pocket_set_up_menu_button_type)) = button_query.get_single_mut() {       
         match *pocket_set_up_menu_button_type {
             WallSetUpMenuButton::Clear => {
                 match *interaction {
                     Interaction::Pressed => {
                         *background_color = PRESSED_CLEAR_BUTTON_COLOR.into();
-                        clear_wall(&mut commands, &mut wall_query, &mut wall_status);
+                        clear_wall(&mut wall_status);
                         next_wall_set_up_state.set(WallSetUpState::Edit);
                     },
                     Interaction::Hovered => {
@@ -63,7 +74,7 @@ pub fn interact_with_button(
                     Interaction::Pressed => {
                         *background_color = PRESSED_DEFAULT_BUTTON_COLOR.into();
                         next_wall_set_up_state.set(WallSetUpState::Disabled);
-                        clear_wall(&mut commands, &mut wall_query, &mut wall_status);
+                        clear_wall(&mut wall_status);
                         spawn_default_walls(&mut commands, &mut wall_status);
                     },
                     Interaction::Hovered => {
