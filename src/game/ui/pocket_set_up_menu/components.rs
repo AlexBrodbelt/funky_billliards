@@ -7,6 +7,7 @@ pub struct PocketSetUpMenu;
 pub enum PocketSetUpMenuButton {
     Clear,
     Done,
+    Default,
 }
 
 

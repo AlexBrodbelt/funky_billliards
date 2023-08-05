@@ -7,6 +7,8 @@ use self::{
 
 pub mod pocket_set_up_menu;
 pub mod wall_set_up_menu;
+pub mod styles;
+pub mod components;
 
 pub struct GameUIPlugin;
 

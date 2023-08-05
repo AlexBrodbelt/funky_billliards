@@ -16,12 +16,10 @@ use super::components::*;
 
 
 pub fn spawn_wall(
-    commands: &mut Commands,
-    vertices:Vec<Vec2>,
-    indices: Option<Vec<[u32; 2]>> ,
+    mut commands: Commands,
 ) {
     println!("wall spawned");
-    commands.spawn(WallBundle::new(vertices, indices));
+    commands.spawn(WallBundle::new());
 }
 
 
@@ -47,7 +45,7 @@ pub fn wall_set_up_events_handler(
                 wall_set_up_done(&wall_status, &mut next_game_setup_state); 
             },
             WallSetUpEvent::SpawnDefaultWall => {
-                spawn_default_wall(&mut commands, &mut wall_status);
+                spawn_default_wall(&mut wall_status);
             },
         }
     }
@@ -56,23 +54,31 @@ pub fn wall_set_up_events_handler(
 /// Helper function to [´set_wall_vertex()´]
 pub fn build_wall_shape_bundle(vertex_buffer: &Vec<Vec2>) -> ShapeBundle {
     let mut path_builder = PathBuilder::new();
-    path_builder.move_to(*vertex_buffer.first().unwrap());
-        for  vertex in vertex_buffer.iter().rev() {
+    if let Some(start_vertex) = vertex_buffer.first() {
+        path_builder.move_to(*start_vertex);
+        for vertex in vertex_buffer.iter().rev() {
                 path_builder.line_to(*vertex);
             }                
             
-            let path = path_builder.build();
-
-            ShapeBundle {
-        path,
-        transform: Transform::from_xyz(0., 75., 0.),
-        ..default()
+        let path = path_builder.build();
+        ShapeBundle {
+            path,
+            transform: Transform::from_xyz(0., 0., 0.),
+            ..default()
+        } 
+    
+    } else {
+        ShapeBundle::default()
     }
 }
 
 /// Helper function to [´set_wall_vertex()´]
 pub fn build_wall_collider(vertex_buffer: Vec<Vec2>, maybe_index_buffer: Option<Vec<[u32; 2]>>) -> Collider {
-    Collider::polyline(vertex_buffer, maybe_index_buffer)
+    if vertex_buffer.is_empty() {
+        Collider::default()
+    } else {
+        Collider::polyline(vertex_buffer, maybe_index_buffer)
+    } 
 }
 
 /// When in [`GameSetupState::WallSetup`] if the the cursor is pressed then a new vertex is added to the wall
@@ -89,17 +95,25 @@ fn set_wall_vertex(
     wall_status.maybe_index_buffer = Some(indices.circular_tuple_windows::<(_, _)>()
                                                                 .map(|(i,j)| { [i, j] })
                                                                 .collect::<Vec<[u32; 2]>>());
+}
+
+pub fn update_wall(
+    mut commands: Commands,
+    wall_query: Query<Entity, With<Wall>>,
+    wall_status: ResMut<WallStatus>,
+) {
     if let Ok(wall_entity) = wall_query.get_single() {
         commands.entity(wall_entity)
             // .remove::<(Collider, ShapeBundle)>()
             .insert(build_wall_shape_bundle(&wall_status.vertex_buffer))
             .insert(build_wall_collider(wall_status.vertex_buffer.clone(), wall_status.maybe_index_buffer.clone()));
-    } else {
-        if (wall_status.vertex_buffer.len() >= 2) && wall_status.is_changed() {
-            println!("vertex buffer: {:?}, index buffer: {:?}", wall_status.vertex_buffer, wall_status.maybe_index_buffer);
-            spawn_wall(commands, wall_status.vertex_buffer.clone(), wall_status.maybe_index_buffer.clone());
-        }
-    }  
+    }// } else {
+    //     if (wall_status.vertex_buffer.len() >= 2) && wall_status.is_changed() {
+    //         println!("vertex buffer: {:?}, index buffer: {:?}", wall_status.vertex_buffer, wall_status.maybe_index_buffer);
+    //         spawn_wall(&mut commands, wall_status.vertex_buffer.clone(), wall_status.maybe_index_buffer.clone());
+    //     }
+    // } 
+
 }
 
 /// Clears the vertex and index buffer of the [`WallStatus`] resource 

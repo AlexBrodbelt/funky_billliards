@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 
-use crate::{game::ui::wall_set_up_menu::{
-    components::{WallSetUpMenu, WallSetUpMenuButton, CanvasButton},
+use crate::{game::ui::{wall_set_up_menu::{
+    components::{WallSetUpMenu, WallSetUpMenuButton},
     styles::*
-},
+}, styles::{CANVAS_BUTTON_STYLE, CANVAS_STYLE, TOOL_BAR_STYLE}, components::CanvasButton},
 styles::BUTTON_STYLE, config::BACKGROUND_COLOR};
 
 

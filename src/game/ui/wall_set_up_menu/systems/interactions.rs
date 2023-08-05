@@ -2,10 +2,10 @@ use bevy::prelude::*;
 
 use crate::{
     game::{
-        ui::wall_set_up_menu::{
-            components::{WallSetUpMenuButton, CanvasButton},
+        ui::{wall_set_up_menu::{
+            components::WallSetUpMenuButton,
             styles::*, events::WallSetUpEvent
-        },
+        }, components::CanvasButton},
         GameSetUpState, 
         resources::WallStatus, 
         walls::WallSetUpState},
@@ -35,7 +35,10 @@ pub fn interact_with_button(
     mut next_wall_set_up_state: ResMut<NextState<WallSetUpState>>,
 ) {
     // Canvas button
-    if let Ok((interaction, mut background_color)) = set.p0().get_single_mut() {
+    if let Ok((
+            interaction,
+            mut background_color
+    )) = set.p0().get_single_mut() {
         match *interaction {
             Interaction::Pressed => {
                 *background_color = (*Color::BLUE.set_a(0.1)).into(); // this is hacky and ugly fix this!!!
@@ -50,7 +53,11 @@ pub fn interact_with_button(
         }
     }
     // Tool bar buttons
-    if let Ok((interaction, mut background_color, pocket_set_up_menu_button_type)) = set.p1().get_single_mut() {       
+    if let Ok((
+        interaction, 
+        mut background_color, 
+        pocket_set_up_menu_button_type
+    )) = set.p1().get_single_mut() {       
         match *pocket_set_up_menu_button_type {
             WallSetUpMenuButton::Clear => {
                 match *interaction {

@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::AppState;
 
-use self::systems::*;
+use self::{systems::*, resources::WindUpDistance};
 
 use super::{GameSetUpState, GameState, SimulationState};
 
@@ -32,6 +32,7 @@ impl Plugin for CueStickPlugin {
                     .run_if(in_state(GameSetUpState::ShotSetUp))
                     .run_if(in_state(AppState::GameSetUp))
                     .run_if(in_state(SimulationState::Running))
+                    .run_if(resource_exists::<WindUpDistance>())
             )
             .add_systems(
                 Update,

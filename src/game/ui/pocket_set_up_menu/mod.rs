@@ -1,6 +1,7 @@
 pub mod systems;
 mod styles;
 pub mod components;
+pub mod events;
 
 use bevy::prelude::*;
 

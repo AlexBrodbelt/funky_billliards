@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{AppState, systems::despawn};
 
-use self::{systems::spawn_pockets, components::Pocket};
+use self::{systems::spawn_pocket, components::Pocket};
 
 pub mod components;
 mod systems;
@@ -16,10 +16,12 @@ pub struct PocketPlugin;
 impl Plugin for PocketPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
-            OnEnter(GameSetUpState::PocketSetUp),
+            Update,
             (
-                spawn_pockets,
+                pocket_set_up_event_handler,
                 )
+                .run_if(in_state(GameSetUpState::PocketSetUp))
+                .run_if(in_state(AppState::GameSetUp))
             )
             .add_systems(
                 Update,

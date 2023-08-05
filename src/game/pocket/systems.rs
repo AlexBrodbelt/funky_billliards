@@ -5,40 +5,96 @@ use super::components::*;
 
 use crate::{game::{
     scoreboard::resources::*,
-    resources::ActivePlayer,
-    ball::components::Ball
+    resources::{ActivePlayer, WallStatus},
+    ball::components::Ball, ui::pocket_set_up_menu::events::PocketSetUpEvent, GameSetUpState
     },
-    resources::CursorPosition
+    resources::CursorPosition, config::POCKET_RADIUS, systems::{despawn, despawn_ref}
 };
 
 
-pub fn set_pockets(
+
+
+
+pub fn spawn_pocket(
+    commands: &mut Commands,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    materials: &mut ResMut<Assets<ColorMaterial>>,
+    // asset_server: Res<AssetServer>, 
+) {
+    commands.spawn(PocketBundle::new(Pocket::BottomLeft, meshes, materials ));
+    commands.spawn(PocketBundle::new(Pocket::BotttomCenter, meshes, materials ));
+    commands.spawn(PocketBundle::new(Pocket::BottomRight, meshes, materials ));
+    commands.spawn(PocketBundle::new(Pocket::TopLeft, meshes, materials ));
+    commands.spawn(PocketBundle::new(Pocket::TopCenter, meshes, materials ));
+    commands.spawn(PocketBundle::new(Pocket::TopRight, meshes, materials ));
+}
+
+fn set_default_pockets(
+    commands: &mut Commands,
+    wall_status: &Res<WallStatus>,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    materials: &mut ResMut<Assets<ColorMaterial>>,
+) {
+    let wall_vertices =  &wall_status.vertex_buffer;
+
+    // pockets on vertices
+    for wall_vertex in wall_vertices {
+        commands.spawn(PocketBundle::from_vec(*wall_vertex, meshes, materials));
+    }
+    // pockets in between vertices
+    if let Some(index_buffer) = &wall_status.maybe_index_buffer {
+        for [i,j] in index_buffer {
+            let v1 = wall_vertices[*i as usize];
+            let v2 = wall_vertices[*j as usize];
+            if 1.5 * v1.distance(v2) > POCKET_RADIUS {
+                commands.spawn(PocketBundle::from_vec(0.5 * (v1 + v2), meshes, materials));
+            }
+        }
+    }
+}
+
+pub fn pocket_set_up_event_handler(
     mut commands: Commands,
-    mut mouse_button_input: EventReader<MouseButtonInput>,
+    mut ev_pocketsetup: EventReader<PocketSetUpEvent>,
+    pocket_query: Query<Entity, With<Pocket>>,
+    cursor_position: Res<CursorPosition>,
+    wall_status: Res<WallStatus>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    cursor_position: Res<CursorPosition>,
+    mut next_game_set_up_state: ResMut<NextState<GameSetUpState>>,
+) {
+    for ev in &mut ev_pocketsetup {
+        match *ev {
+            PocketSetUpEvent::SetPocket => {
+                set_pocket(&mut commands, &mut meshes, &mut materials, &cursor_position)
+            },
+            PocketSetUpEvent::ClearPockets => {
+                despawn_ref::<Pocket>(&mut commands, &pocket_query)
+            },
+            PocketSetUpEvent::Done => {
+                if pocket_query.is_empty() {
+                    println!("at least one pocket is needed")
+                } else {
+                    next_game_set_up_state.set(GameSetUpState::BallSetUp);
+                }
+            },
+            PocketSetUpEvent::SetDefaultPockets => {
+                set_default_pockets(&mut commands, &wall_status, &mut meshes, &mut materials)
+            },
+        }
+    }
+}
+
+fn set_pocket(
+    commands: &mut Commands,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    materials: &mut ResMut<Assets<ColorMaterial>>,
+    cursor_position: &Res<CursorPosition>,
     // mut cue_ball_query: Query<&mut Transform, With<CueBall>>,
     // mut pocket_status: ResMut<PocketStatus>,
     // mut next_cue_ball_state: ResMut<NextState<CueBallState>>,
 ) {
-    if let Some(_button_pressed) = mouse_button_input.iter().last() {
-        commands.spawn(PocketBundle::from_cursor_position(cursor_position.0, &mut meshes, &mut materials));
-    }    
-}
-
-pub fn spawn_pockets(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    // asset_server: Res<AssetServer>, 
-) {
-    commands.spawn(PocketBundle::new(Pocket::BottomLeft, &mut meshes, &mut materials ));
-    commands.spawn(PocketBundle::new(Pocket::BotttomCenter, &mut meshes, &mut materials ));
-    commands.spawn(PocketBundle::new(Pocket::BottomRight, &mut meshes, &mut materials ));
-    commands.spawn(PocketBundle::new(Pocket::TopLeft, &mut meshes, &mut materials ));
-    commands.spawn(PocketBundle::new(Pocket::TopCenter, &mut meshes, &mut materials ));
-    commands.spawn(PocketBundle::new(Pocket::TopRight, &mut meshes, &mut materials ));
+    commands.spawn(PocketBundle::from_vec(cursor_position.0, meshes, materials));    
 }
 
 pub fn pocket_condition(

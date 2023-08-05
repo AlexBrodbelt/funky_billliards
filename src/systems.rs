@@ -1,3 +1,5 @@
+use std::borrow::Borrow;
+
 use bevy::window::PrimaryWindow;
 use bevy::{prelude::*, app::AppExit};
 use bevy_rapier2d::prelude::RapierConfiguration;
@@ -116,11 +118,22 @@ pub fn exit_app(
     }
 }
 
-pub fn despawn<T: Component>(
+/// despawns an entity given a generic type which has the [Component] trait
+pub fn despawn<T: Component + Borrow<Borrowed>>(
     mut commands: Commands,
     query: Query<Entity, With<T>>,
 ) {
     for entity in &query {
+        commands.entity(entity).despawn_recursive();
+    }
+}
+
+/// Same as [despawn()] but takes the appropriate mutable/immutable references as arguments instead of consuming the arguments
+pub fn despawn_ref<T: Component>(
+    commands: &mut Commands,
+    query: &Query<Entity, With<T>>,
+) {
+    for entity in query {
         commands.entity(entity).despawn_recursive();
     }
 }

@@ -23,9 +23,14 @@ impl Plugin for WallPlugin {
         app
             .add_state::<WallSetUpState>()
             .add_systems(
+                OnEnter(GameSetUpState::WallSetUp),                     
+                spawn_wall,
+        )
+            .add_systems(
                 Update,
                 (
-                    wall_set_up_events_handler
+                    wall_set_up_events_handler,
+                    update_wall,
                 )
                 .run_if(in_state(GameSetUpState::WallSetUp))
                 .run_if(in_state(AppState::GameSetUp))
