@@ -94,6 +94,7 @@ pub fn interact_with_button(
                         *background_color = PRESSED_DEFAULT_BUTTON_COLOR.into();
                         ev_wallsetup.send(WallSetUpEvent::SpawnDefaultWall);
                         next_wall_set_up_state.set(WallSetUpState::Disabled);
+
                     },
                     Interaction::Hovered => {
                         *background_color = HOVERED_DEFAULT_BUTTON_COLOR.into();                        
