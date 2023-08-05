@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-pub const POCKET_SET_UP_MENU_STYLE: Style = {
+pub const WALL_SET_UP_MENU_STYLE: Style = {
     let mut style: Style = Style::DEFAULT;
     style.display = Display::Flex;
     style.flex_direction = FlexDirection::Column;

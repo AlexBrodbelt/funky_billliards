@@ -38,13 +38,13 @@ pub fn state_transitions(
     mut next_game_setup_state: ResMut<NextState<GameSetUpState>>,
     mut next_cue_ball_state: ResMut<NextState<CueBallState>>,
 ) {
-    // Press G: _ -> AppState::GameSetup and CueBallState::InHand
-    if keyboard_input.just_pressed(KeyCode::G)
-        && *app_state.get() != AppState::GameSetUp 
-        {
-        next_app_state.set(AppState::GameSetUp);
-        next_game_setup_state.set(GameSetUpState::BallSetUp);
-    }
+    // // Press G: _ -> AppState::GameSetup and CueBallState::InHand
+    // if keyboard_input.just_pressed(KeyCode::G)
+    //     && *app_state.get() != AppState::GameSetUp 
+    //     {
+    //     next_app_state.set(AppState::GameSetUp);
+    //     next_game_setup_state.set(GameSetUpState::BallSetUp);
+    // }
     // Press M: _ -> AppState::Menu
     if keyboard_input.just_pressed(KeyCode::M)
         && *app_state.get() != AppState::Menu
@@ -118,8 +118,8 @@ pub fn exit_app(
     }
 }
 
-/// despawns an entity given a generic type which has the [Component] trait
-pub fn despawn<T: Component + Borrow<Borrowed>>(
+/// Despawns an entity given a generic type which has the [Component] trait
+pub fn despawn<T: Component>(
     mut commands: Commands,
     query: Query<Entity, With<T>>,
 ) {

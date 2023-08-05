@@ -8,7 +8,7 @@ use crate::{
         }, components::CanvasButton},
         GameSetUpState
     },
-    AppState
+    AppState, config::{PRESSED_CANVAS, HOVERED_CANVAS, NORMAL_CANVAS}
 };
 
 
@@ -33,14 +33,14 @@ pub fn interact_with_button(
     )) = set.p0().get_single_mut() {
         match *canvas_interaction {
             Interaction::Pressed => {
-                *background_color = PRESSED_CLEAR_BUTTON_COLOR.into();
+                *background_color = PRESSED_CANVAS.into();
                 ev_pocketsetup.send(PocketSetUpEvent::SetPocket);
             },
             Interaction::Hovered => {
-                *background_color = HOVERED_CLEAR_BUTTON_COLOR.into();                        
+                *background_color = HOVERED_CANVAS.into();                        
             },
             Interaction::None => {
-                *background_color = NORMAL_CLEAR_BUTTON_COLOR.into();
+                *background_color = NORMAL_CANVAS.into();
             },
         }
     }

@@ -41,6 +41,7 @@ pub fn spawn_cue_ball(
     mut materials: ResMut<Assets<ColorMaterial>>,
     // asset_server: Res<AssetServer>, 
 ) {
+    println!("cue ball has been spawned");
     commands.spawn(
         (
             BallBundle::new(Ball::White,  &mut meshes, &mut materials),

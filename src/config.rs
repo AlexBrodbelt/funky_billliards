@@ -92,4 +92,9 @@ pub const TEXT_COLOR: Color = Color::rgb(0.5, 0.5, 1.0);
 // pub const FORCE_CONSTANT: f32 = 1.0;
 pub const VELOCITY_SCALING: f32 =  100.0;
 
+// Canvas
+pub const PRESSED_CANVAS: Color = Color::rgba(0., 0., 1.0, 0.1);
+pub const HOVERED_CANVAS: Color = Color::rgba(0., 0., 0.5, 0.1);
+pub const NORMAL_CANVAS: Color = Color::rgba(0.1, 0.1, 0.44,0.1);
+
 

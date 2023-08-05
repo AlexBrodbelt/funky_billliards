@@ -10,7 +10,7 @@ use crate::{
         resources::WallStatus, 
         walls::WallSetUpState},
     AppState,
-    config::BACKGROUND_COLOR
+    config::{BACKGROUND_COLOR, PRESSED_CANVAS, HOVERED_CANVAS, NORMAL_CANVAS}
 };
 
 
@@ -41,14 +41,14 @@ pub fn interact_with_button(
     )) = set.p0().get_single_mut() {
         match *interaction {
             Interaction::Pressed => {
-                *background_color = (*Color::BLUE.set_a(0.1)).into(); // this is hacky and ugly fix this!!!
+                *background_color = PRESSED_CANVAS.into(); // this is hacky and ugly fix this!!!
                 ev_wallsetup.send(WallSetUpEvent::SetWallVertex);
             },
             Interaction::Hovered => {
-                *background_color = (*Color::NAVY.set_a(0.1)).into();
+                *background_color = HOVERED_CANVAS.into();
             },
             Interaction::None => {
-                *background_color = (*BACKGROUND_COLOR.set_a(0.1)).into();
+                *background_color = NORMAL_CANVAS.into();
             },
         }
     }

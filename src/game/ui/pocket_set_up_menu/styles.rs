@@ -3,11 +3,11 @@ use bevy::prelude::*;
 pub const POCKET_SET_UP_MENU_STYLE: Style = {
     let mut style: Style = Style::DEFAULT;
     style.display = Display::Flex;
-    style.flex_direction = FlexDirection::Row;
+    style.flex_direction = FlexDirection::Column;
     style.justify_content = JustifyContent::SpaceBetween;
     style.align_items = AlignItems::Center;
     style.width = Val::Percent(100.0);
-    style.height = Val::Percent(15.0);
+    style.height = Val::Percent(100.0);
     style
 };
 

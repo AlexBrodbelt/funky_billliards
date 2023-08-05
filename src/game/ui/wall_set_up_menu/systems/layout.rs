@@ -23,7 +23,7 @@ fn build_wall_set_up_menu(
         .spawn(
             (
                 NodeBundle {
-                    style: POCKET_SET_UP_MENU_STYLE,
+                    style: WALL_SET_UP_MENU_STYLE,
                     // background_color: Color::ANTIQUE_WHITE.into(), 
                     ..default()
                 },
@@ -31,8 +31,8 @@ fn build_wall_set_up_menu(
             )
         )
         // TOOL BAR
-        .with_children(|pocket_set_up_menu| {
-            pocket_set_up_menu.spawn((
+        .with_children(|wall_set_up_menu| {
+            wall_set_up_menu.spawn((
                     NodeBundle {
                         style: TOOL_BAR_STYLE,
                         background_color: Color::ANTIQUE_WHITE.into(), 
@@ -132,7 +132,7 @@ fn build_wall_set_up_menu(
                 });        
             });
             // CANVAS
-            pocket_set_up_menu.spawn(
+            wall_set_up_menu.spawn(
             (
                 NodeBundle {
                     style: CANVAS_STYLE,
