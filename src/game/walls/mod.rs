@@ -25,11 +25,11 @@ impl Plugin for WallPlugin {
             .add_systems(
                 Update,
                 (
-                    set_wall_vertex,
+                    wall_set_up_events_handler
                 )
                 .run_if(in_state(GameSetUpState::WallSetUp))
                 .run_if(in_state(AppState::GameSetUp))
-                .run_if(in_state(WallSetUpState::Edit))
+                // .run_if(in_state(WallSetUpState::Edit))
             )
             .add_systems(
                 OnEnter(AppState::Menu),

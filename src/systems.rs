@@ -2,6 +2,7 @@ use bevy::window::PrimaryWindow;
 use bevy::{prelude::*, app::AppExit};
 use bevy_rapier2d::prelude::RapierConfiguration;
 
+use crate::game::walls::WallSetUpState;
 use crate::game::{GameSetUpState, GameState};
 use crate::resources::*;
 use crate::{AppState, game::{SimulationState, ball::CueBallState}};
@@ -92,14 +93,16 @@ pub fn display_state(
     game_setup_state: Res<State<GameSetUpState>>,
     game_state: Res<State<GameState>>,
     cue_ball_state: Res<State<CueBallState>>,  
-    simulation_state: Res<State<SimulationState>>, 
+    simulation_state: Res<State<SimulationState>>,
+    wall_set_up_state: Res<State<WallSetUpState>>
 ) {
     print_if_state_changed!(
         app_state,
         game_setup_state,
         game_state,
         cue_ball_state,
-        simulation_state
+        simulation_state,
+        wall_set_up_state
     );
 }
 

@@ -1,15 +1,16 @@
+pub mod components;
+pub mod events;
 pub mod systems;
 mod styles;
-pub mod components;
 
 use bevy::prelude::*;
 
 use crate::game::GameSetUpState;
 
-use self::systems::{
+use self::{systems::{
     interactions::*,
     layout::*,
-};
+}, events::WallSetUpEvent};
 
 
 
@@ -18,6 +19,7 @@ pub struct WallSetUpMenuPlugin;
 impl Plugin for WallSetUpMenuPlugin {
     fn build(&self, app: &mut App) {
         app
+            .add_event::<WallSetUpEvent>()
             .add_systems(
                 OnEnter(GameSetUpState::WallSetUp),
                 (

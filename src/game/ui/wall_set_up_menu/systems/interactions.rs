@@ -4,44 +4,60 @@ use crate::{
     game::{
         ui::wall_set_up_menu::{
             components::{WallSetUpMenuButton, CanvasButton},
-            styles::*
+            styles::*, events::WallSetUpEvent
         },
-        GameSetUpState, resources::WallStatus, walls::{components::Wall, systems::{clear_wall, spawn_default_walls}, WallSetUpState}},
-    AppState
+        GameSetUpState, 
+        resources::WallStatus, 
+        walls::WallSetUpState},
+    AppState,
+    config::BACKGROUND_COLOR
 };
 
 
 pub fn interact_with_button(
-    mut commands: Commands,
+    mut ev_wallsetup: EventWriter<WallSetUpEvent>,
     // mut wall_query: Query<Entity, With<Wall>>,
     mut wall_status: ResMut<WallStatus>,
-    mut button_query: Query<
-    (&Interaction, &mut BackgroundColor, &WallSetUpMenuButton),
-    (Changed<Interaction>, With<WallSetUpMenuButton>)
+    mut set: ParamSet<
+    (
+        Query<
+        (&Interaction, &mut BackgroundColor),
+        (Changed<Interaction>, With<CanvasButton>)
+        >,
+        Query<
+        (&Interaction, &mut BackgroundColor, &WallSetUpMenuButton),
+        (Changed<Interaction>, With<WallSetUpMenuButton>)
+        >
+    )
     >,
-    mut canvas_button: Query<
-    (&Interaction, &mut BackgroundColor),
-    (Changed<Interaction>, With<CanvasButton>)
-    >,
-    mut next_app_state: ResMut<NextState<AppState>>,
+    mut _next_app_state: ResMut<NextState<AppState>>,
     mut next_game_setup_state: ResMut<NextState<GameSetUpState>>,
     mut next_wall_set_up_state: ResMut<NextState<WallSetUpState>>,
 ) {
-    if let Ok((interaction, mut background_color)) = canvas_button.get_single_mut() {
+    // Canvas button
+    if let Ok((interaction, mut background_color)) = set.p0().get_single_mut() {
         match *interaction {
-            Interaction::Pressed => todo!(),
-            Interaction::Hovered => todo!(),
-            Interaction::None => todo!(),
+            Interaction::Pressed => {
+                *background_color = (*Color::BLUE.set_a(0.1)).into(); // this is hacky and ugly fix this!!!
+                ev_wallsetup.send(WallSetUpEvent::SetWallVertex);
+            },
+            Interaction::Hovered => {
+                *background_color = (*Color::NAVY.set_a(0.1)).into();
+            },
+            Interaction::None => {
+                *background_color = (*BACKGROUND_COLOR.set_a(0.1)).into();
+            },
         }
     }
-    if let Ok((interaction, mut background_color, pocket_set_up_menu_button_type)) = button_query.get_single_mut() {       
+    // Tool bar buttons
+    if let Ok((interaction, mut background_color, pocket_set_up_menu_button_type)) = set.p1().get_single_mut() {       
         match *pocket_set_up_menu_button_type {
             WallSetUpMenuButton::Clear => {
                 match *interaction {
                     Interaction::Pressed => {
                         *background_color = PRESSED_CLEAR_BUTTON_COLOR.into();
-                        clear_wall(&mut wall_status);
-                        next_wall_set_up_state.set(WallSetUpState::Edit);
+                        ev_wallsetup.send(WallSetUpEvent::ClearWall);
+                        // next_wall_set_up_state.set(WallSetUpState::Edit);
                     },
                     Interaction::Hovered => {
                         *background_color = HOVERED_CLEAR_BUTTON_COLOR.into();                        
@@ -55,11 +71,7 @@ pub fn interact_with_button(
                 match *interaction {
                     Interaction::Pressed => {
                         *background_color = PRESSED_DONE_BUTTON_COLOR.into();
-                        if wall_status.vertex_buffer.len() > 2 {
-                            next_game_setup_state.set(GameSetUpState::PocketSetUp);
-                        } else {
-                            println!("Wall is not well defined, three vertices are required to generate a well defined wall");
-                        }
+                        ev_wallsetup.send(WallSetUpEvent::Done)
                     },
                     Interaction::Hovered => {
                         *background_color = HOVERED_DONE_BUTTON_COLOR.into();                        
@@ -73,9 +85,8 @@ pub fn interact_with_button(
                 match *interaction {
                     Interaction::Pressed => {
                         *background_color = PRESSED_DEFAULT_BUTTON_COLOR.into();
+                        ev_wallsetup.send(WallSetUpEvent::SpawnDefaultWall);
                         next_wall_set_up_state.set(WallSetUpState::Disabled);
-                        clear_wall(&mut wall_status);
-                        spawn_default_walls(&mut commands, &mut wall_status);
                     },
                     Interaction::Hovered => {
                         *background_color = HOVERED_DEFAULT_BUTTON_COLOR.into();                        

@@ -65,8 +65,8 @@ impl Default for WallBundle {
 impl WallBundle {
     pub fn new(vertex_buffer: Vec<Vec2>,  maybe_index_buffer: Option<Vec<[u32; 2]>>) -> Self {
         Self {
-        shape_bundle: build_wall_shape_bundle(&vertex_buffer),
-        collider: build_wall_collider(vertex_buffer, maybe_index_buffer),
+        shape_bundle:  build_wall_shape_bundle(&vertex_buffer), //ShapeBundle::default(),
+        collider: build_wall_collider(vertex_buffer, maybe_index_buffer), //Collider::polyline(Vec::new(), None),
         stroke: Stroke::new(WALL_COLOR, WALL_THICKNESS),
         fill: Fill::color(PLAY_FIELD_COLOR),
         ..default() 

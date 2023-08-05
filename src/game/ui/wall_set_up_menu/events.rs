@@ -1,5 +1,9 @@
 use bevy::prelude::*;
 
 #[derive(Event)]
-pub struct ClearWallEvent;
-
+pub enum WallSetUpEvent {
+    SetWallVertex,
+    ClearWall,
+    Done,
+    SpawnDefaultWall
+}
