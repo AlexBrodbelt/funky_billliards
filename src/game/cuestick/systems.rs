@@ -11,7 +11,7 @@ use crate::{
         GameState, 
         resources::{
             CueStickStatus, 
-            CueBallStatus}
+            CueBallStatus}, GameSetUpState
         },
         AppState};
 
@@ -70,6 +70,7 @@ pub fn strike_cue_ball(
     mut cue_stick_status: ResMut<CueStickStatus>,
     mut next_app_state: ResMut<NextState<AppState>>,
     mut next_game_state: ResMut<NextState<GameState>>,
+    mut next_game_set_up_state: ResMut<NextState<GameSetUpState>>,
 ) { 
     // If the mouse is not scrolled any further in the next frame then strike the cue ball and change to the next state
     if !wind_up_distance_resource.is_changed() && wind_up_distance_resource.0 != 0.0  {
@@ -83,6 +84,7 @@ pub fn strike_cue_ball(
 
         next_app_state.set(AppState::Game);
         next_game_state.set(GameState::ShotCoolDown);
+        next_game_set_up_state.set(GameSetUpState::Disabled);
     }
 }
 

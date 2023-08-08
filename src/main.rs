@@ -6,6 +6,8 @@ pub mod resources;
 mod systems;
 pub mod styles;
 
+use std::time::Duration;
+
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
@@ -19,7 +21,7 @@ use game::{
 };
 
 use main_menu::MainMenuPlugin;
-use resources::CursorPosition;
+use resources::{CursorPosition, PeriodicTimer};
 use systems::*;
 
 
@@ -64,6 +66,8 @@ fn main() {
             ..Default::default()
         })
         .insert_resource(CursorPosition::default())
+        // Debugging resource
+        .insert_resource(PeriodicTimer(Timer::new( Duration::from_secs(5), TimerMode::Repeating)))
         // Startup Systems
         .add_systems(
             Startup,
@@ -78,6 +82,7 @@ fn main() {
             (   
                 get_cursor_position,
                 display_state,
+                debug_states,
                 state_transitions,
                 toggle_physics_pipeline,
                 exit_app

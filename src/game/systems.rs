@@ -93,7 +93,7 @@ pub fn switch_player_condition(
         active_player.switch_player();
         println!("{:?}", active_player.0);
         next_app_state.set(AppState::GameSetUp);
-        // If the cue ball is still on the table set the GameSetupState to ShotSetup otherwise set to CueBallSetup
+        // If the cue ball is still on the table set the GameSetupState to ShotSetUp otherwise set to CueBallSetup
         if cue_ball_query.is_empty() {
             println!("cue ball is not in play");
             next_game_setup_state.set(GameSetUpState::CueBallSetUp);

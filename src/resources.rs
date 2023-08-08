@@ -9,5 +9,7 @@ impl Default for CursorPosition {
     }
 }
 
-
+// DEBUGGING PURPSOSES
+#[derive(Resource)]
+pub struct PeriodicTimer(pub Timer);
     

@@ -1,4 +1,3 @@
-use std::borrow::Borrow;
 
 use bevy::window::PrimaryWindow;
 use bevy::{prelude::*, app::AppExit};
@@ -135,5 +134,35 @@ pub fn despawn_ref<T: Component>(
 ) {
     for entity in query {
         commands.entity(entity).despawn_recursive();
+    }
+}
+
+/// This macro expands into if statement that checks if the state has changed
+/// and if so prints the current state.
+macro_rules! print_state {
+    ( $( $state:ident ),* ) => {
+        {
+            $(
+            println!("{:?}", $state.get());
+            )*
+        }
+    };
+}
+
+pub fn debug_states(
+    time: Res<Time>,
+    mut periodic_timer: ResMut<PeriodicTimer>,
+    app_state: Res<State<AppState>>,
+    game_setup_state: Res<State<GameSetUpState>>,
+    game_state: Res<State<GameState>>,
+    cue_ball_state: Res<State<CueBallState>>,  
+    simulation_state: Res<State<SimulationState>>,
+    wall_set_up_state: Res<State<WallSetUpState>>
+) {
+    if periodic_timer.0.finished() {
+        print_state!(app_state, game_setup_state, game_state, cue_ball_state, simulation_state, wall_set_up_state);
+        periodic_timer.0.reset();
+    } else {
+        periodic_timer.0.tick(time.delta());
     }
 }
