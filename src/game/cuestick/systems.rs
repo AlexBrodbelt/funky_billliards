@@ -112,8 +112,8 @@ pub fn handle_cue_stick_motion(
     mut commands: Commands,
     mut cue_stick_query: Query<(Entity, &Transform, &mut Velocity), With<CueStick>>,
     time: Res<Time>,
+    cue_ball_status: Res<CueBallStatus>,
     mut cue_stick_status: ResMut<CueStickStatus>,
-    mut cue_ball_status: ResMut<CueBallStatus>,
     mut next_game_state: ResMut<NextState<GameState>>,
 ) {
     if let Ok((cue_stick_entity, cue_stick_transform, cue_stick_velocity)) = cue_stick_query.get_single_mut() {

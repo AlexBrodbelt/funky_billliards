@@ -67,7 +67,7 @@ fn main() {
         })
         .insert_resource(CursorPosition::default())
         // Debugging resource
-        .insert_resource(PeriodicTimer(Timer::new( Duration::from_secs(5), TimerMode::Repeating)))
+        // .insert_resource(PeriodicTimer(Timer::new( Duration::from_secs(5), TimerMode::Repeating)))
         // Startup Systems
         .add_systems(
             Startup,
@@ -82,7 +82,7 @@ fn main() {
             (   
                 get_cursor_position,
                 display_state,
-                debug_states,
+                // debug_states,
                 state_transitions,
                 toggle_physics_pipeline,
                 exit_app

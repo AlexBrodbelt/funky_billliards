@@ -2,10 +2,11 @@ use bevy::{
     prelude::*,
     input::mouse::MouseButtonInput,
 };
+use bevy_rapier2d::{parry::query::PointQuery, prelude::Collider};
 
 use crate::{
     resources::CursorPosition,
-    config::{LEFT_WALL, RIGHT_WALL, BOTTOM_WALL, TOP_WALL}, game::{GameSetUpState, resources::CueBallStatus},
+    config::{LEFT_WALL, RIGHT_WALL, BOTTOM_WALL, TOP_WALL}, game::{GameSetUpState, resources::CueBallStatus, GameState, walls::components::Wall}, AppState,
 };
 
 use crate::game::ball::{
@@ -50,25 +51,36 @@ pub fn spawn_cue_ball(
     ); 
 }
 
+pub fn tell_me_why_no_spawn_cue_ball(
+    game_set_up_state: Res<State<GameSetUpState>>,
+    game_state: Res<State<AppState>>,
+) {
+    println!("{:?}", game_set_up_state);
+    println!("{:?} should be GameSetUp", game_state);
+}
+
 /// click to set the cue ball initial position
 pub fn set_cue_ball(
     mut mouse_button_input: EventReader<MouseButtonInput>,
+    wall_query: Query<&Collider, With<Wall>>,
     mut cue_ball_query: Query<&mut Transform, With<CueBall>>,
     cursor_position: Res<CursorPosition>,
     mut cue_ball_status: ResMut<CueBallStatus>,
     mut next_cue_ball_state: ResMut<NextState<CueBallState>>,
 ) {
     if let Some(_button_pressed) = mouse_button_input.iter().last() {
-        if let Ok(mut cue_ball_position) = cue_ball_query.get_single_mut() {
-            let mut new_cue_ball_position = cursor_position.0;
+        if let (Ok(mut cue_ball_position), Ok(wall_collider)) = (cue_ball_query.get_single_mut(), wall_query.get_single()) {
+            let new_cue_ball_position = cursor_position.0;
             // Making sure the ball does not leave the arena
-            new_cue_ball_position = new_cue_ball_position.clamp(Vec2::new(LEFT_WALL, BOTTOM_WALL), Vec2::new(RIGHT_WALL, TOP_WALL));
-            // Set cue ball initial position resource
-            cue_ball_status.initial_position = Some(new_cue_ball_position);
-            // Set the position of the cue ball
-            cue_ball_position.translation = new_cue_ball_position.extend(1.0);
-            // Change CueBallState to InPlay
-            next_cue_ball_state.set(CueBallState::InPlay);
+            if wall_collider.contains_local_point(new_cue_ball_position) {
+                // Set cue ball initial position resource
+                cue_ball_status.initial_position = Some(new_cue_ball_position);
+                // Set the position of the cue ball
+                cue_ball_position.translation = new_cue_ball_position.extend(1.0);
+                // Change CueBallState to InPlay
+                next_cue_ball_state.set(CueBallState::InPlay);
+            }
+            // new_cue_ball_position = new_cue_ball_position.clamp(Vec2::new(LEFT_WALL, BOTTOM_WALL), Vec2::new(RIGHT_WALL, TOP_WALL));
         } else {
             println!("either none or multiple ball entities have been spawned");
         }          

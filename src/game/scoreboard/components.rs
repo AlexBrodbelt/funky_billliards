@@ -16,7 +16,6 @@ impl ScoreboardBundle {
             text_bundle: TextBundle::from_sections([
                 TextSection::new(
                     format!("Player {:?} score: ", &player),
-                    // "Player 2 score: ",
                     TextStyle {
                         font: asset_server.load("fonts\\FiraSans-Bold.ttf"),
                         font_size: SCOREBOARD_FONT_SIZE,
