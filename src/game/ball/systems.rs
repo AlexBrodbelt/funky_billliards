@@ -2,7 +2,7 @@ use bevy::{
     prelude::*,
     input::mouse::MouseButtonInput,
 };
-use bevy_rapier2d::{parry::query::PointQuery, prelude::Collider};
+use bevy_xpbd_2d::prelude::Collider;
 
 use crate::{
     resources::CursorPosition,

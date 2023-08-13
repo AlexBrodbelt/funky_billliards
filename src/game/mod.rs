@@ -1,5 +1,5 @@
 use bevy::{prelude::*, app::PluginGroupBuilder};
-use bevy_rapier2d::prelude::*;
+use bevy_xpbd_2d::prelude::*;
 
 pub mod components;
 pub mod events;
@@ -28,6 +28,12 @@ use walls::WallPlugin;
 
 use self::{resources::{ActivePlayer, PocketStatus, CueBallStatus, WallStatus, CueStickStatus}, ui::GameUIPlugin};
 
+#[derive(PhysicsLayer)]
+pub enum Layer {
+    CueStick,
+    Wall,
+    Ball,
+}
 
 pub struct GamePlugin;
 

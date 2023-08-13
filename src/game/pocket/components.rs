@@ -2,19 +2,23 @@ use bevy::{
     prelude::*, 
     sprite::MaterialMesh2dBundle,
 };
-use bevy_rapier2d::prelude::*;
+use bevy_xpbd_2d::prelude::*;
 
-use crate::config::*;
+use crate::{config::*, game::Layer};
 
 #[derive(Component)]
 pub enum Pocket {
+    Standard(StandardPocket),    
+    HandPlaced(PocketIdentifier),
+}
+
+pub enum StandardPocket {
     TopRight,
     TopCenter,
     TopLeft,
     BottomRight,
     BotttomCenter,
     BottomLeft,
-    HandPlaced(PocketIdentifier),
 }
 
 pub struct PocketIdentifier {
@@ -25,24 +29,24 @@ pub struct PocketIdentifier {
 impl Pocket {
     pub fn position(&self) -> Vec2 {
         match *self {
-            Pocket::TopRight      => Vec2::new(RIGHT_WALL - GAP_BETWEEN_POCKET_AND_WALL, TOP_WALL - GAP_BETWEEN_POCKET_AND_WALL),
-            Pocket::TopCenter     => Vec2::new(0.0, TOP_WALL - GAP_BETWEEN_POCKET_AND_WALL),
-            Pocket::TopLeft       => Vec2::new(LEFT_WALL + GAP_BETWEEN_POCKET_AND_WALL, TOP_WALL - GAP_BETWEEN_POCKET_AND_WALL),
-            Pocket::BottomRight   => Vec2::new(RIGHT_WALL - GAP_BETWEEN_POCKET_AND_WALL, BOTTOM_WALL + GAP_BETWEEN_POCKET_AND_WALL),
-            Pocket::BotttomCenter => Vec2::new(0.0, BOTTOM_WALL + GAP_BETWEEN_POCKET_AND_WALL),
-            Pocket::BottomLeft    => Vec2::new(LEFT_WALL + GAP_BETWEEN_POCKET_AND_WALL, BOTTOM_WALL + GAP_BETWEEN_POCKET_AND_WALL),
+            Pocket::Standard(StandardPocket::TopRight)      => Vec2::new(RIGHT_WALL - GAP_BETWEEN_POCKET_AND_WALL, TOP_WALL - GAP_BETWEEN_POCKET_AND_WALL),
+            Pocket::Standard(StandardPocket::TopCenter)     => Vec2::new(0.0, TOP_WALL - GAP_BETWEEN_POCKET_AND_WALL),
+            Pocket::Standard(StandardPocket::TopLeft)       => Vec2::new(LEFT_WALL + GAP_BETWEEN_POCKET_AND_WALL, TOP_WALL - GAP_BETWEEN_POCKET_AND_WALL),
+            Pocket::Standard(StandardPocket::BottomRight)   => Vec2::new(RIGHT_WALL - GAP_BETWEEN_POCKET_AND_WALL, BOTTOM_WALL + GAP_BETWEEN_POCKET_AND_WALL),
+            Pocket::Standard(StandardPocket::BotttomCenter) => Vec2::new(0.0, BOTTOM_WALL + GAP_BETWEEN_POCKET_AND_WALL),
+            Pocket::Standard(StandardPocket::BottomLeft)    => Vec2::new(LEFT_WALL + GAP_BETWEEN_POCKET_AND_WALL, BOTTOM_WALL + GAP_BETWEEN_POCKET_AND_WALL),
             Pocket::HandPlaced(PocketIdentifier{ id: _, position}) => position,    
         }
     }
 
     pub fn name(&self) -> String {
         match *self {
-            Pocket::TopRight => "Top Right Pocket".to_string(),
-            Pocket::TopCenter => "Top Center Pocket".to_string(),
-            Pocket::TopLeft => "Top Left Pocket".to_string(),
-            Pocket::BottomRight => "Bottom Right Pocket".to_string(),
-            Pocket::BotttomCenter => "Botttom Center Pocket".to_string(),
-            Pocket::BottomLeft => "Bottom Left Pocket".to_string(),
+            Pocket::Standard(StandardPocket::TopRight) => "Top Right Pocket".to_string(),
+            Pocket::Standard(StandardPocket::TopCenter) => "Top Center Pocket".to_string(),
+            Pocket::Standard(StandardPocket::TopLeft) => "Top Left Pocket".to_string(),
+            Pocket::Standard(StandardPocket::BottomRight) => "Bottom Right Pocket".to_string(),
+            Pocket::Standard(StandardPocket::BotttomCenter) => "Botttom Center Pocket".to_string(),
+            Pocket::Standard(StandardPocket::BottomLeft) => "Bottom Left Pocket".to_string(),
             Pocket::HandPlaced(PocketIdentifier{ id, position}) => format!("pocket {} at position {}", id, position),
         }
     }
@@ -58,7 +62,7 @@ impl From<&Pocket> for Name {
 pub struct PocketBundle {
     active_events: ActiveEvents,
     collider: Collider,
-    collision_group: CollisionGroups,
+    collision_group: CollisionLayers,
     material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
     name: Name,
     pocket: Pocket,
@@ -72,7 +76,7 @@ impl PocketBundle {
         PocketBundle {
             active_events: ActiveEvents::COLLISION_EVENTS,
             collider: Collider::ball(POCKET_RADIUS - BALL_RADIUS),
-            collision_group: CollisionGroups::new( Group::GROUP_1, Group::GROUP_1),
+            collision_group: CollisionLayers::new( [Layer::CueStick, Layer::Wall], [Layer::Ball]),
             material_mesh_bundle: MaterialMesh2dBundle {
                     mesh: meshes.add(shape::Circle::new(POCKET_RADIUS).into()).into(),
                     material: materials.add(ColorMaterial::from(POCKET_COLOR)),
@@ -81,7 +85,7 @@ impl PocketBundle {
             },
             name: Name::from(&pocket),
             pocket,
-            rigid_body: RigidBody::Fixed,
+            rigid_body: RigidBody::Static,
             sensor: Sensor,
         }
     }
@@ -103,7 +107,7 @@ impl PocketBundle {
             },
             name: Name::from(&pocket),
             pocket,
-            rigid_body: RigidBody::Fixed,
+            rigid_body: RigidBody::Static,
             sensor: Sensor, 
         }  
     }

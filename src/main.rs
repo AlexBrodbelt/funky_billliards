@@ -9,7 +9,7 @@ pub mod styles;
 use std::time::Duration;
 
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+use bevy_xpbd_2d::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_prototype_lyon::prelude::*;
 // use bevy_inspector_egui_rapier::InspectableRapierPlugin;
@@ -42,13 +42,8 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_state::<AppState>()
         .add_plugins(WorldInspectorPlugin::new())
-        // Bevy Rapier Plugins
-        .add_plugins(
-            (
-                RapierDebugRenderPlugin::default(),
-                RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(1500.0)
-            )
-        ) 
+        // Bevy XPBD Plugins
+        .add_plugins(PhysicsPlugins) 
         // Bevy Prototype Lyon
         .add_plugins(ShapePlugin)
         // Bevy Rapier Egui Plugin
@@ -61,10 +56,7 @@ fn main() {
             )
         )
         // Bevy Rapier Resources
-        .insert_resource( RapierConfiguration {
-            gravity : Vec2::ZERO,
-            ..Default::default()
-        })
+        .insert_resource(Gravity(Vec2::ZERO))
         .insert_resource(CursorPosition::default())
         // Debugging resource
         // .insert_resource(PeriodicTimer(Timer::new( Duration::from_secs(5), TimerMode::Repeating)))

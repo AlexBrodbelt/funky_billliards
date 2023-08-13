@@ -2,9 +2,9 @@ use bevy::{
     prelude::*, 
     sprite::MaterialMesh2dBundle,
 };
-use bevy_rapier2d::prelude::*;
+use bevy_xpbd_2d::prelude::*;
 
-use crate::config::*;
+use crate::{config::*, game::Layer};
 
 #[derive(Eq, PartialEq, Hash, Debug)]
 pub struct RedBallIdentifier {
@@ -111,9 +111,11 @@ impl From<&Ball> for Transform {
     }
 }
 
-impl From<&Ball> for Velocity {
-    fn from(ball: &Ball) -> Velocity {
-        Velocity::linear(ball.velocity())
+
+
+impl From<&Ball> for LinearVelocity {
+    fn from(ball: &Ball) -> LinearVelocity {
+        LinearVelocity(ball.velocity())
     }
 }
 
@@ -128,14 +130,15 @@ impl From<&Ball> for Name {
 pub struct BallBundle {
     ball: Ball,
     collider: Collider,
-    collision_group: CollisionGroups,
-    damping: Damping,
+    collision_group: CollisionLayers,
+    linear_damping: LinearDamping,
+    angular_damping: AngularDamping,
     // external_force: ExternalForce,
     name: Name,
     material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
     restitution_coefficient: Restitution,
     rigid_body: RigidBody,
-    velocity: Velocity,
+    velocity: LinearVelocity,
 }
 
 
@@ -145,14 +148,12 @@ impl BallBundle {
         BallBundle {
             collider: Collider::ball(BALL_RADIUS),
             collision_group: if ball == Ball::White {
-                    CollisionGroups::new( Group::GROUP_1 | Group::GROUP_2, Group::GROUP_1 | Group::GROUP_2 )
+                    CollisionLayers::new([Layer::Wall] ,[Layer::CueStick, Layer::Wall] )
                 } else {
-                    CollisionGroups::new( Group::GROUP_1, Group::GROUP_1)
+                    CollisionLayers::new( [Layer::CueStick], [Layer::Wall])
                 },
-            damping: Damping {
-                linear_damping: FRICTION_COEFFICIENT,
-                angular_damping: FRICTION_COEFFICIENT,
-            },
+            linear_damping: LinearDamping(FRICTION_COEFFICIENT),
+            angular_damping: AngularDamping(FRICTION_COEFFICIENT),
             material_mesh_bundle: MaterialMesh2dBundle {
                 mesh: meshes.add(shape::Circle::new(BALL_RADIUS).into()).into(),
                 material: materials.add(ColorMaterial::from(&ball)),
@@ -161,8 +162,8 @@ impl BallBundle {
             },
             name: Name::from(&ball),
             rigid_body: RigidBody::Dynamic,
-            restitution_coefficient: Restitution::coefficient(0.90), 
-            velocity: Velocity::from(&ball),
+            restitution_coefficient: Restitution::new(0.90), 
+            velocity: LinearVelocity::from(&ball),
             ball,
         }
     }

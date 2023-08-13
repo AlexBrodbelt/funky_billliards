@@ -2,7 +2,6 @@ use bevy::{
     prelude::*, input::mouse::{MouseButtonInput, MouseWheel},
 
 };
-use bevy_rapier2d::prelude::Velocity;
 
 use crate::{
     config::*, 
