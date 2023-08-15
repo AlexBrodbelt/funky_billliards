@@ -1,8 +1,8 @@
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+use bevy_xpbd_2d::prelude::*;
 use bevy_prototype_lyon::prelude::*;
 
-use crate::config::*;
+use crate::{config::*, game::Layer};
 
 #[derive(Component)]
 pub struct Wall;
@@ -18,7 +18,7 @@ pub struct WallBundle {
     rigid_body : RigidBody,
     restitution_coefficient: Restitution,
     wall: Wall,
-    collision_group: CollisionGroups,
+    collision_group: CollisionLayers,
     fill: Fill,
     stroke: Stroke
 }
@@ -51,9 +51,9 @@ impl Default for WallBundle {
                                             .collect::<Vec<Vec2>>(),
                 Some(WALL_INDEX_BUFFER.to_vec()),
             ),
-            collision_group: CollisionGroups::new( Group::GROUP_1, Group::GROUP_1),
-            rigid_body: RigidBody::Fixed,
-            restitution_coefficient:  Restitution::coefficient(0.95),
+            collision_group: CollisionLayers::new( [Layer::CueStick], [Layer::Ball]),
+            rigid_body: RigidBody::Static,
+            restitution_coefficient:  Restitution::new(0.95),
             wall: Wall,
         }
     }

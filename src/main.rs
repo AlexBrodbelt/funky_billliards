@@ -43,7 +43,7 @@ fn main() {
         .add_state::<AppState>()
         .add_plugins(WorldInspectorPlugin::new())
         // Bevy XPBD Plugins
-        .add_plugins(PhysicsPlugins) 
+        .add_plugins(PhysicsPlugins::default()) 
         // Bevy Prototype Lyon
         .add_plugins(ShapePlugin)
         // Bevy Rapier Egui Plugin

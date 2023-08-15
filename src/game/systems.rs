@@ -1,9 +1,9 @@
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+use bevy_xpbd_2d::prelude::*;
 
 use crate::{AppState, config::STOPPING_THRESHOLD};
 
-use super::{resources::*, SimulationState, ball::{components::{Ball, CueBall}}, GameSetUpState, components::CollisionSound};
+use super::{resources::*, SimulationState, ball::components::{Ball, CueBall}, GameSetUpState, components::CollisionSound};
 
 
 pub fn spawn_camera(
@@ -59,11 +59,11 @@ pub fn toggle_simulation(
 
 /// Sets the velocity of a ball to zero whenever they are below the [`STOPPING_THRESHOLD`]
 pub fn stopping_threshold(
-    mut ball_query: Query<&mut Velocity, With<Ball>>,
+    mut ball_query: Query<&mut LinearVelocity, With<Ball>>,
 ) {
-    for mut ball_velocity in &mut ball_query {
-        if ball_velocity.linvel.length_squared() < STOPPING_THRESHOLD {
-            *ball_velocity = Velocity::zero();
+    for mut ball_linear_velocity in &mut ball_query {
+        if ball_linear_velocity.0.length_squared() < STOPPING_THRESHOLD {
+            *ball_linear_velocity = LinearVelocity::ZERO;
         }
     }
 }
@@ -71,17 +71,17 @@ pub fn stopping_threshold(
 /// detects if sprites are not moving
 fn balls_not_moving(
     // ball_query: Query<Entity, (With<Ball>, Changed<Transform>)>,
-    ball_query: Query<&Velocity, With<Ball>>,
+    ball_query: Query<&LinearVelocity, With<Ball>>,
 ) -> bool {
-    ball_query.iter().all(|&ball_velocity| {
-        ball_velocity.linvel.length_squared() <= STOPPING_THRESHOLD
+    ball_query.iter().all(|&ball_linear_velocity| {
+        ball_linear_velocity.0.length_squared() <= STOPPING_THRESHOLD
     })
 }
 
 /// Whenever the balls are not moving anymore it handles the transition from the current player to the next.
 /// Moreover, it detects whether the cue ball has been pocketed and sets [`GameSetupState`] to the appropriate state
 pub fn switch_player_condition(
-    ball_query: Query<&Velocity, With<Ball>>, 
+    ball_query: Query<&LinearVelocity, With<Ball>>, 
     cue_ball_query: Query<&Transform, With<CueBall>>,
     simulation_state: Res<State<SimulationState>>,
     mut active_player: ResMut<ActivePlayer>,

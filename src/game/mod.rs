@@ -55,7 +55,7 @@ impl Plugin for GamePlugin {
             .insert_resource(FixedTime::new_from_secs(TIME_STEP))
             .insert_resource(ClearColor(BACKGROUND_COLOR))
             // Events
-            .add_event::<CollisionEvent>()
+            // .add_event::<CollisionEvent>()
             // On Update Systems
             .add_systems(
                 Update,

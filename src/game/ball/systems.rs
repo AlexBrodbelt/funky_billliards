@@ -70,22 +70,21 @@ pub fn set_cue_ball(
 ) {
     if let Some(_button_pressed) = mouse_button_input.iter().last() {
         if let (Ok(mut cue_ball_position), Ok(wall_collider)) = (cue_ball_query.get_single_mut(), wall_query.get_single()) {
-            let new_cue_ball_position = cursor_position.0;
-            // Making sure the ball does not leave the arena
-            if wall_collider.contains_local_point(new_cue_ball_position) {
-                // Set cue ball initial position resource
-                cue_ball_status.initial_position = Some(new_cue_ball_position);
-                // Set the position of the cue ball
-                cue_ball_position.translation = new_cue_ball_position.extend(1.0);
-                // Change CueBallState to InPlay
-                next_cue_ball_state.set(CueBallState::InPlay);
+            let mut new_cue_ball_position = cursor_position.0;
+            // Making sure the ball does not leave the arena  
+            new_cue_ball_position = new_cue_ball_position.clamp(Vec2::new(LEFT_WALL, BOTTOM_WALL), Vec2::new(RIGHT_WALL, TOP_WALL));
+            // Set cue ball initial position resource
+            cue_ball_status.initial_position = Some(new_cue_ball_position);
+            // Set the position of the cue ball
+            cue_ball_position.translation = new_cue_ball_position.extend(1.0);
+            // Change CueBallState to InPlay
+            next_cue_ball_state.set(CueBallState::InPlay);
             }
-            // new_cue_ball_position = new_cue_ball_position.clamp(Vec2::new(LEFT_WALL, BOTTOM_WALL), Vec2::new(RIGHT_WALL, TOP_WALL));
         } else {
             println!("either none or multiple ball entities have been spawned");
         }          
-    }
 }
+
 
 // pub fn despawn_balls(
 //     mut commands: Commands,

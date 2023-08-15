@@ -1,7 +1,7 @@
 
 use bevy::window::PrimaryWindow;
 use bevy::{prelude::*, app::AppExit};
-use bevy_rapier2d::prelude::RapierConfiguration;
+use bevy_xpbd_2d::prelude::PhysicsLoop;
 
 use crate::game::walls::WallSetUpState;
 use crate::game::{GameSetUpState, GameState};
@@ -63,13 +63,13 @@ pub fn state_transitions(
 pub fn toggle_physics_pipeline(
     app_state: Res<State<AppState>>,
     simulation_state: Res<State<SimulationState>>,
-    mut rapier_config: ResMut<RapierConfiguration>,
+    mut physics_loop: ResMut<PhysicsLoop>,
 ) {
     if app_state.is_changed() || simulation_state.is_changed() {
         if *app_state.get() != AppState::Game || *simulation_state.get() != SimulationState::Running {
-            rapier_config.physics_pipeline_active = false;
+            physics_loop.pause();
         } else {
-            rapier_config.physics_pipeline_active = true;
+            physics_loop.resume();
         }
     }
 }

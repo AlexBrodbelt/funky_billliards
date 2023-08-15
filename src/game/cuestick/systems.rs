@@ -2,6 +2,7 @@ use bevy::{
     prelude::*, input::mouse::{MouseButtonInput, MouseWheel},
 
 };
+use bevy_xpbd_2d::prelude::LinearVelocity;
 
 use crate::{
     config::*, 
@@ -64,7 +65,7 @@ pub fn set_cue_stick(
 /// When there wind up distance has been computed set the initial velocity of the cue ball.
 /// Handle appropriate state transitions and resources.
 pub fn strike_cue_ball(
-    mut cue_stick_query: Query<(&Transform, &mut Velocity), With<CueStick>>,
+    mut cue_stick_query: Query<(&Transform, &mut LinearVelocity), With<CueStick>>,
     wind_up_distance_resource: Res<WindUpDistance>,
     mut cue_stick_status: ResMut<CueStickStatus>,
     mut next_app_state: ResMut<NextState<AppState>>,
@@ -73,11 +74,11 @@ pub fn strike_cue_ball(
 ) { 
     // If the mouse is not scrolled any further in the next frame then strike the cue ball and change to the next state
     if !wind_up_distance_resource.is_changed() && wind_up_distance_resource.0 != 0.0  {
-        let (cue_stick_transform, mut cue_stick_velocity) = cue_stick_query.single_mut();
+        let (cue_stick_transform, mut cue_stick_linear_velocity) = cue_stick_query.single_mut();
         let wind_up_distance = wind_up_distance_resource.0;
         let (axis, angle) = cue_stick_transform.rotation.to_axis_angle();
         // set the velocity of the cue stick
-        cue_stick_velocity.linvel =  - (VELOCITY_SCALING * wind_up_distance).clamp(MIN_VELOCITY, MAX_VELOCITY) * Vec2::from_angle(axis.z * angle);
+        cue_stick_linear_velocity.0 =  - (VELOCITY_SCALING * wind_up_distance).clamp(MIN_VELOCITY, MAX_VELOCITY) * Vec2::from_angle(axis.z * angle);
         // record initial position of the cue stick
         cue_stick_status.initial_position =  Some(cue_stick_transform.translation.truncate());
 
@@ -109,13 +110,13 @@ pub fn compute_wind_up_distance(
 /// The cue stick will despawn once it's position is past a threshold value relative to the cue ball's initial position. 
 pub fn handle_cue_stick_motion(
     mut commands: Commands,
-    mut cue_stick_query: Query<(Entity, &Transform, &mut Velocity), With<CueStick>>,
+    mut cue_stick_query: Query<(Entity, &Transform, &mut LinearVelocity), With<CueStick>>,
     time: Res<Time>,
     cue_ball_status: Res<CueBallStatus>,
     mut cue_stick_status: ResMut<CueStickStatus>,
     mut next_game_state: ResMut<NextState<GameState>>,
 ) {
-    if let Ok((cue_stick_entity, cue_stick_transform, cue_stick_velocity)) = cue_stick_query.get_single_mut() {
+    if let Ok((cue_stick_entity, cue_stick_transform, cue_stick_linear_velocity)) = cue_stick_query.get_single_mut() {
         if let Some(cue_ball_initial_position) = cue_ball_status.initial_position {
             // tick timer
             cue_stick_status.lifetime_timer.tick(time.delta());
@@ -124,7 +125,7 @@ pub fn handle_cue_stick_motion(
             let _cue_stick_distance_from_initial_cue_ball_position = (cue_stick_transform.translation.truncate() - cue_ball_initial_position).length();
 
             // despawn cue stick condition
-            if cue_stick_status.lifetime_timer.elapsed_secs() * cue_stick_velocity.linvel.length() >= ball_stick_initial_distance + BALL_RADIUS
+            if cue_stick_status.lifetime_timer.elapsed_secs() * cue_stick_linear_velocity.0.length() >= ball_stick_initial_distance + BALL_RADIUS
             || cue_stick_status.lifetime_timer.finished() {
                 // reset the timer
                 cue_stick_status.lifetime_timer.reset();

@@ -1,6 +1,6 @@
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
 use bevy_prototype_lyon::prelude::*;
+use bevy_xpbd_2d::prelude::*;
 use itertools::Itertools;
 
 use crate::{

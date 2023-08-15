@@ -8,7 +8,8 @@ use crate::{config::*, game::Layer};
 
 #[derive(Component)]
 pub enum Pocket {
-    Standard(StandardPocket),    
+    Standard(StandardPocket),
+    /// This Pocket can be placed given a [Vec]   
     HandPlaced(PocketIdentifier),
 }
 
@@ -60,7 +61,7 @@ impl From<&Pocket> for Name {
 
 #[derive(Bundle)]
 pub struct PocketBundle {
-    active_events: ActiveEvents,
+    // active_events: ActiveEvents,
     collider: Collider,
     collision_group: CollisionLayers,
     material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
@@ -74,7 +75,7 @@ impl PocketBundle {
     /// Returns a [`PocketBundle`] given a [`Pocket`] variant
     pub fn new(pocket: Pocket, meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<ColorMaterial>>) -> PocketBundle {
         PocketBundle {
-            active_events: ActiveEvents::COLLISION_EVENTS,
+            // active_events: ActiveEvents::COLLISION_EVENTS,
             collider: Collider::ball(POCKET_RADIUS - BALL_RADIUS),
             collision_group: CollisionLayers::new( [Layer::CueStick, Layer::Wall], [Layer::Ball]),
             material_mesh_bundle: MaterialMesh2dBundle {
@@ -88,28 +89,6 @@ impl PocketBundle {
             rigid_body: RigidBody::Static,
             sensor: Sensor,
         }
-    }
-
-    /// Returns a [`PocketBundle`] given the [`CursorPosition`] and sets it to said position 
-    pub fn from_vec(vector: Vec2, meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<ColorMaterial>>) -> Self {
-
-        let pocket = Pocket::HandPlaced(PocketIdentifier { id: 0, position: vector });
-
-        PocketBundle { 
-            active_events: ActiveEvents::COLLISION_EVENTS,
-            collider: Collider::ball(POCKET_RADIUS - BALL_RADIUS),
-            collision_group: CollisionGroups::new( Group::GROUP_1, Group::GROUP_1),
-            material_mesh_bundle: MaterialMesh2dBundle {
-                    mesh: meshes.add(shape::Circle::new(POCKET_RADIUS).into()).into(),
-                    material: materials.add(ColorMaterial::from(POCKET_COLOR)),
-                    transform: Transform::from_translation(pocket.position().extend(0.9)),
-                    ..default()
-            },
-            name: Name::from(&pocket),
-            pocket,
-            rigid_body: RigidBody::Static,
-            sensor: Sensor, 
-        }  
     }
 }
 
