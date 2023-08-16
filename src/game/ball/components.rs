@@ -136,6 +136,7 @@ pub struct BallBundle {
     // external_force: ExternalForce,
     name: Name,
     material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
+    position: Position,
     restitution_coefficient: Restitution,
     rigid_body: RigidBody,
     velocity: LinearVelocity,
@@ -161,6 +162,7 @@ impl BallBundle {
                 ..default()
             },
             name: Name::from(&ball),
+            position: Position(ball.position()),
             rigid_body: RigidBody::Dynamic,
             restitution_coefficient: Restitution::new(0.90), 
             velocity: LinearVelocity::from(&ball),

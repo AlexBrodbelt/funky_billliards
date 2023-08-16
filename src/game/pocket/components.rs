@@ -67,6 +67,7 @@ pub struct PocketBundle {
     material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
     name: Name,
     pocket: Pocket,
+    position: Position,
     rigid_body : RigidBody,
     sensor: Sensor,
 }
@@ -74,6 +75,7 @@ pub struct PocketBundle {
 impl PocketBundle {
     /// Returns a [`PocketBundle`] given a [`Pocket`] variant
     pub fn new(pocket: Pocket, meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<ColorMaterial>>) -> PocketBundle {
+        let translation = pocket.position();
         PocketBundle {
             // active_events: ActiveEvents::COLLISION_EVENTS,
             collider: Collider::ball(POCKET_RADIUS - BALL_RADIUS),
@@ -81,11 +83,12 @@ impl PocketBundle {
             material_mesh_bundle: MaterialMesh2dBundle {
                     mesh: meshes.add(shape::Circle::new(POCKET_RADIUS).into()).into(),
                     material: materials.add(ColorMaterial::from(POCKET_COLOR)),
-                    transform: Transform::from_translation(pocket.position().extend(0.9)),
+                    transform: Transform::from_translation(translation.extend(0.9)),
                     ..default()
             },
             name: Name::from(&pocket),
             pocket,
+            position: Position(translation),
             rigid_body: RigidBody::Static,
             sensor: Sensor,
         }

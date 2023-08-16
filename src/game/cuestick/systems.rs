@@ -2,7 +2,7 @@ use bevy::{
     prelude::*, input::mouse::{MouseButtonInput, MouseWheel},
 
 };
-use bevy_xpbd_2d::prelude::LinearVelocity;
+use bevy_xpbd_2d::prelude::{LinearVelocity, Position};
 
 use crate::{
     config::*, 
@@ -92,14 +92,15 @@ pub fn strike_cue_ball(
 pub fn compute_wind_up_distance(
     mut mouse_wheel_events: EventReader<MouseWheel>,
     cue_ball_query: Query<&Transform, (With<CueBall>, Without<CueStick>)>,
-    mut cue_stick_query: Query<&mut Transform, With<CueStick>>,
+    mut cue_stick_query: Query<(&mut Transform, &mut Position), With<CueStick>>,
     mut strike_force: ResMut<WindUpDistance>,
 ) {
     for mouse_wheel_event in mouse_wheel_events.iter() {
         strike_force.0 += mouse_wheel_event.y.abs();
-        if let (Ok(mut cue_stick_transform), Ok(cue_ball_transform)) = (cue_stick_query.get_single_mut(), cue_ball_query.get_single()) {
+        if let (Ok((mut cue_stick_transform, mut cue_stick_position)), Ok(cue_ball_transform)) = (cue_stick_query.get_single_mut(), cue_ball_query.get_single()) {
             let pull_back_displacement = (cue_stick_transform.translation - cue_ball_transform.translation).truncate().normalize() * mouse_wheel_event.y * PULL_BACK_DISPLACEMENT_CONVERSION_FACTOR;
             cue_stick_transform.translation += pull_back_displacement.extend(0.0);
+            cue_stick_position.0 = cue_stick_transform.translation.truncate();
         } else {
             println!("there is no cue sitick entity");
         }

@@ -122,7 +122,7 @@ fn set_pocket(
 
 struct NoBallPocketCollisionError;
 
-fn get_maybe_ball<'a>(contact: &Contact, ball_query: &Query<(Entity, &Ball), With<Ball>> ) -> Result<(Entity, &'a Ball), NoBallPocketCollisionError> {
+fn get_maybe_ball<'a>(contact: &Contact, ball_query: &'a Query<(Entity, &Ball), With<Ball>> ) -> Result<(Entity, &'a Ball), NoBallPocketCollisionError> {
     match ball_query.get(contact.entity1) {
         Ok((entity, ball_type)) => Ok((entity, ball_type)),
         Err(_) => match ball_query.get(contact.entity2) {
@@ -146,6 +146,7 @@ pub fn pocket_condition(
         
         match get_maybe_ball(&contact, &ball_query) {
             Ok((entity, ball_type)) => {  
+                // let ball_type = ball_query.get(entity).unwrap();
                 scoreboard.pocket(&active_player.0, ball_type);
                 commands.entity(entity).despawn();               
             },

@@ -2,7 +2,7 @@ use bevy::{
     prelude::*,
     input::mouse::MouseButtonInput,
 };
-use bevy_xpbd_2d::prelude::Collider;
+use bevy_xpbd_2d::prelude::{Collider, Position};
 
 use crate::{
     resources::CursorPosition,
@@ -63,20 +63,20 @@ pub fn tell_me_why_no_spawn_cue_ball(
 pub fn set_cue_ball(
     mut mouse_button_input: EventReader<MouseButtonInput>,
     wall_query: Query<&Collider, With<Wall>>,
-    mut cue_ball_query: Query<&mut Transform, With<CueBall>>,
+    mut cue_ball_query: Query<(&mut Transform, &mut Position), With<CueBall>>,
     cursor_position: Res<CursorPosition>,
     mut cue_ball_status: ResMut<CueBallStatus>,
     mut next_cue_ball_state: ResMut<NextState<CueBallState>>,
 ) {
     if let Some(_button_pressed) = mouse_button_input.iter().last() {
-        if let (Ok(mut cue_ball_position), Ok(wall_collider)) = (cue_ball_query.get_single_mut(), wall_query.get_single()) {
+        if let (Ok((mut cue_ball_transform, mut cue_ball_position)), Ok(wall_collider)) = (cue_ball_query.get_single_mut(), wall_query.get_single()) {
             let mut new_cue_ball_position = cursor_position.0;
             // Making sure the ball does not leave the arena  
             new_cue_ball_position = new_cue_ball_position.clamp(Vec2::new(LEFT_WALL, BOTTOM_WALL), Vec2::new(RIGHT_WALL, TOP_WALL));
             // Set cue ball initial position resource
             cue_ball_status.initial_position = Some(new_cue_ball_position);
             // Set the position of the cue ball
-            cue_ball_position.translation = new_cue_ball_position.extend(1.0);
+            cue_ball_transform.translation = new_cue_ball_position.extend(1.0);
             // Change CueBallState to InPlay
             next_cue_ball_state.set(CueBallState::InPlay);
             }
