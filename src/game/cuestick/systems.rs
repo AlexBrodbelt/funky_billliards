@@ -1,7 +1,7 @@
 use bevy::{
     prelude::*, input::mouse::{MouseButtonInput, MouseWheel},
 };
-use bevy_xpbd_2d::prelude::{LinearVelocity, Position, Collider};
+use bevy_xpbd_2d::prelude::*;
 
 use crate::{
     config::*, 
@@ -35,11 +35,14 @@ pub fn spawn_cue_stick(
 /// manages the placement of the cue_stick given mouse position input.
 pub fn set_cue_stick(
     mut mouse_button_input: EventReader<MouseButtonInput>,
-    mut cue_stick_query: Query<(&mut Transform, &mut Position, &mut Collider), (With<CueStick>, Without<CueBall>)>, // without filter is necessary as there could be an entity with CueBall and CueStick component
+    mut cue_stick_query: Query<(&mut Transform, &mut Position, &mut Rotation), (With<CueStick>, Without<CueBall>)>, // without filter is necessary as there could be an entity with CueBall and CueStick component
     cue_ball_query: Query<&Transform, With<CueBall>>,
     cursor_position: Res<CursorPosition>,
 ) {
-    let (mut cue_stick_transform, mut cue_stick_position, mut cue_stick_collider) = cue_stick_query.single_mut();
+    let (mut cue_stick_transform,
+        mut cue_stick_position,
+        mut cue_stick_rotation
+    ) = cue_stick_query.single_mut();
     let cue_ball_transform = cue_ball_query.single();
     let diff = cursor_position.0 - cue_ball_transform.translation.truncate(); 
 
@@ -58,6 +61,7 @@ pub fn set_cue_stick(
         cue_stick_transform.translation = new_cue_stick_translation.extend(1.0);
         cue_stick_position.0 = new_cue_stick_translation;
         cue_stick_transform.rotation = Quat::from_rotation_z(new_cue_stick_angle);
+        cue_stick_rotation.mul(Rotation::from_radians(new_cue_stick_angle));
     }
 }
 

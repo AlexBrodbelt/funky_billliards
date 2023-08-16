@@ -77,6 +77,7 @@ pub fn set_cue_ball(
             cue_ball_status.initial_position = Some(new_cue_ball_position);
             // Set the position of the cue ball
             cue_ball_transform.translation = new_cue_ball_position.extend(1.0);
+            cue_ball_position.0 = new_cue_ball_position;
             // Change CueBallState to InPlay
             next_cue_ball_state.set(CueBallState::InPlay);
             }

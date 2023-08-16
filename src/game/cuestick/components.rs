@@ -21,6 +21,7 @@ pub struct CueStickBundle {
     name: Name,
     position: Position,
     rigid_body: RigidBody,
+    rotation: Rotation,
     velocity: LinearVelocity,
     // damping: Damping,
     // restitution_coefficient: Restitution,
@@ -50,6 +51,7 @@ impl CueStickBundle {
             name: Name::new("cue stick"),
             position: Position(cuestick_position),
             rigid_body: RigidBody::Kinematic,
+            rotation: Rotation::ZERO,
             velocity: LinearVelocity::ZERO,
         }
     }   
