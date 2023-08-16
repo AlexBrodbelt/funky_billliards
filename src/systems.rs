@@ -60,7 +60,7 @@ pub fn state_transitions(
 }
 
 /// pauses/resumes the physics pipeline in [`RapierConfiguration`] depending if in the appropriate app state.
-pub fn toggle_physics_pipeline(
+pub fn toggle_physics_loop(
     app_state: Res<State<AppState>>,
     simulation_state: Res<State<SimulationState>>,
     mut physics_loop: ResMut<PhysicsLoop>,

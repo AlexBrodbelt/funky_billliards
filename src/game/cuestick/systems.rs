@@ -1,8 +1,7 @@
 use bevy::{
     prelude::*, input::mouse::{MouseButtonInput, MouseWheel},
-
 };
-use bevy_xpbd_2d::prelude::{LinearVelocity, Position};
+use bevy_xpbd_2d::prelude::{LinearVelocity, Position, Collider};
 
 use crate::{
     config::*, 
@@ -36,11 +35,11 @@ pub fn spawn_cue_stick(
 /// manages the placement of the cue_stick given mouse position input.
 pub fn set_cue_stick(
     mut mouse_button_input: EventReader<MouseButtonInput>,
-    mut cue_stick_query: Query<&mut Transform, (With<CueStick>, Without<CueBall>)>, // without filter is necessary as there could be an entity with CueBall and CueStick component
+    mut cue_stick_query: Query<(&mut Transform, &mut Position, &mut Collider), (With<CueStick>, Without<CueBall>)>, // without filter is necessary as there could be an entity with CueBall and CueStick component
     cue_ball_query: Query<&Transform, With<CueBall>>,
     cursor_position: Res<CursorPosition>,
 ) {
-    let mut cue_stick_transform = cue_stick_query.single_mut();
+    let (mut cue_stick_transform, mut cue_stick_position, mut cue_stick_collider) = cue_stick_query.single_mut();
     let cue_ball_transform = cue_ball_query.single();
     let diff = cursor_position.0 - cue_ball_transform.translation.truncate(); 
 
@@ -55,9 +54,9 @@ pub fn set_cue_stick(
     let new_cue_stick_angle = Vec2::X.angle_between(diff_normalized);
 
     // Update the cue_stick transform when mouse is PRESSED
-
     if let Some(_button_pressed) = mouse_button_input.iter().last() {
         cue_stick_transform.translation = new_cue_stick_translation.extend(1.0);
+        cue_stick_position.0 = new_cue_stick_translation;
         cue_stick_transform.rotation = Quat::from_rotation_z(new_cue_stick_angle);
     }
 }
@@ -78,7 +77,7 @@ pub fn strike_cue_ball(
         let wind_up_distance = wind_up_distance_resource.0;
         let (axis, angle) = cue_stick_transform.rotation.to_axis_angle();
         // set the velocity of the cue stick
-        cue_stick_linear_velocity.0 =  - (VELOCITY_SCALING * wind_up_distance).clamp(MIN_VELOCITY, MAX_VELOCITY) * Vec2::from_angle(axis.z * angle);
+        cue_stick_linear_velocity.0 =  (VELOCITY_SCALING * wind_up_distance).clamp(MIN_VELOCITY, MAX_VELOCITY) * Vec2::from_angle(axis.z * angle);
         // record initial position of the cue stick
         cue_stick_status.initial_position =  Some(cue_stick_transform.translation.truncate());
 

@@ -76,7 +76,7 @@ fn main() {
                 display_state,
                 // debug_states,
                 state_transitions,
-                toggle_physics_pipeline,
+                toggle_physics_loop,
                 exit_app
             )
         )

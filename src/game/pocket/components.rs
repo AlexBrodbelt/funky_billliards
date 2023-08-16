@@ -79,7 +79,7 @@ impl PocketBundle {
         PocketBundle {
             // active_events: ActiveEvents::COLLISION_EVENTS,
             collider: Collider::ball(POCKET_RADIUS - BALL_RADIUS),
-            collision_group: CollisionLayers::new( [Layer::CueStick, Layer::Wall], [Layer::Ball]),
+            collision_group: CollisionLayers::new( [Layer::Ball], [Layer::Ball]),
             material_mesh_bundle: MaterialMesh2dBundle {
                     mesh: meshes.add(shape::Circle::new(POCKET_RADIUS).into()).into(),
                     material: materials.add(ColorMaterial::from(POCKET_COLOR)),

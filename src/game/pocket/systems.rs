@@ -120,14 +120,26 @@ fn set_pocket(
 }
 
 
-struct NoBallPocketCollisionError;
+struct NoBallPocketedError;
 
-fn get_maybe_ball<'a>(contact: &Contact, ball_query: &'a Query<(Entity, &Ball), With<Ball>> ) -> Result<(Entity, &'a Ball), NoBallPocketCollisionError> {
+fn maybe_ball_pocketed<'a>(contact: &Contact, ball_query: &'a Query<(Entity, &Ball), With<Ball>>, pocket_query: &Query<Entity, With<Pocket>>) -> Result<(Entity, &'a Ball), NoBallPocketedError> {
     match ball_query.get(contact.entity1) {
-        Ok((entity, ball_type)) => Ok((entity, ball_type)),
+        Ok((entity, ball_type)) => {
+            if let Ok((_)) = pocket_query.get(contact.entity2) {
+                Ok((entity, ball_type))
+            } else {
+                Err(NoBallPocketedError)
+            }
+        },
         Err(_) => match ball_query.get(contact.entity2) {
-            Ok((entity, ball_type)) => Ok((entity, ball_type)),
-            Err(_) => Err(NoBallPocketCollisionError),
+            Ok((entity, ball_type)) => {
+                if let Ok((_)) = pocket_query.get(contact.entity1) {
+                    Ok((entity, ball_type))
+                } else {
+                    Err(NoBallPocketedError)
+                }
+            },
+            Err(_) => Err(NoBallPocketedError),
         }
     }
 }
@@ -140,13 +152,13 @@ pub fn pocket_condition(
     pocket_query: Query<Entity, With<Pocket>>,
     ball_query: Query<(Entity, &Ball), With<Ball>>,
 ) {
-        
     for ev in collision_event.iter() {
         let contact = ev.0;
         
-        match get_maybe_ball(&contact, &ball_query) {
+        match maybe_ball_pocketed(&contact, &ball_query, &pocket_query) {
             Ok((entity, ball_type)) => {  
                 // let ball_type = ball_query.get(entity).unwrap();
+                println!("{:?} has been despawned", ball_type);
                 scoreboard.pocket(&active_player.0, ball_type);
                 commands.entity(entity).despawn();               
             },

@@ -33,7 +33,7 @@ impl CueStickBundle {
         CueStickBundle { 
             cue_stick: CueStick,
             collider: Collider::cuboid(CUESTICK_SIZE.x, CUESTICK_SIZE.y),
-            collision_group: CollisionLayers::new( [Layer::Wall], [Layer::Ball]),
+            collision_group: CollisionLayers::new( [Layer::CueStick], [Layer::CueStick]),
             // external_force: ExternalForce { force: Vec2::ZERO, torque: 0.0 },
             material_mesh_bundle: MaterialMesh2dBundle { 
                 mesh: meshes

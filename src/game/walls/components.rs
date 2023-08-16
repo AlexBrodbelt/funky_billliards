@@ -51,7 +51,7 @@ impl Default for WallBundle {
                                             .collect::<Vec<Vec2>>(),
                 Some(WALL_INDEX_BUFFER.to_vec()),
             ),
-            collision_group: CollisionLayers::new( [Layer::CueStick], [Layer::Ball]),
+            collision_group: CollisionLayers::new( [Layer::Wall], [Layer::Wall]),
             rigid_body: RigidBody::Static,
             restitution_coefficient:  Restitution::new(0.95),
             wall: Wall,

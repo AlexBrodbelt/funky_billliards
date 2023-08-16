@@ -149,9 +149,9 @@ impl BallBundle {
         BallBundle {
             collider: Collider::ball(BALL_RADIUS),
             collision_group: if ball == Ball::White {
-                    CollisionLayers::new([Layer::Wall] ,[Layer::CueStick, Layer::Wall] )
+                    CollisionLayers::new([Layer::Wall, Layer::Ball, Layer::CueStick] ,[Layer::Wall, Layer::Ball, Layer::CueStick] )
                 } else {
-                    CollisionLayers::new( [Layer::CueStick], [Layer::Wall])
+                    CollisionLayers::new( [Layer::Wall, Layer::Ball], [Layer::Wall, Layer::Ball])
                 },
             linear_damping: LinearDamping(FRICTION_COEFFICIENT),
             angular_damping: AngularDamping(FRICTION_COEFFICIENT),

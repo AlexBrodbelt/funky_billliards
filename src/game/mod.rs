@@ -31,8 +31,8 @@ use self::{resources::{ActivePlayer, PocketStatus, CueBallStatus, WallStatus, Cu
 #[derive(PhysicsLayer)]
 pub enum Layer {
     CueStick,
-    Wall,
     Ball,
+    Wall,
 }
 
 pub struct GamePlugin;

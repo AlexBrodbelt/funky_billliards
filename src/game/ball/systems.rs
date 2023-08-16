@@ -81,7 +81,7 @@ pub fn set_cue_ball(
             next_cue_ball_state.set(CueBallState::InPlay);
             }
         } else {
-            println!("either none or multiple ball entities have been spawned");
+            // println!("either none or multiple ball entities have been spawned");
         }          
 }
 
