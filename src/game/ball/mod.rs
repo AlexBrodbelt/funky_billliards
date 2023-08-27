@@ -27,8 +27,7 @@ impl Plugin for BallPlugin {
             .add_systems(
                 OnEnter(GameSetUpState::CueBallSetUp),
                 (
-                    spawn_cue_ball.run_if(in_state(AppState::GameSetUp)),
-                    tell_me_why_no_spawn_cue_ball
+                    spawn_cue_ball,
                 )     
             )
             // Update systems
