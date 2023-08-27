@@ -3,6 +3,9 @@
         ".\\Cargo.toml",
         ".\\Cargo.toml",
         ".\\Cargo.toml",
-        ".\\Cargo.toml"
+        ".\\Cargo.toml",
+        ".\\Cargo.toml",
+        ".\\store\\Cargo.toml",
+        ".\\client\\Cargo.toml"
     ]
 }

@@ -6,14 +6,15 @@ pub mod resources;
 mod systems;
 pub mod styles;
 
-use std::time::Duration;
-
 use bevy::prelude::*;
+use bevy_renet::RenetClientPlugin;
+use renet::{
+    transport::ClientAuthentication, ConnectionConfig, NETCODE_USER_DATA_BYTES_ERROR
+};
 use bevy_xpbd_2d::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_prototype_lyon::prelude::*;
-// use bevy_inspector_egui_rapier::InspectableRapierPlugin;
-
+use std::{net::UdpSocket, time::SystemTime};
 
 use game::{
     GamePlugins, 
@@ -38,16 +39,17 @@ pub enum AppState {
 
 fn main() {
     App::new()
+        .add_state::<AppState>()
         // Bevy Plugins
         .add_plugins(DefaultPlugins)
-        .add_state::<AppState>()
+        // Renet Plugin
+        .add_plugins(RenetClientPlugin)
+        // Bevy Inspector EGUI
         .add_plugins(WorldInspectorPlugin::new())
         // Bevy XPBD Plugins
         .add_plugins(PhysicsPlugins::default()) 
         // Bevy Prototype Lyon
         .add_plugins(ShapePlugin)
-        // Bevy Rapier Egui Plugin
-        // .add_plugins(InspectableRapierPlugin)
         // My Plugins
         .add_plugins(
             (
@@ -55,7 +57,7 @@ fn main() {
                 MainMenuPlugin,
             )
         )
-        // Bevy Rapier Resources
+        // Bevy XPBD Resources
         .insert_resource(Gravity(Vec2::ZERO))
         .insert_resource(CursorPosition::default())
         // Debugging resource
