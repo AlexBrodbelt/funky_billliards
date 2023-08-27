@@ -33,7 +33,7 @@ impl CueStickBundle {
         let cuestick_position = cueball_transform.translation.truncate() - (BALL_RADIUS + CUESTICK_SIZE.x + GAP_BETWEEN_CUESTICK_AND_CUEBALL) * Vec2::X;
         CueStickBundle { 
             cue_stick: CueStick,
-            collider: Collider::cuboid(CUESTICK_SIZE.x, CUESTICK_SIZE.y),
+            collider: Collider::cuboid(2.0 * CUESTICK_SIZE.x, 2.0 * CUESTICK_SIZE.y),
             collision_group: CollisionLayers::new( [Layer::CueStick], [Layer::CueStick]),
             // external_force: ExternalForce { force: Vec2::ZERO, torque: 0.0 },
             material_mesh_bundle: MaterialMesh2dBundle { 

@@ -5,7 +5,7 @@ pub const TIME_STEP: f32 = 1.0 / 60.0;
 
 /// Defines the friction coefficient for the material of the table
 pub const FRICTION_COEFFICIENT: f32 = 0.5;
-pub const STOPPING_THRESHOLD: f32 = 100.0;
+pub const STOPPING_THRESHOLD: f32 = 225.0;
 
 // Ball
 pub const BALL_RADIUS: f32 = TABLE_WIDTH / 136.0;

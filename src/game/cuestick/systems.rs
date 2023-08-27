@@ -44,7 +44,8 @@ pub fn set_cue_stick(
         mut cue_stick_rotation
     ) = cue_stick_query.single_mut();
     let cue_ball_transform = cue_ball_query.single();
-    let diff = cursor_position.0 - cue_ball_transform.translation.truncate(); 
+    let diff = cursor_position.0 - cue_ball_transform.translation.truncate();
+    
 
     // Calculate the new position for the cue_stick adjacent to the cue_ball
     let diff_normalized = match diff.try_normalize() {
@@ -61,7 +62,9 @@ pub fn set_cue_stick(
         cue_stick_transform.translation = new_cue_stick_translation.extend(1.0);
         cue_stick_position.0 = new_cue_stick_translation;
         cue_stick_transform.rotation = Quat::from_rotation_z(new_cue_stick_angle);
-        cue_stick_rotation.mul(Rotation::from_radians(new_cue_stick_angle));
+        *cue_stick_rotation = Rotation::from_radians(new_cue_stick_angle);
+
+        println!("{:?} {:?}", cue_stick_rotation, cue_stick_transform.rotation);
     }
 }
 
@@ -81,7 +84,7 @@ pub fn strike_cue_ball(
         let wind_up_distance = wind_up_distance_resource.0;
         let (axis, angle) = cue_stick_transform.rotation.to_axis_angle();
         // set the velocity of the cue stick
-        cue_stick_linear_velocity.0 =  (VELOCITY_SCALING * wind_up_distance).clamp(MIN_VELOCITY, MAX_VELOCITY) * Vec2::from_angle(axis.z * angle);
+        cue_stick_linear_velocity.0 = - (VELOCITY_SCALING * wind_up_distance).clamp(MIN_VELOCITY, MAX_VELOCITY) * Vec2::from_angle(axis.z * angle);
         // record initial position of the cue stick
         cue_stick_status.initial_position =  Some(cue_stick_transform.translation.truncate());
 
