@@ -1,218 +1,17 @@
-use log::{info, trace, warn};
-use renet::{ChannelConfig, SendType};
-use renet::transport::NetcodeServerTransport;
-use renet::{
-    ConnectionConfig, RenetServer, transport::ServerAuthentication, transport::ServerConfig, ServerEvent,
-    NETCODE_USER_DATA_BYTES,
+use bevy::{
+    diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
+    prelude::*,
 };
-use std::net::{SocketAddr, UdpSocket};
-use std::thread;
-use std::time::{Duration, Instant, SystemTime};
-use store::EndGameReason;
-
-// TicTacTussle converted to utf-8 codes is 84 105 99 84 97 99 84 117 115 115 108 101
-// If you add those up you get 1208.
-// It is not necessary to do the protocol id like this but it is fun 🤷‍♂️
-pub const PROTOCOL_ID: u64 = 1208;
-
-/// Utility function for extracting a players name from renet user data
-fn name_from_user_data(user_data: &[u8; NETCODE_USER_DATA_BYTES]) -> String {
-    let mut buffer = [0u8; 8];
-    buffer.copy_from_slice(&user_data[0..8]);
-    let mut len = u64::from_le_bytes(buffer) as usize;
-    len = len.min(NETCODE_USER_DATA_BYTES - 8);
-    let data = user_data[8..len + 8].to_vec();
-    String::from_utf8(data).unwrap()
-}
-
-fn main() {
-    env_logger::init();
-
-    let server_addr: SocketAddr = format!("{}:{}", env!("HOST"), env!("PORT"))
-        .parse()
-        .unwrap();
-    let mut server: RenetServer = RenetServer::new(
-        // Pass the current time to renet, so it can use it to order messages
-        SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)
-            .unwrap(),
-        // Pass a server configuration specifying that we want to allow only 2 clients to connect
-        // and that we don't want to authenticate them. Everybody is welcome!
-        ServerConfig::new(2, PROTOCOL_ID, server_addr, ServerAuthentication::Unsecure),
-        // Pass the default connection configuration. This will create a reliable, unreliable and blocking channel.
-        // We only actually need the reliable one, but we can just not use the other two.
-        RenetConnectionConfig::default(),
-        UdpSocket::bind(server_addr).unwrap(),
-    )
-    .unwrap();
-
-    trace!("🕹  TicTacTussle server listening on {}", server_addr);
-
-    let mut game_state = store::GameState::default();
-    let mut last_updated = Instant::now();
-
-    loop {
-        // Update server time
-        let now = Instant::now();
-        server.update(now - last_updated).unwrap();
-        last_updated = now;
-
-        // Receive connection events from clients
-        while let Some(event) = server.get_event() {
-            match event {
-                ServerEvent::ClientConnected(id, user_data) => {
-                    // Tell the recently joined player about the other player
-                    for (player_id, player) in game_state.players.iter() {
-                        let event = store::GameEvent::PlayerJoined {
-                            player_id: *player_id,
-                            name: player.name.clone(),
-                        };
-                        server.send_message(id, 0, bincode::serialize(&event).unwrap());
-                    }
-
-                    // Add the new player to the game
-                    let event = store::GameEvent::PlayerJoined {
-                        player_id: id,
-                        name: name_from_user_data(&user_data),
-                    };
-                    game_state.consume(&event);
-
-                    // Tell all players that a new player has joined
-                    server.broadcast_message(0, bincode::serialize(&event).unwrap());
-
-                    info!("Client {} connected.", id);
-                    // In TicTacTussle the game can begin once two players has joined
-                    if game_state.players.len() == 2 {
-                        let event = store::GameEvent::BeginGame { goes_first: id };
-                        game_state.consume(&event);
-                        server.broadcast_message(0, bincode::serialize(&event).unwrap());
-                        trace!("The game gas begun");
-                    }
-                }
-                ServerEvent::ClientDisconnected(id) => {
-                    // First consume a disconnect event
-                    let event = store::GameEvent::PlayerDisconnected { player_id: id };
-                    game_state.consume(&event);
-                    server.broadcast_message(0, bincode::serialize(&event).unwrap());
-                    info!("Client {} disconnected", id);
-
-                    // Then end the game, since tic tac toe can't go on with a single player
-                    let event = store::GameEvent::EndGame {
-                        reason: EndGameReason::PlayerLeft { player_id: id },
-                    };
-                    game_state.consume(&event);
-                    server.broadcast_message(0, bincode::serialize(&event).unwrap());
-
-                    // NOTE: Since we don't authenticate users we can't do any reconnection attempts.
-                    // We simply have no way to know if the next user is the same as the one that disconnected.
-                }
-            }
-        }
-
-        // Receive GameEvents from clients. Broadcast valid events.
-        for client_id in server.clients_id().into_iter() {
-            while let Some(message) = server.receive_message(client_id, 0) {
-                if let Ok(event) = bincode::deserialize::<store::GameEvent>(&message) {
-                    if game_state.validate(&event) {
-                        game_state.consume(&event);
-                        trace!("Player {} sent:\n\t{:#?}", client_id, event);
-                        server.broadcast_message(0, bincode::serialize(&event).unwrap());
-
-                        // Determine if a player has won the game
-                        if let Some(winner) = game_state.determine_winner() {
-                            let event = store::GameEvent::EndGame {
-                                reason: store::EndGameReason::PlayerWon { winner },
-                            };
-                            server.broadcast_message(0, bincode::serialize(&event).unwrap());
-                        }
-                    } else {
-                        warn!("Player {} sent invalid event:\n\t{:#?}", client_id, event);
-                    }
-                }
-            }
-        }
-
-        server.send_packets().unwrap();
-        thread::sleep(Duration::from_millis(50));
-    }
-}
-
-pub enum ClientChannel {
-    Input,
-    Command,
-}
-
-pub enum ServerChannel {
-    ServerMessages,
-    NetworkedEntities,
-}
-
-impl From<ClientChannel> for u8 {
-    fn from(channel_id: ClientChannel) -> Self {
-        match channel_id {
-            ClientChannel::Command => 0,
-            ClientChannel::Input => 1,
-        }
-    }
-}
-
-impl ClientChannel {
-    pub fn channels_config() -> Vec<ChannelConfig> {
-        vec![
-            ChannelConfig {
-                channel_id: Self::Input.into(),
-                max_memory_usage_bytes: 5 * 1024 * 1024,
-                send_type: SendType::ReliableOrdered {
-                    resend_time: Duration::ZERO,
-                },
-            },
-            ChannelConfig {
-                channel_id: Self::Command.into(),
-                max_memory_usage_bytes: 5 * 1024 * 1024,
-                send_type: SendType::ReliableOrdered {
-                    resend_time: Duration::ZERO,
-                },
-            },
-        ]
-    }
-}
-
-impl From<ServerChannel> for u8 {
-    fn from(channel_id: ServerChannel) -> Self {
-        match channel_id {
-            ServerChannel::NetworkedEntities => 0,
-            ServerChannel::ServerMessages => 1,
-        }
-    }
-}
-
-impl ServerChannel {
-    pub fn channels_config() -> Vec<ChannelConfig> {
-        vec![
-            ChannelConfig {
-                channel_id: Self::NetworkedEntities.into(),
-                max_memory_usage_bytes: 10 * 1024 * 1024,
-                send_type: SendType::Unreliable,
-            },
-            ChannelConfig {
-                channel_id: Self::ServerMessages.into(),
-                max_memory_usage_bytes: 10 * 1024 * 1024,
-                send_type: SendType::ReliableOrdered {
-                    resend_time: Duration::from_millis(200),
-                },
-            },
-        ]
-    }
-}
-
-
-pub fn connection_config() -> ConnectionConfig {
-    ConnectionConfig {
-        available_bytes_per_tick: 1024 * 1024,
-        client_channels_config: ClientChannel::channels_config(),
-        server_channels_config: ServerChannel::channels_config(),
-    }
-}
+use bevy_egui::{EguiContexts, EguiPlugin};
+use bevy_renet::{
+    renet::{
+        transport::{NetcodeServerTransport, ServerAuthentication, ServerConfig},
+        RenetServer, ServerEvent,
+    },
+    transport::NetcodeServerPlugin,
+    RenetServerPlugin,
+};
+use renet_visualizer::RenetServerVisualizer;
 
 fn new_renet_server() -> (RenetServer, NetcodeServerTransport) {
     let server = RenetServer::new(connection_config());
@@ -221,15 +20,28 @@ fn new_renet_server() -> (RenetServer, NetcodeServerTransport) {
     let socket = UdpSocket::bind(public_addr).unwrap();
     let current_time: std::time::Duration = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap();
     let server_config = ServerConfig {
-        // current_time,
+        current_time,
         max_clients: 64,
         protocol_id: PROTOCOL_ID,
-        // public_addresses: vec![public_addr],
+        public_addresses: vec![public_addr],
         authentication: ServerAuthentication::Unsecure,
-        public_addr,
     };
 
-    let transport = NetcodeServerTransport::new(current_time, server_config, socket).unwrap();
+    let transport = NetcodeServerTransport::new(server_config, socket).unwrap();
 
     (server, transport)
+}
+
+fn main() {    
+    fn main() {
+        App::new()
+            .add_plugins(DefaultPlugins)
+            .add_plugins(RenetServerPlugin)
+            .add_plugins(NetcodeServerPlugin)
+            .add_plugins(FrameTimeDiagnosticsPlugin)
+            .add_plugins(LogDiagnosticsPlugin::default())
+            .add_plugins(EguiPlugin)
+            .run();
+    }
+
 }
