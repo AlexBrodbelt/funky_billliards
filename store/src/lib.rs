@@ -1,8 +1,17 @@
 use std::{f32::consts::PI, time::Duration};
 use bevy_renet::renet::{transport::NETCODE_KEY_BYTES, ChannelConfig, ConnectionConfig, SendType};
 use serde::{Deserialize, Serialize};
-
+use bevy::prelude::*;
 /// FROM RENET EXAMPLE
+
+pub const PRIVATE_KEY: &[u8; NETCODE_KEY_BYTES] = b"an example very very secret key."; // 32-bytes
+pub const PROTOCOL_ID: u64 = 7;
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct NetworkedEntities {
+    pub entities: Vec<Entity>,
+    pub translations: Vec<[f32; 3]>,
+}
 
 pub enum ClientChannel {
     Input,
@@ -81,22 +90,3 @@ pub fn connection_config() -> ConnectionConfig {
     }
 }
 
-fn new_renet_server() -> (RenetServer, NetcodeServerTransport) {
-    let server = RenetServer::new(connection_config());
-
-    let public_addr = "127.0.0.1:5000".parse().unwrap();
-    let socket = UdpSocket::bind(public_addr).unwrap();
-    let current_time: std::time::Duration = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap();
-    let server_config = ServerConfig {
-        // current_time,
-        max_clients: 64,
-        protocol_id: PROTOCOL_ID,
-        // public_addresses: vec![public_addr],
-        authentication: ServerAuthentication::Unsecure,
-        public_addr,
-    };
-
-    let transport = NetcodeServerTransport::new(current_time, server_config, socket).unwrap();
-
-    (server, transport)
-}

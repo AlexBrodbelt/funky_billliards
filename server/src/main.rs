@@ -1,3 +1,5 @@
+use std::{collections::HashMap, f32::consts::PI, net::UdpSocket, time::SystemTime};
+
 use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
     prelude::*,
@@ -12,6 +14,12 @@ use bevy_renet::{
     RenetServerPlugin,
 };
 use renet_visualizer::RenetServerVisualizer;
+use store::{connection_config, PROTOCOL_ID};
+
+#[derive(Debug, Default, Resource)]
+pub struct ServerLobby {
+    pub players: HashMap<u64, Entity>,
+}
 
 fn new_renet_server() -> (RenetServer, NetcodeServerTransport) {
     let server = RenetServer::new(connection_config());
@@ -20,14 +28,13 @@ fn new_renet_server() -> (RenetServer, NetcodeServerTransport) {
     let socket = UdpSocket::bind(public_addr).unwrap();
     let current_time: std::time::Duration = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap();
     let server_config = ServerConfig {
-        current_time,
         max_clients: 64,
         protocol_id: PROTOCOL_ID,
-        public_addresses: vec![public_addr],
         authentication: ServerAuthentication::Unsecure,
+        public_addr,
     };
 
-    let transport = NetcodeServerTransport::new(server_config, socket).unwrap();
+    let transport = NetcodeServerTransport::new(current_time, server_config, socket).unwrap();
 
     (server, transport)
 }

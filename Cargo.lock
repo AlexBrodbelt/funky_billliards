@@ -3371,6 +3371,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "renet_visualizer"
+version = "0.0.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ecccb7c372a41525637fc70e58d8c38bde0c72db3e2fc0a9fb457096f90bd94"
+dependencies = [
+ "egui",
+ "renet",
+]
+
+[[package]]
 name = "renetcode"
 version = "0.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3524,11 +3534,14 @@ dependencies = [
 name = "server"
 version = "0.0.1"
 dependencies = [
+ "bevy",
+ "bevy_egui",
  "bevy_renet",
  "bincode",
  "env_logger",
  "log",
  "renet",
+ "renet_visualizer",
  "serde",
  "store",
 ]
@@ -3641,6 +3654,7 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 name = "store"
 version = "0.0.1"
 dependencies = [
+ "bevy",
  "bevy_renet",
  "renet",
  "serde",
