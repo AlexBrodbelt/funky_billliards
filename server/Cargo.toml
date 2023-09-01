@@ -1,0 +1,10 @@
+[package]
+name = "server"
+version = "0.0.1"
+edition = "2021"
+
+[dependencies]
+store = { path = "../store" }
+tokio = {version = "1.32.0", features = ["full"] }
+tokio-serde = "0.8.0"
+tokio-util = "0.7.8"
