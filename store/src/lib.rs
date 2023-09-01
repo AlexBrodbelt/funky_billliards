@@ -1,4 +1,4 @@
-use std::{f32::consts::PI, time::Duration};
+use std::time::Duration;
 use bevy_renet::renet::{transport::NETCODE_KEY_BYTES, ChannelConfig, ConnectionConfig, SendType};
 use serde::{Deserialize, Serialize};
 use bevy::prelude::*;
@@ -21,6 +21,15 @@ pub enum ClientChannel {
 pub enum ServerChannel {
     ServerMessages,
     NetworkedEntities,
+}
+
+#[derive(Debug, Serialize, Deserialize, Component)]
+pub enum ServerMessage {
+    SetWallVertex { position: [f32; 3] },
+    SetPocketPosition { position: [f32; 3] },
+    SetCueBallPosition { position: [f32; 3] },
+    SetCueStickPosition { position: [f32; 3] },
+    CueStickVelocity { velocity: [f32; 3] },
 }
 
 impl From<ClientChannel> for u8 {

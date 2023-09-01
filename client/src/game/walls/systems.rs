@@ -18,7 +18,6 @@ use super::components::*;
 pub fn spawn_wall(
     mut commands: Commands,
 ) {
-    println!("wall spawned");
     commands.spawn(WallBundle::new());
 }
 

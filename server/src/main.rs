@@ -1,4 +1,4 @@
-use std::{collections::HashMap, f32::consts::PI, net::UdpSocket, time::SystemTime};
+use std::{collections::HashMap, net::UdpSocket, time::SystemTime};
 
 use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
@@ -39,16 +39,59 @@ fn new_renet_server() -> (RenetServer, NetcodeServerTransport) {
     (server, transport)
 }
 
-fn main() {    
-    fn main() {
-        App::new()
-            .add_plugins(DefaultPlugins)
-            .add_plugins(RenetServerPlugin)
-            .add_plugins(NetcodeServerPlugin)
-            .add_plugins(FrameTimeDiagnosticsPlugin)
-            .add_plugins(LogDiagnosticsPlugin::default())
-            .add_plugins(EguiPlugin)
-            .run();
+#[allow(clippy::too_many_arguments)]
+fn server_update_system(
+    mut server_events: EventReader<ServerEvent>,
+    mut server: ResMut<RenetServer>,
+    mut netcode_server: ResMut<NetcodeServerTransport>,
+    mut server_lobby: ResMut<ServerLobby>,
+    mut visualizer: ResMut<RenetServerVisualizer<200>>,
+    time: Res<Time>,
+    mut egui_contexts: EguiContexts,
+) {
+
+    for event in server_events.iter() {
+        match event {
+            ServerEvent::ClientConnected { client_id }=> {
+                println!("Client {} connected", client_id);
+                visualizer.add_client(*client_id);
+            }
+            ServerEvent::ClientDisconnected { client_id, reason} => {
+                println!("Client disconnected: {}", client_id);
+                if let Some(entity) = server_lobby.players.remove(&client_id) {
+                    egui_contexts.remove(entity);
+                }
+            }
+        }
     }
 
+    for event in netcode_server_events {
+        match event {
+            ServerEvent::ClientConnected(client_id) => {
+                println!("Client connected: {}", client_id);
+            }
+            ServerEvent::ClientDisconnected(client_id) => {
+                println!("Client disconnected: {}", client_id);
+                if let Some(entity) = server_lobby.players.remove(&client_id) {
+                    egui_contexts.remove(entity);
+                }
+            }
+            ServerEvent::ClientMessage(client_id, message) => {
+                println!("Client message: {} {:?}", client_id, message);
+            }
+        }
+    }
+
+    netcode_server_visualizer.update(&server, &netcode_server, time.delta_seconds());
+}
+
+fn main() {    
+    App::new()
+        .add_plugins(DefaultPlugins)
+        .add_plugins(RenetServerPlugin)
+        .add_plugins(NetcodeServerPlugin)
+        .add_plugins(FrameTimeDiagnosticsPlugin)
+        .add_plugins(LogDiagnosticsPlugin::default())
+        .add_plugins(EguiPlugin)
+        .run();
 }

@@ -27,7 +27,7 @@ pub fn spawn_cue_stick(
     // asset_server: Res<AssetServer>,
 ) {
     let cue_ball_transform = cue_ball_query.single();
-    commands.spawn(CueStickBundle::new(cue_ball_transform ,meshes, materials));
+    commands.spawn(CueStickBundle::new(cue_ball_transform, meshes, materials));
     commands.insert_resource(WindUpDistance::default());
 }
 
